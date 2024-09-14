@@ -1,0 +1,94 @@
+version: '2.29.2'
+
+services:
+  backend:
+    build:
+      path: ./backend/
+      target: developer
+    ports:
+        - 8000:8000
+    links:
+      - db
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:8000"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    develop:
+      watch:
+        - path: ./backend/app
+          action: sync
+          target: /usr/local/app
+        - path: ./backend/requirements.txt
+          action: rebuild
+          ignore:
+            - ./backend/.venv
+            - ./backend/Dockerfile
+            - ./frontend/web/app/*.md
+
+
+  web:
+    build: ./frontend/web/
+    ports:
+        - 5173:5173
+    links:
+      - backend
+    depends_on:
+      backend:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: ./frontend/web/app/src
+          action: sync
+          target: /usr/local/app/src
+        - path: ./frontend/web/app/node_modules
+          action: rebuild
+          ignore:
+            - ./frontend/web/app/public
+            - ./frontend/web/app/src
+            - ./frontend/web/app/*.md
+            - ./frontend/web/app/*.html
+            - ./frontend/web/app/*.json
+            - ./frontend/web/app/*.ts
+            - ./frontend/web/app/*.js
+            - ./frontend/web/app/*.yaml
+            - ./frontend/web/app/.gitignore
+
+
+  movil:
+    build: ./frontend/movil/
+    ports:
+        - 8081:8081
+    links:
+      - backend
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: POSTGRES_PASSWORD
+    volumes:
+      - data_personal_finance:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh", "-c", "pg_isready"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      -80:8080
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  - data_personal_finance
