@@ -53,10 +53,10 @@ class Period(BaseModel):
     start_date: datetime
     end_date: datetime
 
-    @model_validator(mode="after")
+    @model_validator(mode="before")
     def start_date_must_be_before_end_date(self) -> Self:
-        if self.start_date <= self.end_date:
-            raise ValueError("passwords do not match")
+        if self["start_date"] >= self["end_date"]:
+            raise ValueError("Start date must be before end date")
         return self
 
 

@@ -1,2 +1,6 @@
 # Python
-.venv
+.venv/
+*.pyc
+
+# Visual Studio Code
+.vscode/
