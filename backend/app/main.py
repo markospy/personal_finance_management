@@ -7,7 +7,7 @@ from app.models.models import Base
 
 
 @asynccontextmanager
-def lifespan():
+async def lifespan(app: FastAPI):
     Base.metadata.create_all(engine)
     yield
     pass

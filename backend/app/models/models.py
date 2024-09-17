@@ -19,11 +19,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(50))
     password: Mapped[str] = mapped_column(String(50))
 
-    account: Mapped[List["Account"]] = relationship(back_populates="user", cascade="all, delete-orpha")
-    expected_transaction: Mapped[List["ExpectedTransaction"]] = relationship(
-        back_populates="user", cascade="all, delete-orpha"
-    )
-    budget: Mapped[List["Budget"]] = relationship(back_populates="user", cascade="all, delete-orpha")
+    account: Mapped[List["Account"]] = relationship(back_populates="user")
+    expected_transaction: Mapped[List["ExpectedTransaction"]] = relationship(back_populates="user")
+    budget: Mapped[List["Budget"]] = relationship(back_populates="user")
 
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, name={self.name!r}, fullname={self.fullname!r})"
@@ -39,7 +37,7 @@ class Account(Base):
     name: Mapped[str] = mapped_column(String(50))
 
     user: Mapped["User"] = relationship(back_populates="account")
-    transaction: Mapped[List["Transaction"]] = relationship(back_populates="account", cascade="all, delete-orpha")
+    transaction: Mapped[List["Transaction"]] = relationship(back_populates="account")
 
 
 class ExpectedTransaction(Base):
@@ -64,11 +62,9 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String(50))
     type: Mapped[TransactionType] = mapped_column(Enum(TransactionType))
 
-    expected_transaction: Mapped[List["ExpectedTransaction"]] = relationship(
-        back_populates="category", cascade="all, delete-orpha"
-    )
-    budget: Mapped[List["Budget"]] = relationship(back_populates="category", cascade="all, delete-orpha")
-    transaction: Mapped[List["Transaction"]] = relationship(back_populates="category", cascade="all, delete-orpha")
+    expected_transaction: Mapped[List["ExpectedTransaction"]] = relationship(back_populates="category")
+    budget: Mapped[List["Budget"]] = relationship(back_populates="category")
+    transaction: Mapped[List["Transaction"]] = relationship(back_populates="category")
 
 
 class Budget(Base):
