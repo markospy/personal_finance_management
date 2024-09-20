@@ -19,12 +19,16 @@ class Frecuency(str, Enum):
     ANNUAL = "annual"
 
 
-class UserOut(BaseModel):
+class UserBase(BaseModel):
     name: Annotated[str, Field(min_length=2, max_length=50)]
     email: EmailStr
 
 
-class UserIn(UserOut):
+class UserOut(UserBase):
+    id: int
+
+
+class UserIn(UserBase):
     password: Annotated[str, Field(min_length=6)]
 
 
