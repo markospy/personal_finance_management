@@ -21,7 +21,7 @@ def create_user(user: UserIn, db: Session = Depends(get_db)):
         stmt = select(User).where(User.name == user.name)
         database_user = db.scalar(stmt)
         if database_user and database_user.__dict__["name"] == user.name:
-            raise HTTPException(status_code=400, detail="User already exists")
+            raise HTTPException(status_code=409, detail="User already exists")
         new_user = user.model_dump(exclude_unset=True)
         new_user["password"] = get_password_hash(new_user["password"])
         db.add(User(**new_user))

@@ -69,5 +69,5 @@ class TestUserCreation:
             json={"name": "Marcos", "email": "marcos@gmail.com", "password": "123456"},
         )
 
-        assert response.status_code == 400
+        assert response.status_code == 409
         assert response.json()["detail"] == "User already exists"
