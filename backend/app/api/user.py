@@ -1,3 +1,5 @@
+from typing import Annotated
+
 import requests
 from fastapi import Depends, HTTPException
 from fastapi.responses import JSONResponse
@@ -8,7 +10,7 @@ from sqlalchemy.orm import Session
 from ..db.dependencie import get_db
 from ..models.models import User
 from ..schemas.schemas import UserIn, UserOut
-from .oauth import get_password_hash
+from .oauth import get_current_user, get_password_hash
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -20,14 +22,14 @@ def create_user(user: UserIn, db: Session = Depends(get_db)):
         new_user["password"] = get_password_hash(new_user["password"])
         db.add(User(**new_user))
         db.commit()
-        created_user = db.query(User).order_by(User.id.desc()).first()
+        stmt = select(User).order_by(User.id.desc())
+        created_user = db.scalar(stmt)
         user_data = UserOut(**created_user.__dict__).model_dump()
         return JSONResponse(content=user_data, status_code=201)
     except requests.exceptions.HTTPError:
         raise HTTPException(status_code=400, detail="error occured")
 
 
-@router.get("/me/{id}")
-def get_user_me(id: int, db: Session = Depends(get_db)):
-    db.execute(select(User).where(User.id == id))
-    pass
+@router.get("/me")
+def get_user_me(current_user: Annotated[UserOut, Depends(get_current_user)]):
+    return UserOut(**current_user.model_dump())
