@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from .api import oauth, user
+from .api import account, oauth, user
 from .db.database import engine
 from .models.models import Base
 
@@ -18,3 +18,4 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(user.router)
 app.include_router(oauth.router)
+app.include_router(account.router)
