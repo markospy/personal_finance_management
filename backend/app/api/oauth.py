@@ -1,4 +1,3 @@
-import logging as log
 import os
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
@@ -16,9 +15,6 @@ from sqlalchemy.orm import Session
 
 from ..db.dependencie import get_db
 from ..models.models import User
-
-log.basicConfig(level=log.DEBUG)
-logger = log.getLogger(__name__)
 
 load_dotenv()
 
@@ -66,7 +62,6 @@ def get_user(db: Session, username: str):
     user = db.scalar(stmt)
     if not user:
         raise HTTPException(status_code=404, detail="User's name or password invalid")
-    logger.debug(user)
     return UserInDB(**user.__dict__)
 
 
@@ -114,7 +109,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)
 ) -> Token:
-    logger.debug(f"{form_data.username} password: {form_data.password}")
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
