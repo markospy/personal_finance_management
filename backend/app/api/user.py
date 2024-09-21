@@ -2,7 +2,6 @@ from typing import Annotated
 
 import requests
 from fastapi import Depends, HTTPException
-from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,7 +14,7 @@ from .oauth import get_current_user, get_password_hash
 router = APIRouter(prefix="/user", tags=["user"])
 
 
-@router.post("/")
+@router.post("/", status_code=201)
 def create_user(user: UserIn, db: Session = Depends(get_db)):
     try:
         stmt = select(User).where(User.name == user.name)
@@ -28,8 +27,7 @@ def create_user(user: UserIn, db: Session = Depends(get_db)):
         db.commit()
         stmt = select(User).order_by(User.id.desc())
         created_user = db.scalar(stmt)
-        user_data = UserOut(**created_user.__dict__).model_dump()
-        return JSONResponse(content=user_data, status_code=201)
+        return UserOut(**created_user.__dict__)
     except requests.exceptions.HTTPError:
         raise HTTPException(status_code=400, detail="error occured")
 
