@@ -4,6 +4,8 @@ from enum import Enum
 from pydantic import BaseModel, EmailStr, Field, model_validator
 from typing_extensions import Annotated, Self
 
+from .currency import Currency
+
 
 class TransactionType(str, Enum):
     SPENT = "spent"
@@ -32,11 +34,15 @@ class UserIn(UserBase):
     password: Annotated[str, Field(min_length=6)]
 
 
-class Account(BaseModel):
-    user_id: int
-    currency: Annotated[str, Field(max_length=20)]
-    amount: Annotated[float, Field(ge=0)]
+class AccountIn(BaseModel):
+    currency: Annotated[Currency, Field(default="USD")]
+    balance: Annotated[float, Field(ge=0)]
     name: Annotated[str, Field(max_length=50)]
+
+
+class AccountOut(AccountIn):
+    id: int
+    user_id: int
 
 
 class ExpectedTransaction(BaseModel):

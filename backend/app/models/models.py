@@ -35,7 +35,7 @@ class Account(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     currency: Mapped[str] = mapped_column(String(20))
-    amount: Mapped[float]
+    balance: Mapped[float]
     name: Mapped[str] = mapped_column(String(50))
 
     user: Mapped["User"] = relationship(back_populates="account")
