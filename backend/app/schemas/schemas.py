@@ -2,9 +2,8 @@ from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel, EmailStr, Field, model_validator
+from pydantic_extra_types.currency_code import Currency
 from typing_extensions import Annotated, Self
-
-from .currency import Currency
 
 
 class TransactionType(str, Enum):
@@ -37,7 +36,7 @@ class UserIn(UserBase):
 class AccountIn(BaseModel):
     currency: Annotated[Currency, Field(default="USD")]
     balance: Annotated[float, Field(ge=0)]
-    name: Annotated[str, Field(max_length=50)]
+    name: Annotated[str, Field(max_length=50, default="My Account")]
 
 
 class AccountOut(AccountIn):
