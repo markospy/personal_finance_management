@@ -27,14 +27,10 @@ def create_account(
 @router.get("/", response_model=List[AccountOut])
 def get_accounts(db: Session = Depends(get_db), current_user: UserOut = Depends(get_current_user)):
     stmt = select(AccountModel).where(AccountModel.user_id == current_user.id, AccountModel.user_id == current_user.id)
-    accounts = db.scalars(stmt)
-    print("Accounts")
-    accounts_list = []
-    for account in accounts:
-        accounts_list.append(account)
-    if not accounts_list:
+    accounts = db.scalars(stmt).all()
+    if not accounts:
         raise HTTPException(status_code=404, detail="Accounts not found")
-    return accounts_list
+    return accounts
 
 
 @router.get("/{account_id}", response_model=AccountOut)
