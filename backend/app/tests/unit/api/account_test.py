@@ -30,7 +30,7 @@ class TestAccountCreation:
             json={"name": "Cuenta Ahorros", "currency": "INVALID_CURRENCY", "balance": 5000},
         )
         assert response.status_code == 422
-        assert "Input should be" in response.json()["detail"][0]["msg"]
+        assert "String should have" in response.json()["detail"][0]["msg"]
 
     def test_create_account_without_name(self, client: TestClient, token: dict):
         # Intentar crear una cuenta sin el campo "name"

@@ -9,37 +9,18 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
-from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db.dependencie import get_db
 from ..models.models import User
+from ..schemas.schemas import Token, TokenData, UserInDB
 
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: str | None = None
-
-
-class UserScheme(BaseModel):
-    id: int
-    name: str
-    email: str | None = None
-
-
-class UserInDB(UserScheme):
-    password: str
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
