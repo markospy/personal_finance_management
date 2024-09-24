@@ -70,7 +70,7 @@ class TestUserCreation:
         )
 
         assert response.status_code == 409
-        assert response.json()["detail"] == "User already exists"
+        assert response.json()["detail"] == "The user's name is already being used by another user"
 
 
 class TestUserGet:

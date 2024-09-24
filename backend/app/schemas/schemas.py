@@ -32,6 +32,37 @@ class UserOut(UserBase):
 class UserIn(UserBase):
     password: Annotated[str, Field(min_length=6)]
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "Joe Doe",
+                    "email": "joedoe@mail.com",
+                    "password": "secret",
+                }
+            ]
+        }
+    }
+
+
+class UserInDB(UserOut):
+    password: str
+
+
+class UserUpdate(BaseModel):
+    name: Annotated[str | None, Field(min_length=2, max_length=5)] = None
+    email: EmailStr | None = None
+    password: Annotated[str | None, Field(min_length=6)] = None
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
 
 class AccountIn(BaseModel):
     currency: Annotated[Currency, Field(default="USD")]
