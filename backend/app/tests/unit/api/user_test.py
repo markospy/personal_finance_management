@@ -79,3 +79,16 @@ class TestUserGet:
         response = client.get("/user/me", headers=token)
         assert response.status_code == 200
         assert response.json()["name"] == client.user["name"]
+
+
+class TestUserDelete:
+
+    def test_delete_me(self, client: TestClient, token: dict):
+
+        # Delete the user
+        response = client.delete("/user/me", headers=token)
+        assert response.status_code == 204
+
+        # Try to get the user again, should return 404
+        response = client.get("/user/me", headers=token)
+        assert response.status_code == 404

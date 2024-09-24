@@ -29,5 +29,13 @@ def create_user(user: UserIn, db: Session = Depends(get_db)):
 
 
 @router.get("/me")
-def get_user_me(current_user: Annotated[UserOut, Depends(get_current_user)]):
+def get_me(current_user: Annotated[UserOut, Depends(get_current_user)]):
     return UserOut(**current_user.model_dump())
+
+
+@router.delete("/me", status_code=204)
+def delete_me(db: Annotated[Session, Depends(get_db)], current_user: Annotated[UserOut, Depends(get_current_user)]):
+    stmt = select(User).where(User.id == current_user.id)
+    user = db.scalar(stmt)
+    db.delete(user)
+    db.commit()
