@@ -112,6 +112,11 @@ class TestListAccounts:
             {"currency": "EUR", "balance": 1000, "name": "Cuenta Corriente", "id": 2, "user_id": 1},
         ]
 
+    def test_list_accounts_no_accounts(self, client: TestClient, token: dict):
+        # Listar todas las cuentas del usuario (should raise 404)
+        response = client.get("/accounts/", headers=token)
+        assert response.status_code == 404
+
 
 @pytest.mark.account
 @pytest.mark.delete_account
