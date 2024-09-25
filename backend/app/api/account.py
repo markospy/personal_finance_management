@@ -16,8 +16,7 @@ router = APIRouter(prefix="/accounts", tags=["account"])
 def create_account(
     account: AccountIn, db: Session = Depends(get_db), current_user: UserOut = Depends(get_current_user)
 ):
-    new_account = account.model_dump()
-    db.add(AccountModel(**new_account, user_id=current_user.id))
+    db.add(AccountModel(**account.model_dump(), user_id=current_user.id))
     db.commit()
     stmt = select(AccountModel).order_by(AccountModel.id.desc())
     created_account = db.scalar(stmt)
