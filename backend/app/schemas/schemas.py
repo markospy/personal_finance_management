@@ -7,7 +7,7 @@ from typing_extensions import Annotated, Self
 
 
 class TransactionType(str, Enum):
-    SPENT = "spent"
+    EXPENSE = "expense"
     INCOME = "income"
 
 

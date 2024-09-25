@@ -19,6 +19,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(50))
     password: Mapped[str] = mapped_column(String(50))
 
+    category: Mapped[List["Category"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     account: Mapped[List["Account"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     expected_transaction: Mapped[List["ExpectedTransaction"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
@@ -63,6 +64,10 @@ class Category(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(50))
     type: Mapped[TransactionType]
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    is_global: Mapped[bool] = mapped_column(default=True)
+
+    user: Mapped["User"] = relationship(back_populates="category")
 
     expected_transaction: Mapped[List["ExpectedTransaction"]] = relationship(
         back_populates="category", cascade="all, delete-orphan"
