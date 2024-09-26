@@ -1,12 +1,12 @@
-from typing import List
+from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Security
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db.dependencie import get_db
 from ..models.models import Account as AccountModel
-from ..schemas.schemas import AccountIn, AccountOut, UserOut
+from ..schemas.schemas import AccountIn, AccountOut, Scopes, UserOut
 from .oauth import get_current_user
 
 router = APIRouter(prefix="/accounts", tags=["account"])
@@ -14,7 +14,9 @@ router = APIRouter(prefix="/accounts", tags=["account"])
 
 @router.post("/", response_model=AccountOut, status_code=201)
 def create_account(
-    account: AccountIn, db: Session = Depends(get_db), current_user: UserOut = Depends(get_current_user)
+    account: AccountIn,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
     db.add(AccountModel(**account.model_dump(), user_id=current_user.id))
     db.commit()
@@ -24,7 +26,10 @@ def create_account(
 
 
 @router.get("/", response_model=List[AccountOut])
-def get_accounts(db: Session = Depends(get_db), current_user: UserOut = Depends(get_current_user)):
+def get_accounts(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+):
     stmt = select(AccountModel).where(AccountModel.user_id == current_user.id, AccountModel.user_id == current_user.id)
     accounts = db.scalars(stmt).all()
     if not accounts:
@@ -33,7 +38,11 @@ def get_accounts(db: Session = Depends(get_db), current_user: UserOut = Depends(
 
 
 @router.get("/{account_id}", response_model=AccountOut)
-def get_account(account_id: int, db: Session = Depends(get_db), current_user: UserOut = Depends(get_current_user)):
+def get_account(
+    account_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+):
     stmt = select(AccountModel).where(AccountModel.id == account_id, AccountModel.user_id == current_user.id)
     account = db.scalar(stmt)
     if not account:
@@ -42,7 +51,11 @@ def get_account(account_id: int, db: Session = Depends(get_db), current_user: Us
 
 
 @router.delete("/{account_id}", status_code=204)
-def delete_account(account_id: int, db: Session = Depends(get_db), current_user: UserOut = Depends(get_current_user)):
+def delete_account(
+    account_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+):
     stmt = select(AccountModel).where(AccountModel.id == account_id, AccountModel.user_id == current_user.id)
     account = db.scalar(stmt)
     if not account:

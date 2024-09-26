@@ -98,6 +98,6 @@ def client(db):
 
 @pytest.fixture
 def token(db, client):
-    name = {"sub": client.user["name"]}
+    name = {"sub": client.user["name"], "scopes": ["user"]}
     token = create_access_token(name)
     return {"Authorization": f"Bearer {token}"}

@@ -20,6 +20,11 @@ class Frecuency(str, Enum):
     ANNUAL = "annual"
 
 
+class Scopes(Enum):
+    USER = "user"
+    ADMIN = "admin"
+
+
 class UserBase(BaseModel):
     name: Annotated[str, Field(min_length=2, max_length=50)]
     email: EmailStr
@@ -62,6 +67,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+    scopes: list[str] = []
 
 
 class AccountIn(BaseModel):
@@ -84,9 +90,15 @@ class ExpectedTransaction(BaseModel):
     type: TransactionType
 
 
-class Category(BaseModel):
+class CategoryIn(BaseModel):
     name: Annotated[str, Field(max_length=50)]
     type: TransactionType
+    user_id: int | None = None
+    is_global: Annotated[bool, Field(default=True)]
+
+
+class CategoryOut(CategoryIn):
+    id: int
 
 
 class Period(BaseModel):
