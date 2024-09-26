@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 from sqlalchemy import JSON, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -19,12 +18,12 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(50))
     password: Mapped[str] = mapped_column(String(50))
 
-    category: Mapped[List["Category"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-    account: Mapped[List["Account"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-    expected_transaction: Mapped[List["ExpectedTransaction"]] = relationship(
+    category: Mapped[list["Category"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    account: Mapped[list["Account"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    expected_transaction: Mapped[list["ExpectedTransaction"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-    budget: Mapped[List["Budget"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    budget: Mapped[list["Budget"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, name={self.name!r}, email={self.email!r})"
@@ -34,27 +33,27 @@ class Account(Base):
     __tablename__ = "account"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     currency: Mapped[str] = mapped_column(String(20))
     balance: Mapped[float]
     name: Mapped[str] = mapped_column(String(50))
 
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
     user: Mapped["User"] = relationship(back_populates="account")
-    transaction: Mapped[List["Transaction"]] = relationship(back_populates="account", cascade="all, delete-orphan")
+    transaction: Mapped[list["Transaction"]] = relationship(back_populates="account", cascade="all, delete-orphan")
 
 
 class ExpectedTransaction(Base):
     __tablename__ = "expected_transaction"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     amount: Mapped[float]
     frequency: Mapped[Frecuency]
     date: Mapped[datetime]
     type: Mapped[TransactionType]
 
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
     user: Mapped["User"] = relationship(back_populates="expected_transaction")
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="cascade"))
     category: Mapped["Category"] = relationship(back_populates="expected_transaction")
 
 
@@ -64,16 +63,16 @@ class Category(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(50))
     type: Mapped[TransactionType]
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     is_global: Mapped[bool] = mapped_column(default=True)
 
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
     user: Mapped["User"] = relationship(back_populates="category")
 
-    expected_transaction: Mapped[List["ExpectedTransaction"]] = relationship(
+    expected_transaction: Mapped[list["ExpectedTransaction"]] = relationship(
         back_populates="category", cascade="all, delete-orphan"
     )
-    budget: Mapped[List["Budget"]] = relationship(back_populates="category", cascade="all, delete-orphan")
-    transaction: Mapped[List["Transaction"]] = relationship(back_populates="category", cascade="all, delete-orphan")
+    budget: Mapped[list["Budget"]] = relationship(back_populates="category", cascade="all, delete-orphan")
+    transaction: Mapped[list["Transaction"]] = relationship(back_populates="category", cascade="all, delete-orphan")
 
 
 class Budget(Base):
@@ -81,10 +80,10 @@ class Budget(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     amount: Mapped[float]
     period: Mapped[dict] = mapped_column(JSON)
 
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
     user: Mapped["User"] = relationship(back_populates="budget")
     category: Mapped["Category"] = relationship(back_populates="budget")
 
@@ -93,12 +92,12 @@ class Transaction(Base):
     __tablename__ = "transaction"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
-    account_id: Mapped[int] = mapped_column(ForeignKey("account.id"))
     amount: Mapped[float]
     date: Mapped[datetime]
     comments: Mapped[str] = mapped_column(String(250))
     type: Mapped[TransactionType]
 
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="cascade"))
     category: Mapped["Category"] = relationship(back_populates="transaction")
+    account_id: Mapped[int] = mapped_column(ForeignKey("account.id", ondelete="cascade"))
     account: Mapped["Account"] = relationship(back_populates="transaction")
