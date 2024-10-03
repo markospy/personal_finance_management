@@ -93,12 +93,12 @@ class ExpectedTransaction(BaseModel):
 class CategoryIn(BaseModel):
     name: Annotated[str, Field(max_length=50)]
     type: TransactionType
-    user_id: int | None = None
     is_global: Annotated[bool, Field(default=True)]
 
 
 class CategoryOut(CategoryIn):
     id: int
+    user_id: int
 
 
 class Period(BaseModel):
