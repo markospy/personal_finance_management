@@ -196,7 +196,7 @@ class TestListCategories:
 @pytest.mark.delete_category
 class TestDeleteCategory:
 
-    def test_delete_category(self, client: TestClient, token_user: dict):
+    def test_delete_user_category(self, client: TestClient, token_user: dict):
         # Crear una categoría
         category_response = client.post(
             "/categories/user",
@@ -221,11 +221,45 @@ class TestDeleteCategory:
         assert response.status_code == 404
         assert response.json()["detail"] == "Category not found"
 
-    def test_delete_non_existent_category(self, client: TestClient, token_user: dict):
+    def test_delete_non_existent_user_category(self, client: TestClient, token_user: dict):
         # Intentar eliminar una categoría que no existe
         response = client.delete(
             "/categories/99999",
             headers=token_user,
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Category not found"
+
+    def test_delete_global_category(self, client: TestClient, token_admin: dict, token_user: dict):
+        # Crear una categoría
+        category_response = client.post(
+            "/categories/global",
+            headers=token_admin,
+            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value},
+        )
+        assert category_response.status_code == 201
+        category_id = category_response.json()["id"]
+
+        # Eliminar la categoría creada
+        response = client.delete(
+            f"/categories/{category_id}/global",
+            headers=token_admin,
+        )
+        assert response.status_code == 204
+
+        # Verificar que la categoría ya no existe
+        response = client.get(
+            f"/categories/{category_id}",
+            headers=token_user,
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Category not found"
+
+    def test_delete_non_existent_global_category(self, client: TestClient, token_admin: dict):
+        # Intentar eliminar una categoría que no existe
+        response = client.delete(
+            "/categories/99999/global",
+            headers=token_admin,
         )
         assert response.status_code == 404
         assert response.json()["detail"] == "Category not found"

@@ -90,3 +90,16 @@ def delete_category(
         raise HTTPException(status_code=404, detail="Category not found")
     db.delete(db_category)
     db.commit()
+
+
+@router.delete("/{category_id}/global", status_code=204)
+def delete_global_category(
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.ADMIN.value])],
+    category_id: int,
+    db: Session = Depends(get_db),
+):
+    db_category = db.scalar(select(Category).where(and_(Category.is_global, Category.id == category_id)))
+    if not db_category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    db.delete(db_category)
+    db.commit()
