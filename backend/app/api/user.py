@@ -16,7 +16,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 @router.post("/", status_code=201, response_model=UserOut)
 def create_user(user: UserIn, db: Session = Depends(get_db)):
     db_user = db.scalar(select(User).where(User.name == user.name))
-    if db_user and db_user.__dict__["name"] == user.name:
+    if db_user:
         raise HTTPException(status_code=409, detail="The user's name is already being used by another user")
     new_user = user.model_dump(exclude_none=True)
     new_user["password"] = get_password_hash(new_user["password"])

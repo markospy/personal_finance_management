@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Security
 from sqlalchemy import select
@@ -25,7 +25,7 @@ def create_account(
     return created_account
 
 
-@router.get("/", response_model=List[AccountOut])
+@router.get("/", response_model=list[AccountOut])
 def get_accounts(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
