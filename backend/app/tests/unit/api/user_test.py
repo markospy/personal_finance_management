@@ -75,20 +75,20 @@ class TestUserCreation:
 
 class TestUserGet:
 
-    def test_user_name(self, client: TestClient, token: dict):
-        response = client.get("/user/me", headers=token)
+    def test_user_name(self, client: TestClient, token_user: dict):
+        response = client.get("/user/me", headers=token_user)
         assert response.status_code == 200
         assert response.json()["name"] == client.user["name"]
 
 
 class TestUserDelete:
 
-    def test_delete_me(self, client: TestClient, token: dict):
+    def test_delete_me(self, client: TestClient, token_user: dict):
 
         # Delete the user
-        response = client.delete("/user/me", headers=token)
+        response = client.delete("/user/me", headers=token_user)
         assert response.status_code == 204
 
         # Try to get the user again, should return 404
-        response = client.get("/user/me", headers=token)
+        response = client.get("/user/me", headers=token_user)
         assert response.status_code == 404
