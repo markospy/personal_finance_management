@@ -36,7 +36,7 @@ def engine():
         conn.execute(text(f"CREATE DATABASE {test_db_name}"))
         conn.close()
     finally:
-        Base.metadata.create_all(bind=test_engine)
+        Base.metadata.create_all(bind=test_engine, checkfirst=True)
 
     return test_engine
 
@@ -97,14 +97,14 @@ def client(db):
 
 
 @pytest.fixture
-def token_user(db, client):
+def token_user(client):
     name = {"sub": client.user["name"], "scopes": ["user"]}
     token = create_access_token(name)
     return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.fixture
-def token_admin(db, client):
+def token_admin(client):
     name = {"sub": client.user["name"], "scopes": ["admin"]}
     token = create_access_token(name)
     return {"Authorization": f"Bearer {token}"}

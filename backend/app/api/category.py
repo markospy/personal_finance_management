@@ -1,34 +1,92 @@
-from typing import List
+from typing import Annotated
 
-from fastapi import APIRouter, Depends
-from sqlachemy import select
+from fastapi import APIRouter, Depends, HTTPException, Security
+from sqlalchemy import and_, or_, select
 from sqlalchemy.orm import Session
 
 from ..api.oauth import get_current_user
 from ..db.dependencie import get_db
-from ..models.models import Category, User
-from ..schemas.schemas import CategoryIn, CategoryOut
+from ..models.models import Category
+from ..schemas.schemas import CategoryIn, CategoryOut, Scopes, UserOut
 
-router = APIRouter()
+router = APIRouter(prefix="/categories", tags=["category"])
 
 
-@router.post("/categories/", response_model=CategoryOut)
-def create_category(
-    category: CategoryIn, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+@router.get("/", response_model=list[CategoryOut])
+def get_categories(
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+    db: Session = Depends(get_db),
 ):
+    categories = db.scalars(select(Category).where(or_(Category.is_global, Category.user_id == current_user.id))).all()
+    if not categories:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return categories
+
+
+@router.get("/{category_id}", response_model=CategoryOut)
+def get_one_category(
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+    category_id: int,
+    db: Session = Depends(get_db),
+):
+
+    category = db.scalar(
+        select(Category).where(
+            and_(Category.id == category_id, or_(Category.is_global, Category.user_id == current_user.id))
+        )
+    )
+    db.commit()
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return category
+
+
+@router.post("/global", response_model=CategoryOut, status_code=201)
+def create_category_global(
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.ADMIN.value])],
+    category: CategoryIn,
+    db: Session = Depends(get_db),
+):
+    db_category = db.scalar(select(Category).where(Category.name == category.name))
+    if db_category:
+        raise HTTPException(status_code=409, detail="The category's name is already exists")
+    if category.is_global is False:
+        raise HTTPException(status_code=406, detail="This category is not global.")
+
+    db.add(Category(**category.model_dump(), user_id=None))
+    db.commit()
+    new_category = db.scalar(select(Category).order_by(Category.id.desc()))
+    return new_category
+
+
+@router.post("/user", response_model=CategoryOut, status_code=201)
+def create_category_user(
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+    category: CategoryIn,
+    db: Session = Depends(get_db),
+):
+    db_category = db.scalar(select(Category).where(Category.name == category.name))
+    if db_category:
+        raise HTTPException(status_code=409, detail="The category's name is already exists")
+    if category.is_global is True:
+        raise HTTPException(status_code=406, detail="This category is global.")
+
     db.add(Category(**category.model_dump(), user_id=current_user.id))
     db.commit()
     new_category = db.scalar(select(Category).order_by(Category.id.desc()))
     return new_category
 
 
-@router.get("/categories/", response_model=List[CategoryOut])
-def get_categories(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    # lógica para obtener todas las categorías del usuario
-    pass
-
-
-@router.delete("/categories/{category_id}")
-def delete_category(category_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    # lógica para eliminar una categoría
-    pass
+@router.delete("/{category_id}", status_code=204)
+def delete_category(
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+    category_id: int,
+    db: Session = Depends(get_db),
+):
+    db_category = db.scalar(
+        select(Category).where(and_(Category.user_id == current_user.id, Category.id == category_id))
+    )
+    if not db_category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    db.delete(db_category)
+    db.commit()
