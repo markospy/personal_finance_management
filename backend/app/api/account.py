@@ -30,8 +30,7 @@ def get_accounts(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
-    stmt = select(AccountModel).where(AccountModel.user_id == current_user.id, AccountModel.user_id == current_user.id)
-    accounts = db.scalars(stmt).all()
+    accounts = db.scalars(select(AccountModel).where(AccountModel.user_id == current_user.id)).all()
     if not accounts:
         raise HTTPException(status_code=404, detail="Accounts not found")
     return accounts
@@ -43,8 +42,9 @@ def get_account(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
-    stmt = select(AccountModel).where(AccountModel.id == account_id, AccountModel.user_id == current_user.id)
-    account = db.scalar(stmt)
+    account = db.scalar(
+        select(AccountModel).where(AccountModel.id == account_id, AccountModel.user_id == current_user.id)
+    )
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
     return account
@@ -56,8 +56,9 @@ def delete_account(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
-    stmt = select(AccountModel).where(AccountModel.id == account_id, AccountModel.user_id == current_user.id)
-    account = db.scalar(stmt)
+    account = db.scalar(
+        select(AccountModel).where(AccountModel.id == account_id, AccountModel.user_id == current_user.id)
+    )
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
     db.delete(account)

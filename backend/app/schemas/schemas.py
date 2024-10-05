@@ -119,10 +119,14 @@ class Budget(BaseModel):
     period: Period
 
 
-class Transaction(BaseModel):
+class TransactionIn(BaseModel):
     category_id: int
     account_id: int
     amount: Annotated[float, Field(ge=0)]
     date: Annotated[datetime, Field(ge=datetime.now())]
     comments: Annotated[str, Field(max_length=250)]
+
+
+class TransactionOut(TransactionIn):
+    id: int
     type: TransactionType
