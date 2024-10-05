@@ -41,15 +41,21 @@ def get_one_category(
     return category
 
 
-@router.post("/global", response_model=CategoryOut, status_code=201)
+@router.post(
+    "/global",
+    response_model=CategoryOut,
+    status_code=201,
+    dependencies=[Security(get_current_user, scopes=[Scopes.ADMIN.value])],
+)
 def create_category_global(
-    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.ADMIN.value])],
     category: CategoryIn,
     db: Session = Depends(get_db),
 ):
-    db_category = db.scalar(select(Category).where(Category.name == category.name))
+    db_category = db.scalar(
+        select(Category).where(Category.is_global, Category.name == category.name, Category.type == category.type)
+    )
     if db_category:
-        raise HTTPException(status_code=409, detail="The category's name is already exists")
+        raise HTTPException(status_code=409, detail="The category is already exists")
     if category.is_global is False:
         raise HTTPException(status_code=406, detail="This category is not global.")
 
@@ -65,9 +71,9 @@ def create_category_user(
     category: CategoryIn,
     db: Session = Depends(get_db),
 ):
-    db_category = db.scalar(select(Category).where(Category.name == category.name))
+    db_category = db.scalar(select(Category).where(Category.name == category.name, Category.type == category.type))
     if db_category:
-        raise HTTPException(status_code=409, detail="The category's name is already exists")
+        raise HTTPException(status_code=409, detail="The category is already exists")
     if category.is_global is True:
         raise HTTPException(status_code=406, detail="This category is global.")
 

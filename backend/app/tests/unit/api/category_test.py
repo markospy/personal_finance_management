@@ -48,7 +48,7 @@ class TestCategoryCreation:
             json={"name": "Alimentos", "type": TransactionType.EXPENSE.value},
         )
         assert response.status_code == 409
-        assert response.json()["detail"] == "The category's name is already exists"
+        assert response.json()["detail"] == "The category is already exists"
 
     def test_create_user_category(self, client: TestClient, token_user: dict):
         # Crear una categoría válida
