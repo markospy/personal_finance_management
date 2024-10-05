@@ -83,7 +83,7 @@ def create_category_user(
     return new_category
 
 
-@router.delete("/{category_id}", status_code=204)
+@router.delete("/{category_id}/user", status_code=204)
 def delete_category(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
     category_id: int,

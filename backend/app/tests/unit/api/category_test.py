@@ -208,7 +208,7 @@ class TestDeleteCategory:
 
         # Eliminar la categoría creada
         response = client.delete(
-            f"/categories/{category_id}",
+            f"/categories/{category_id}/user",
             headers=token_user,
         )
         assert response.status_code == 204
@@ -224,7 +224,7 @@ class TestDeleteCategory:
     def test_delete_non_existent_user_category(self, client: TestClient, token_user: dict):
         # Intentar eliminar una categoría que no existe
         response = client.delete(
-            "/categories/99999",
+            "/categories/99999/user",
             headers=token_user,
         )
         assert response.status_code == 404
