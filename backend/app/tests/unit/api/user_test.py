@@ -17,10 +17,10 @@ class TestUserCreation:
     def test_create_user(self, client_some: TestClient):
         response = client_some.post(
             "/user/",
-            json={"name": "John Doe", "email": "john@gmail.com", "password": "123456"},
+            json={"name": "Jane Doe", "email": "john@gmail.com", "password": "123456"},
         )
         assert response.status_code == 201
-        assert response.json() == {"id": 1, "name": "John Doe", "email": "john@gmail.com"}
+        assert response.json() == {"id": 1, "name": "Jane Doe", "email": "john@gmail.com"}
 
     def test_create_user_name_less_than_2_letters(self, client_some: TestClient):
         response = client_some.post(
@@ -60,13 +60,13 @@ class TestUserCreation:
     def test_create_user_already_exists(self, client_some: TestClient):
         response = client_some.post(
             "/user/",
-            json={"name": "John Doe", "email": "john@gmail.com", "password": "123456"},
+            json={"name": "Jane Doe", "email": "john@gmail.com", "password": "123456"},
         )
         assert response.status_code == 201
 
         response = client_some.post(
             "/user/",
-            json={"name": "John Doe", "email": "john@gmail.com", "password": "123456"},
+            json={"name": "Jane Doe", "email": "john@gmail.com", "password": "123456"},
         )
 
         assert response.status_code == 409

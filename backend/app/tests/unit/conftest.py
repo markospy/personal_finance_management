@@ -1,7 +1,6 @@
 from urllib.parse import urlparse
 
 import pytest
-from fastapi import Depends
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event, select, text
 from sqlalchemy.engine import Engine
@@ -78,7 +77,9 @@ def db(engine: Engine, request):
     del app.dependency_overrides[get_db]
 
 
-def create_user(user: UserIn, db: Session = Depends(get_db)):
+@pytest.fixture
+def user(db: Session):
+    user = UserIn(name="John Doe", email="john@gmail.com", password="123456")
     new_user = user.model_dump(exclude_unset=True)
     db.add(User(**new_user))
     db.commit()
@@ -89,8 +90,7 @@ def create_user(user: UserIn, db: Session = Depends(get_db)):
 
 
 @pytest.fixture
-def client(db):
-    user = create_user(user=UserIn(name="John Doe", email="john@gmail.com", password="123456"), db=db)
+def client(user):
     client = TestClient(app)
     client.user = user
     return client
