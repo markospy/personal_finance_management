@@ -93,7 +93,7 @@ class Transaction(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     amount: Mapped[float]
-    date: Mapped[datetime]
+    date: Mapped[datetime] = mapped_column(default=datetime.now())
     comments: Mapped[str] = mapped_column(String(250))
     type: Mapped[TransactionType]
 

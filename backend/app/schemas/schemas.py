@@ -123,10 +123,11 @@ class TransactionIn(BaseModel):
     category_id: int
     account_id: int
     amount: Annotated[float, Field(ge=0)]
-    date: Annotated[datetime, Field(ge=datetime.now())]
+    date: datetime | None = Field(default=datetime.now())
     comments: Annotated[str, Field(max_length=250)]
 
 
 class TransactionOut(TransactionIn):
     id: int
     type: TransactionType
+    date: datetime
