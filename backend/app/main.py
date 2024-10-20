@@ -3,13 +3,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from .api import account, category, oauth, transaction, user
-from .db.database import engine
-from .models.models import Base
+from .db.database import create_tables
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(engine)
+    create_tables()
     yield
     pass
 
