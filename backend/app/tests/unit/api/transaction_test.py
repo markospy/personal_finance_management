@@ -47,7 +47,7 @@ def create_transactions(
     create_categories: tuple[int],
 ):
     date = str(datetime.now())
-    response = client.post(
+    transaction_1 = client.post(
         "/transactions",
         headers=token_user,
         json={
@@ -58,9 +58,9 @@ def create_transactions(
             "comments": "Pago de servicios",
         },
     )
-    assert response.status_code == 201
+    assert transaction_1.status_code == 201
 
-    response = client.post(
+    transaction_2 = client.post(
         "/transactions",
         headers=token_user,
         json={
@@ -68,11 +68,11 @@ def create_transactions(
             "account_id": create_account,
             "amount": 200.0,
             "date": date,
-            "comments": "Pago de servicios",
+            "comments": "Cobro de servicios",
         },
     )
-    assert response.status_code == 201
-    return
+    assert transaction_2.status_code == 201
+    return (transaction_1.json()["id"], transaction_2.json()["id"])
 
 
 @pytest.mark.transaction
@@ -220,7 +220,7 @@ class TestGetTransactions:
         self,
         client: TestClient,
         token_user: dict,
-        create_transactions: None,
+        create_transactions: tuple[int],
     ):
 
         # Obtener todas las transacciones del usuario
@@ -228,14 +228,14 @@ class TestGetTransactions:
         assert response.status_code == 200
         transactions = response.json()
         assert isinstance(transactions, list)
-        assert len(transactions) > 0
+        assert len(transactions) == len(create_transactions)
 
     def test_get_transactions_by_account(
         self,
         client: TestClient,
         token_user: dict,
         create_account: int,
-        create_transactions: None,
+        create_transactions: tuple[int],
     ):
 
         response = client.get(f"/transactions/account/{create_account}", headers=token_user)
@@ -255,33 +255,19 @@ class TestDeleteTransactions:
         client: TestClient,
         token_user: dict,
         create_account: int,
-        create_categories: tuple[int],
+        create_transactions: tuple[int],
     ):
-        # Primero, crear una transacción para eliminarla
-        date = str(datetime.now())
-        create_response = client.post(
-            "/transactions",
-            headers=token_user,
-            json={
-                "category_id": create_categories[0],
-                "account_id": create_account,
-                "amount": 200.0,
-                "date": date,
-            },
-        )
-        assert create_response.status_code == 201
-        transaction_id = create_response.json()["id"]
 
-        # Luego, eliminar la transacción creada
+        # Eliminar una transacción
         delete_response = client.delete(
-            f"/transactions/{transaction_id}",
+            f"/transactions/{create_transactions[1]}",
             headers=token_user,
         )
         assert delete_response.status_code == 204
 
         # Verificar que la transacción ya no exista
         get_response = client.get(
-            f"/transactions/{transaction_id}",
+            f"/transactions/{create_transactions[1]}",
             headers=token_user,
         )
         assert get_response.status_code == 404
@@ -290,7 +276,7 @@ class TestDeleteTransactions:
         # Verifica que el saldo de la cuenta se haya restaurado
         response = client.get(f"/accounts/{create_account}", headers=token_user)
         assert response.status_code == 200
-        assert response.json()["balance"] == 5000
+        assert response.json()["balance"] == 4800
 
     def test_delete_transaction_not_found(
         self,
@@ -305,3 +291,24 @@ class TestDeleteTransactions:
         )
         assert response.status_code == 404
         assert response.json()["detail"] == "Transaction not found"
+
+
+    def test_delete_transaction_not_last(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+
+        # Intentamos eliminar la primera transacción, que no es la última
+        response = client.delete(
+            f"/transactions/{create_transactions[0]}",
+            headers=token_user,
+        )
+
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Only the last transaction can be deleted"
+
+        # Verificamos que la última transacción aún existe
+        last_transaction_response = client.get(f"/transactions/{create_transactions[1]}", headers=token_user)
+        assert last_transaction_response.status_code == 200

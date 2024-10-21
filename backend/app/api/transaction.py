@@ -114,6 +114,13 @@ def delete_transaction(
         select(Account).where(Account.id == transaction.account_id, Account.user_id == current_user.id)
     )
 
+    # Verificar si la transacción es la última de la cuenta
+    last_transaction = db.scalar(
+        select(Transaction).where(Transaction.account_id == transaction.account_id).order_by(Transaction.id.desc())
+    )
+    if last_transaction.id != transaction.id:
+        raise HTTPException(status_code=400, detail="Only the last transaction can be deleted")
+
     category = db.scalar(select(Category).where(Category.id == transaction.category_id))
 
     db.delete(transaction)
