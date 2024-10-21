@@ -94,7 +94,7 @@ class Transaction(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     amount: Mapped[float]
     date: Mapped[datetime] = mapped_column(default=datetime.now())
-    comments: Mapped[str] = mapped_column(String(250))
+    comments: Mapped[str | None] = mapped_column(String(250))
     type: Mapped[TransactionType]
 
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="cascade"))

@@ -26,7 +26,7 @@ class Scopes(Enum):
 
 
 class UserBase(BaseModel):
-    name: Annotated[str, Field(min_length=2, max_length=50)]
+    name: str = Field(min_length=2, max_length=50)
     email: EmailStr
 
 
@@ -35,7 +35,7 @@ class UserOut(UserBase):
 
 
 class UserIn(UserBase):
-    password: Annotated[str, Field(min_length=6)]
+    password: str = Field(min_length=6)
 
     model_config = {
         "json_schema_extra": {
@@ -72,8 +72,8 @@ class TokenData(BaseModel):
 
 class AccountIn(BaseModel):
     currency: Annotated[Currency, Field(default="USD")]
-    balance: Annotated[float, Field(ge=0)]
-    name: Annotated[str, Field(max_length=50)]
+    balance: float = Field(ge=0)
+    name: str = Field(max_length=50)
 
 
 class AccountOut(AccountIn):
@@ -84,16 +84,16 @@ class AccountOut(AccountIn):
 class ExpectedTransaction(BaseModel):
     category_id: int
     user_id: int
-    amount: Annotated[float, Field(ge=0)]
+    amount: float = Field(ge=0)
     frequency: Frecuency
-    date: Annotated[datetime, Field(ge=datetime.now())]
+    date: datetime = Field(ge=datetime.now())
     type: TransactionType
 
 
 class CategoryIn(BaseModel):
-    name: Annotated[str, Field(max_length=50)]
+    name: str = Field(max_length=50)
     type: TransactionType
-    is_global: Annotated[bool, Field(default=True)]
+    is_global: bool = Field(default=True)
 
 
 class CategoryOut(CategoryIn):
@@ -115,16 +115,16 @@ class Period(BaseModel):
 class Budget(BaseModel):
     category_id: int
     user_id: int
-    amount: Annotated[float, Field(ge=0)]
+    amount: float = Field(ge=0)
     period: Period
 
 
 class TransactionIn(BaseModel):
     category_id: int
     account_id: int
-    amount: Annotated[float, Field(ge=0)]
+    amount: float = Field(ge=0)
     date: datetime | None = Field(default=datetime.now())
-    comments: Annotated[str, Field(max_length=250)]
+    comments: str | None = Field(max_length=250, default=None)
 
 
 class TransactionOut(TransactionIn):
