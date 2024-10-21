@@ -188,6 +188,28 @@ class TestCreateTransactions:
         assert response.status_code == 404
         assert response.json()["detail"] == "Account not found"
 
+    def test_create_transaction_insufficient_funds(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_account: int,
+        create_categories: tuple[int],
+    ):
+        date = str(datetime.now())
+        response = client.post(
+            "/transactions",
+            headers=token_user,
+            json={
+                "category_id": create_categories[0],
+                "account_id": create_account,
+                "amount": 6000.0,  # Monto que excede el balance
+                "date": date,
+                "comments": "Pago de servicios",
+            },
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Insufficient funds"
+
 
 @pytest.mark.transaction
 @pytest.mark.get_transaction
