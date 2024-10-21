@@ -100,6 +100,59 @@ def get_transactions_by_account(
     return transactions
 
 
+@router.put("/{transaction_id}", response_model=TransactionOut)
+def update_transaction(
+    transaction_id: int,
+    transaction: TransactionIn,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+):
+    transaction_existing = db.scalar(select(Transaction).where(Transaction.id == transaction_id))
+    if not transaction_existing:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    account = db.scalar(
+        select(Account).where(Account.id == transaction.account_id, Account.user_id == current_user.id)
+    )
+    if not account:
+        raise HTTPException(404, detail="Account not found")
+
+    # Verificar si la transacción es la última de la cuenta
+    last_transaction = db.scalar(
+        select(Transaction).where(Transaction.account_id == transaction.account_id).order_by(Transaction.id.desc())
+    )
+    if last_transaction.id != transaction_id:
+        raise HTTPException(status_code=400, detail="Only the last transaction can be updated")
+
+    # Verificar si la categoría existe y es válida
+    category = db.scalar(
+        select(Category).where(
+            and_(Category.id == transaction.category_id, or_(Category.is_global, Category.user_id == current_user.id))
+        )
+    )
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    # Actualizar la transacción
+    last_transaction.category_id = transaction.category_id
+    last_transaction.amount = transaction.amount
+    last_transaction.date = transaction.date
+    last_transaction.comments = transaction.comments
+    db.execute(
+        update(Transaction)
+        .where(Account.id == transaction.account_id, Account.user_id == current_user.id)
+        .values(
+            category_id=transaction.category_id,
+            amount=transaction.amount,
+            date=transaction.date,
+            comments=transaction.comments,
+        )
+    )
+
+    db.commit()
+    return last_transaction
+
+
 @router.delete("/{transaction_id}", status_code=204)
 def delete_transaction(
     transaction_id: int,
@@ -113,12 +166,14 @@ def delete_transaction(
     account = db.scalar(
         select(Account).where(Account.id == transaction.account_id, Account.user_id == current_user.id)
     )
+    if not account:
+        raise HTTPException(404, detail="Transaction not found")
 
     # Verificar si la transacción es la última de la cuenta
     last_transaction = db.scalar(
         select(Transaction).where(Transaction.account_id == transaction.account_id).order_by(Transaction.id.desc())
     )
-    if last_transaction.id != transaction.id:
+    if last_transaction.id != transaction_id:
         raise HTTPException(status_code=400, detail="Only the last transaction can be deleted")
 
     category = db.scalar(select(Category).where(Category.id == transaction.category_id))

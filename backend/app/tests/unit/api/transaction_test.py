@@ -272,6 +272,91 @@ class TestGetTransactions:
 
 
 @pytest.mark.transaction
+@pytest.mark.update_transaction
+class TestUpdateTransaction:
+
+    def test_update_last_transaction(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Datos de la transacción actualizada
+        updated_data = {
+            "category_id": 1,  # Asegúrate de que esta categoría existe
+            "account_id": 1,  # Asegúrate de que esta cuenta existe
+            "amount": 250.0,
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+
+        # Actualizar la última transacción
+        response = client.put(f"/transactions/{create_transactions[1]}", headers=token_user, json=updated_data)
+        assert response.status_code == 200
+        updated_transaction = response.json()
+        assert updated_transaction["id"] == create_transactions[1]
+        assert updated_transaction["amount"] == 250.0
+        assert updated_transaction["comments"] == "Pago de servicios actualizado"
+
+    def test_update_transaction_not_found(
+        self,
+        client: TestClient,
+        token_user: dict,
+    ):
+        # Intentar actualizar una transacción con un ID inexistente
+        transaction_id = 999  # ID de transacción inexistente
+        updated_data = {
+            "category_id": 1,
+            "account_id": 1,
+            "amount": 250.0,
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+        response = client.put(f"/transactions/{transaction_id}", headers=token_user, json=updated_data)
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Transaction not found"
+
+    def test_update_transaction_not_last(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Intentar actualizar una transacción que no es la última
+        previous_transaction_id = create_transactions[0]  # ID de la transacción anterior
+        updated_data = {
+            "category_id": 1,
+            "account_id": 1,
+            "amount": 250.0,
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+        response = client.put(f"/transactions/{previous_transaction_id}", headers=token_user, json=updated_data)
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Only the last transaction can be updated"
+
+    def test_update_transaction_account_not_found(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Datos de la transacción actualizada con un ID de cuenta que no existe
+        updated_data = {
+            "category_id": 1,  # Asegúrate de que esta categoría existe
+            "account_id": 999,  # ID de cuenta inexistente
+            "amount": 250.0,
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+
+        # Intentar actualizar la última transacción
+        response = client.put(f"/transactions/{create_transactions[1]}", headers=token_user, json=updated_data)
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Account not found"
+
+
+@pytest.mark.transaction
 @pytest.mark.delete_transaction
 class TestDeleteTransactions:
 
