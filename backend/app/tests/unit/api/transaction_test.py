@@ -291,3 +291,17 @@ class TestDeleteTransactions:
         response = client.get(f"/accounts/{create_account}", headers=token_user)
         assert response.status_code == 200
         assert response.json()["balance"] == 5000
+
+    def test_delete_transaction_not_found(
+        self,
+        client: TestClient,
+        token_user: dict,
+    ):
+        # Intentamos eliminar una transacción con un ID inexistente
+        transaction_id = 999  # ID de transacción inexistente
+        response = client.delete(
+            f"/transactions/{transaction_id}",
+            headers=token_user,
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Transaction not found"
