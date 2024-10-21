@@ -40,10 +40,13 @@ def create_transaction(
 
     db.add(Transaction(**transaction.model_dump(), type=category.type))
     if category.type == TransactionType.EXPENSE.value:
+        balance = account.balance - transaction.amount
+        if balance < 0:
+            raise HTTPException(status_code=400, detail="Insufficient funds")
         db.execute(
             update(Account)
             .where(Account.id == transaction.account_id, Account.user_id == current_user.id)
-            .values(balance=account.balance - transaction.amount)
+            .values(balance=balance)
         )
     else:
         db.execute(
@@ -55,8 +58,6 @@ def create_transaction(
     db.commit()
     created_transaction = db.scalar(select(Transaction).order_by(Transaction.id.desc()))
     return created_transaction
-
-    # Todo: Agregar funcionalidad de sumar o restar dinero de la cuenta en funcion de si la transaccion es un ingreso o un gasto.
 
 
 @router.get("/", response_model=list[TransactionOut])
@@ -75,21 +76,58 @@ def get_transactions(
     return transactions_list
 
 
+@router.get("/{transaction_id}", response_model=TransactionOut)
+def get_transaction(
+    transaction_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+):
+    transaction = db.scalar(
+        select(Transaction).where(Transaction.id == transaction_id, Account.user_id == current_user.id)
+    )
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    return transaction
+
+
 @router.get("/account/{account_id}", response_model=list[TransactionOut])
 def get_transactions_by_account(
     account_id: int,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
-    # lógica para obtener transacciones de una cuenta específica
-    pass
+    transactions = db.scalars(select(Transaction).join(Account).where(Transaction.account_id == account_id)).all()
+    return transactions
 
 
-@router.delete("/{transaction_id}")
+@router.delete("/{transaction_id}", status_code=204)
 def delete_transaction(
     transaction_id: int,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
-    # lógica para eliminar una transacción
-    pass
+    transaction = db.scalar(select(Transaction).where(Transaction.id == transaction_id))
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    account = db.scalar(
+        select(Account).where(Account.id == transaction.account_id, Account.user_id == current_user.id)
+    )
+
+    category = db.scalar(select(Category).where(Category.id == transaction.category_id))
+
+    db.delete(transaction)
+
+    if category.type == TransactionType.EXPENSE.value:
+        db.execute(
+            update(Account)
+            .where(Account.id == transaction.account_id, Account.user_id == current_user.id)
+            .values(balance=account.balance + transaction.amount)
+        )
+    else:
+        db.execute(
+            update(Account)
+            .where(Account.id == transaction.account_id, Account.user_id == current_user.id)
+            .values(balance=account.balance - transaction.amount)
+        )
+    db.commit()

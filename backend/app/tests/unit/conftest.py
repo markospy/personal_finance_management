@@ -1,10 +1,7 @@
-from urllib.parse import urlparse
-
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, event, select, text
+from sqlalchemy import create_engine, event, select
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from ...api.oauth import create_access_token
@@ -21,22 +18,8 @@ def engine():
     """
     Create the test database (if needed) and engine
     """
-    test_db_name = "database_test"
-    db_url = urlparse(f"sqlite:///{test_db_name}.db")
-    test_engine = create_engine(f"sqlite:///backend/app/{test_db_name}.db")
-
-    try:
-        Base.metadata.drop_all(bind=test_engine)
-    except OperationalError as err:
-        if f'database "{test_db_name}" does not exist' not in str(err):
-            raise
-        root_db_url = db_url._replace(path="/postgres").geturl()
-        conn = create_engine(root_db_url, isolation_level="AUTOCOMMIT").connect()
-        conn.execute(text(f"CREATE DATABASE {test_db_name}"))
-        conn.close()
-    finally:
-        Base.metadata.create_all(bind=test_engine, checkfirst=True)
-
+    test_engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+    Base.metadata.create_all(bind=test_engine)
     return test_engine
 
 
