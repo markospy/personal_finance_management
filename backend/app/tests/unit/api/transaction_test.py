@@ -245,6 +245,31 @@ class TestGetTransactions:
         for transaction in transactions:
             assert transaction["account_id"] == create_account
 
+    def test_get_transaction_by_id(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Obtener una transacción específica por su ID
+        response = client.get(f"/transactions/{create_transactions[1]}", headers=token_user)
+        assert response.status_code == 200
+        transaction = response.json()
+        assert transaction["id"] == create_transactions[1]
+        assert transaction["amount"] == 200.0  # Ajusta esto al monto de la transacción creada
+        assert transaction["comments"] == "Cobro de servicios"  # Ajusta esto según el comentario de la transacción
+
+    def test_get_transaction_not_found(
+        self,
+        client: TestClient,
+        token_user: dict,
+    ):
+        # Intentar obtener una transacción con un ID inexistente
+        transaction_id = 999  # ID de transacción inexistente
+        response = client.get(f"/transactions/{transaction_id}", headers=token_user)
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Transaction not found"
+
 
 @pytest.mark.transaction
 @pytest.mark.delete_transaction
@@ -291,7 +316,6 @@ class TestDeleteTransactions:
         )
         assert response.status_code == 404
         assert response.json()["detail"] == "Transaction not found"
-
 
     def test_delete_transaction_not_last(
         self,
