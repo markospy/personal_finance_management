@@ -421,3 +421,5 @@ class TestDeleteTransactions:
         # Verificamos que la última transacción aún existe
         last_transaction_response = client.get(f"/transactions/{create_transactions[1]}", headers=token_user)
         assert last_transaction_response.status_code == 200
+
+    # TODO: Agregar test que compruebe la funcionalidad que impide que se eliminen transacciones de la cuenta de otro usuario.
