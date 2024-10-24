@@ -35,7 +35,6 @@ def get_one_category(
             and_(Category.id == category_id, or_(Category.is_global, Category.user_id == current_user.id))
         )
     )
-    db.commit()
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
     return category
