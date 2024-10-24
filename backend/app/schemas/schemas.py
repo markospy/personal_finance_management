@@ -112,11 +112,15 @@ class Period(BaseModel):
         return self
 
 
-class Budget(BaseModel):
+class BudgetIn(BaseModel):
     category_id: int
-    user_id: int
     amount: float = Field(ge=0)
     period: Period
+
+
+class BudgetOut(BudgetIn):
+    id: int
+    user_id: int
 
 
 class TransactionIn(BaseModel):
