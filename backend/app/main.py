@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from .api import account, category, oauth, transaction, user
+from .api import account, budget, category, oauth, transaction, user
 from .db.database import create_tables
 
 
@@ -20,3 +20,4 @@ app.include_router(oauth.router)
 app.include_router(account.router)
 app.include_router(category.router)
 app.include_router(transaction.router)
+app.include_router(budget.router)
