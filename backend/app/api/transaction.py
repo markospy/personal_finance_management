@@ -25,7 +25,7 @@ def create_transaction(
     transaction: TransactionIn,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
-    strict: Annotated[bool, Cookie()] = True,
+    strict: Annotated[bool, Cookie()] = False,
 ):
 
     category = db.scalar(

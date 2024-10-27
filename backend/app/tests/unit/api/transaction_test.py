@@ -88,7 +88,6 @@ class TestCreateTransactions:
     ):
         date = str(datetime.now())
         date_isoformat = datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f").isoformat()
-        print(f"Categorias: {create_categories}")
         response = client.post(
             "/transactions",
             headers=token_user,
