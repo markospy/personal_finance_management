@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
@@ -209,6 +209,49 @@ class TestCreateTransactions:
         )
         assert response.status_code == 400
         assert response.json()["detail"] == "Insufficient funds"
+
+    def test_create_transaction_exceeding_budget(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_account: int,
+        create_categories: tuple[int],
+    ):
+        start_date = datetime.now()
+        end_date = start_date + timedelta(days=30)
+        # Asumir que existe un presupuesto para la categoría con un límite de 500
+        budget_response = client.post(
+            "/budgets/",
+            json={
+                "category_id": 1,
+                "amount": 500.0,
+                "period": {
+                    "start_date": str(start_date),
+                    "end_date": str(end_date),
+                },
+            },
+            headers=token_user,
+        )
+        assert budget_response.status_code == 201
+
+        date = str(datetime.now())
+        # Crear una transacción que excede el presupuesto
+        response = client.post(
+            "/transactions/",
+            json={
+                "category_id": create_categories[0],
+                "account_id": create_account,
+                "amount": 600.0,
+                "date": date,
+                "comments": "Compra grande",
+                "type": "Expense",
+            },
+            headers=token_user,
+        )
+        assert response.status_code == 409
+        data = response.json()
+        assert "warning" in data
+        assert "Transacción cancelada." in data["warning"]
 
 
 @pytest.mark.transaction

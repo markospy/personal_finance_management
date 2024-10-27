@@ -1,11 +1,13 @@
+from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Security
-from sqlalchemy import and_, or_, select, update
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Security
+from fastapi.responses import JSONResponse
+from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.orm import Session
 
 from ..db.dependencie import get_db
-from ..models.models import Account, Category, Transaction
+from ..models.models import Account, Budget, Category, Transaction
 from ..schemas.schemas import (
     Scopes,
     TransactionIn,
@@ -23,7 +25,9 @@ def create_transaction(
     transaction: TransactionIn,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+    strict: Annotated[bool, Cookie()] = True,
 ):
+
     category = db.scalar(
         select(Category).where(
             and_(Category.id == transaction.category_id, or_(Category.is_global, Category.user_id == current_user.id))
@@ -38,7 +42,13 @@ def create_transaction(
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    db.add(Transaction(**transaction.model_dump(), type=category.type))
+    budget = db.scalar(
+        select(Budget).where(Budget.user_id == current_user.id, Budget.category_id == transaction.category_id)
+    )
+
+    transaction = Transaction(**transaction.model_dump(), type=category.type)
+    db.add(transaction)
+
     if category.type == TransactionType.EXPENSE.value:
         balance = account.balance - transaction.amount
         if balance < 0:
@@ -48,6 +58,33 @@ def create_transaction(
             .where(Account.id == transaction.account_id, Account.user_id == current_user.id)
             .values(balance=balance)
         )
+
+        if transaction.date >= datetime.strptime(
+            budget.period["start_date"], "%Y-%m-%d %H:%M:%S"
+        ) and transaction.date <= datetime.strptime(budget.period["end_date"], "%Y-%m-%d %H:%M:%S"):
+            total_expenses = (
+                db.scalar(
+                    select(func.sum(Transaction.amount))
+                    .join(Account)
+                    .where(
+                        Transaction.category_id == transaction.category_id,
+                        Transaction.date >= budget.period["start_date"],
+                        Transaction.date <= budget.period["end_date"],
+                        Account.user_id == current_user.id,
+                    )
+                )
+                or 0
+            )
+            new_total_expenses = total_expenses + transaction.amount
+            if budget and new_total_expenses > budget.amount and strict:
+                # Devolver un mensaje de advertencia y no guardar la transacción
+                return JSONResponse(
+                    content={
+                        "warning": f"Transacción cancelada. El gasto total para la categoría '{category.name}' supera el presupuesto proyectado de {budget.amount}.",
+                    },
+                    status_code=409,
+                )
+
     else:
         db.execute(
             update(Account)
@@ -56,8 +93,8 @@ def create_transaction(
         )
 
     db.commit()
-    created_transaction = db.scalar(select(Transaction).order_by(Transaction.id.desc()))
-    return created_transaction
+    db.refresh(transaction)
+    return transaction
 
 
 @router.get("/", response_model=list[TransactionOut])
