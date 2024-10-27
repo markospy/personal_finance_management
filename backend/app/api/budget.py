@@ -1,11 +1,11 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Security
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..db.dependencie import get_db
-from ..models.models import Budget, Category
+from ..models.models import Account, Budget, Category, Transaction
 from ..schemas.schemas import BudgetIn, BudgetOut, BudgetUpdate, Scopes, UserOut
 from .oauth import get_current_user
 
@@ -61,6 +61,43 @@ def get_one_budget(
         raise HTTPException(status_code=404, detail="Budgets is not found")
 
     return budget
+
+
+@router.get("/{budget_id}/status", response_model=dict)
+def get_one_budget_status(
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+    budget_id: int,
+    db: Session = Depends(get_db),
+):
+    budget = db.scalar(select(Budget).where(Budget.id == budget_id, Budget.user_id == current_user.id))
+    if not budget:
+        raise HTTPException(status_code=404, detail="Budgets is not found")
+
+    total_expenses = (
+        db.scalar(
+            select(func.sum(Transaction.amount))
+            .join(Account)
+            .where(
+                Transaction.category_id == budget.category_id,
+                Transaction.date >= budget.period["start_date"],
+                Transaction.date <= budget.period["end_date"],
+                Account.user_id == current_user.id,
+            )
+        )
+        or 0
+    )
+
+    # Preparar el estado del presupuesto
+    status = {
+        "category_id": budget.category_id,
+        "category_name": budget.category.name,
+        "budget_amount": budget.amount,
+        "spent_amount": total_expenses,
+        "is_exceeded": total_expenses > budget.amount,
+        "remaining_amount": budget.amount - total_expenses,
+    }
+
+    return status
 
 
 @router.put("/{budget_id}", response_model=BudgetOut, status_code=201)

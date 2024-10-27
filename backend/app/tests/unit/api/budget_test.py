@@ -27,6 +27,18 @@ def create_categories(client: TestClient, token_admin: dict, token_user: dict):
     return (global_category.json()["id"], user_category.json()["id"])
 
 
+@pytest.fixture
+def create_account(client: TestClient, token_user: dict):
+    # Crear una cuenta de prueba para el usuario
+    response = client.post(
+        "/accounts/",
+        headers=token_user,
+        json={"name": "Cuenta Ahorros", "currency": "USD", "balance": 5000},
+    )
+    assert response.status_code == 201
+    return response.json()["id"]
+
+
 @pytest.mark.budget
 @pytest.mark.create_budget
 class TestBudgetCreation:
@@ -91,6 +103,58 @@ class TestBudgetCreation:
         )
         assert response.status_code == 404
         assert response.json()["detail"] == "Category not found"
+
+    def test_get_budget_status(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_account: int,
+        create_categories: tuple[int],
+    ):
+        # Crear un presupuesto válido
+        start_date = datetime.now()
+        end_date = start_date + timedelta(days=30)
+        response = client.post(
+            "/budgets/",
+            headers=token_user,
+            json={
+                "category_id": create_categories[0],
+                "amount": 1000.0,
+                "period": {
+                    "start_date": str(start_date),
+                    "end_date": str(end_date),
+                },
+            },
+        )
+        assert response.status_code == 201
+        budget_id = response.json()["id"]
+
+        # Crear algunas transacciones para simular gastos
+        date = str(datetime.now())
+        response = client.post(
+            "/transactions",
+            headers=token_user,
+            json={
+                "category_id": create_categories[0],
+                "account_id": create_account,
+                "amount": 200.0,
+                "date": date,
+                "comments": "Pago de servicios",
+            },
+        )
+        assert response.status_code == 201
+
+        # Consultar el estado de los presupuestos
+        response = client.get(f"/budgets/{budget_id}/status", headers=token_user)
+        assert response.status_code == 200
+        data = response.json()
+
+        # Verificar la respuesta
+        assert data["category_id"] == budget_id
+        assert data["budget_amount"] == 1000.0
+        assert data["spent_amount"] == 200.0
+        assert data["remaining_amount"] == 800.0
+        assert not data["is_exceeded"]
 
 
 @pytest.mark.budget
