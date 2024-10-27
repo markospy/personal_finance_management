@@ -58,10 +58,11 @@ def create_category_global(
     if category.is_global is False:
         raise HTTPException(status_code=406, detail="This category is not global.")
 
-    db.add(Category(**category.model_dump(), user_id=None))
+    category = Category(**category.model_dump(), user_id=None)
+    db.add(category)
     db.commit()
-    new_category = db.scalar(select(Category).order_by(Category.id.desc()))
-    return new_category
+    db.refresh(category)
+    return category
 
 
 @router.post("/user", response_model=CategoryOut, status_code=201)
@@ -76,10 +77,11 @@ def create_category_user(
     if category.is_global is True:
         raise HTTPException(status_code=406, detail="This category is global.")
 
-    db.add(Category(**category.model_dump(), user_id=current_user.id))
+    category = Category(**category.model_dump(), user_id=current_user.id)
+    db.add(category)
     db.commit()
-    new_category = db.scalar(select(Category).order_by(Category.id.desc()))
-    return new_category
+    db.refresh(category)
+    return category
 
 
 @router.delete("/{category_id}/user", status_code=204)
