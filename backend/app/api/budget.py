@@ -1,12 +1,12 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Security
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db.dependencie import get_db
 from ..models.models import Budget, Category
-from ..schemas.schemas import BudgetIn, BudgetOut, Scopes, UserOut
+from ..schemas.schemas import BudgetIn, BudgetOut, BudgetUpdate, Scopes, UserOut
 from .oauth import get_current_user
 
 router = APIRouter(prefix="/budgets", tags=["budgets"])
@@ -67,33 +67,20 @@ def get_one_budget(
 def update_one_budget(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
     budget_id: int,
-    modify_budget: BudgetIn,
+    modify_budget: BudgetUpdate,
     db: Session = Depends(get_db),
 ):
-    budget = db.scalars(select(Budget).where(Budget.id == budget_id, Budget.user_id == current_user.id)).all()
-    if not budget:
-        raise HTTPException(status_code=404, detail="Budgets is not found")
-
-    modify_budget_dict = modify_budget.model_dump()
-    period = {
-        "start_date": str(modify_budget_dict["period"]["start_date"]),
-        "end_date": str(modify_budget_dict["period"]["end_date"]),
-    }
-
-    db.execute(
-        update(Budget)
-        .where(Budget.id == budget_id, Budget.user_id == current_user.id)
-        .values(
-            category_id=modify_budget.category_id,
-            amount=modify_budget.amount,
-            period=period,
-        )
-    )
-    db.commit()
-
     budget = db.scalar(select(Budget).where(Budget.id == budget_id, Budget.user_id == current_user.id))
     if not budget:
-        raise HTTPException(status_code=404, detail="Budgets is not found")
+        raise HTTPException(status_code=404, detail="Budget is not found")
+
+    modify_budget_dict = modify_budget.model_dump(exclude_unset=True)
+    # Actualiza los atributos del objeto existente
+    for key, value in modify_budget_dict.items():
+        setattr(budget, key, value)
+
+    db.commit()
+    db.refresh(budget)
     return budget
 
 

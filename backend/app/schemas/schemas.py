@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, EmailStr, Field, model_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
 from pydantic_extra_types.currency_code import Currency
 from typing_extensions import Annotated, Self
 
@@ -127,6 +127,12 @@ class BudgetOut(BudgetIn):
     user_id: int
 
 
+class BudgetUpdate(BaseModel):
+    category_id: int | None = None
+    amount: float = Field(ge=0, default=None)
+    period: Period | None = None
+
+
 class TransactionIn(BaseModel):
     category_id: int
     account_id: int
@@ -136,6 +142,7 @@ class TransactionIn(BaseModel):
 
 
 class TransactionOut(TransactionIn):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     type: TransactionType
     date: datetime
