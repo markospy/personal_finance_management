@@ -18,11 +18,11 @@ def create_account(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
-    db.add(AccountModel(**account.model_dump(), user_id=current_user.id))
+    account = AccountModel(**account.model_dump(), user_id=current_user.id)
+    db.add(account)
     db.commit()
-    stmt = select(AccountModel).order_by(AccountModel.id.desc())
-    created_account = db.scalar(stmt)
-    return created_account
+    db.refresh(account)
+    return account
 
 
 @router.get("/", response_model=list[AccountOut])
