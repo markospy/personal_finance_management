@@ -81,13 +81,17 @@ class AccountOut(AccountIn):
     user_id: int
 
 
-class ExpectedTransaction(BaseModel):
+class ExpectedTransactionIn(BaseModel):
     category_id: int
-    user_id: int
     amount: float = Field(ge=0)
     frequency: Frecuency
     date: datetime = Field(ge=datetime.now())
     type: TransactionType
+
+
+class ExpectedTransactionOut(ExpectedTransactionIn):
+    id: int
+    user_id: int
 
 
 class CategoryIn(BaseModel):

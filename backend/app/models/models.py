@@ -47,8 +47,8 @@ class ExpectedTransaction(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     amount: Mapped[float]
-    frequency: Mapped[Frecuency]
-    date: Mapped[datetime]
+    frequency: Mapped[Frecuency | None] = mapped_column(default=None)
+    date: Mapped[datetime | None] = mapped_column(default=None)
     type: Mapped[TransactionType]
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
