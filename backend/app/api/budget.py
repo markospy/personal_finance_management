@@ -31,11 +31,11 @@ def create_budget(
     budget_data["period"]["start_date"] = budget_data["period"]["start_date"].strftime("%Y-%m-%d %H:%M:%S")
     budget_data["period"]["end_date"] = budget_data["period"]["end_date"].strftime("%Y-%m-%d %H:%M:%S")
 
-    db.add(Budget(**budget_data, user_id=current_user.id))
+    budget = Budget(**budget_data, user_id=current_user.id)
+    db.add(budget)
     db.commit()
-
-    new_budget = db.scalar(select(Budget).order_by(Budget.id.desc()))
-    return new_budget
+    db.refresh(budget)
+    return budget
 
 
 @router.get("/", response_model=list[BudgetOut])
