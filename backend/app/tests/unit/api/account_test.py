@@ -22,6 +22,17 @@ class TestAccountCreation:
             "balance": 5000,
         }
 
+    def test_create_account_already_exists(self, client: TestClient, token_user: dict):
+        # Crear una cuenta inicial
+        account_data = {"currency": "USD", "balance": 1000, "name": "Cuenta de Prueba"}
+        response = client.post("/accounts/", headers=token_user, json=account_data)
+        assert response.status_code == 201
+
+        # Intentar crear la misma cuenta nuevamente
+        response_duplicate = client.post("/accounts/", headers=token_user, json=account_data)
+        assert response_duplicate.status_code == 409
+        assert response_duplicate.json()["detail"] == "Account is already exists"
+
     def test_create_account_with_invalid_currency(self, client: TestClient, token_user: dict):
         # Intentar crear una cuenta con una moneda inválida
         response = client.post(

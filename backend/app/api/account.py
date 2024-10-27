@@ -18,6 +18,12 @@ def create_account(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
+    account_db = db.scalar(
+        select(AccountModel).where(AccountModel.name == account.name, AccountModel.user_id == current_user.id)
+    )
+    if account_db:
+        raise HTTPException(status_code=409, detail="Account is already exists")
+
     account = AccountModel(**account.model_dump(), user_id=current_user.id)
     db.add(account)
     db.commit()
