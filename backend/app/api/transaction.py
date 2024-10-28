@@ -42,10 +42,6 @@ def create_transaction(
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    budget = db.scalar(
-        select(Budget).where(Budget.user_id == current_user.id, Budget.category_id == transaction.category_id)
-    )
-
     transaction = Transaction(**transaction.model_dump(), type=category.type)
     db.add(transaction)
 
@@ -59,31 +55,36 @@ def create_transaction(
             .values(balance=balance)
         )
 
-        if transaction.date >= datetime.strptime(
-            budget.period["start_date"], "%Y-%m-%d %H:%M:%S"
-        ) and transaction.date <= datetime.strptime(budget.period["end_date"], "%Y-%m-%d %H:%M:%S"):
-            total_expenses = (
-                db.scalar(
-                    select(func.sum(Transaction.amount))
-                    .join(Account)
-                    .where(
-                        Transaction.category_id == transaction.category_id,
-                        Transaction.date >= budget.period["start_date"],
-                        Transaction.date <= budget.period["end_date"],
-                        Account.user_id == current_user.id,
+        budget = db.scalar(
+            select(Budget).where(Budget.user_id == current_user.id, Budget.category_id == transaction.category_id)
+        )
+        if budget:
+            if transaction.date >= datetime.strptime(
+                budget.period["start_date"], "%Y-%m-%d %H:%M:%S"
+            ) and transaction.date <= datetime.strptime(budget.period["end_date"], "%Y-%m-%d %H:%M:%S"):
+                total_expenses = (
+                    db.scalar(
+                        select(func.sum(Transaction.amount))
+                        .join(Account)
+                        .where(
+                            Transaction.category_id == transaction.category_id,
+                            Transaction.date >= budget.period["start_date"],
+                            Transaction.date <= budget.period["end_date"],
+                            Account.user_id == current_user.id,
+                        )
                     )
+                    or 0
                 )
-                or 0
-            )
-            new_total_expenses = total_expenses + transaction.amount
-            if budget and new_total_expenses > budget.amount and strict:
-                # Devolver un mensaje de advertencia y no guardar la transacción
-                return JSONResponse(
-                    content={
-                        "warning": f"Transacción cancelada. El gasto total para la categoría '{category.name}' supera el presupuesto proyectado de {budget.amount}.",
-                    },
-                    status_code=409,
-                )
+                new_total_expenses = total_expenses + transaction.amount
+                print("new_total_expenses:", new_total_expenses)
+                if budget and new_total_expenses > budget.amount and strict:
+                    # Devolver un mensaje de advertencia y no guardar la transacción
+                    return JSONResponse(
+                        content={
+                            "warning": f"Transacción cancelada. El gasto total para la categoría '{category.name}' supera el presupuesto proyectado de {budget.amount}.",
+                        },
+                        status_code=409,
+                    )
 
     else:
         db.execute(

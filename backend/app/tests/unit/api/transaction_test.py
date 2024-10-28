@@ -86,7 +86,24 @@ class TestCreateTransactions:
         create_account: int,
         create_categories: tuple[int],
     ):
-        date = str(datetime.now())
+        start_date = datetime.now()
+        end_date = start_date + timedelta(days=30)
+        # Asumir que existe un presupuesto para la categoría con un límite de 500
+        budget_response = client.post(
+            "/budgets/",
+            json={
+                "category_id": create_categories[0],
+                "amount": 500.0,
+                "period": {
+                    "start_date": str(start_date),
+                    "end_date": str(end_date),
+                },
+            },
+            headers=token_user,
+        )
+        assert budget_response.status_code == 201
+
+        date = str(start_date)
         date_isoformat = datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f").isoformat()
         response = client.post(
             "/transactions",
@@ -222,7 +239,7 @@ class TestCreateTransactions:
         budget_response = client.post(
             "/budgets/",
             json={
-                "category_id": 1,
+                "category_id": create_categories[0],
                 "amount": 500.0,
                 "period": {
                     "start_date": str(start_date),
@@ -246,6 +263,7 @@ class TestCreateTransactions:
                 "type": "Expense",
             },
             headers=token_user,
+            cookies={"strict": "true"},
         )
         assert response.status_code == 409
         data = response.json()
