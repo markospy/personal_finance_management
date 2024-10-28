@@ -296,7 +296,7 @@ class TestUpdateBudget:
             },
         )
         assert response.status_code == 404
-        assert response.json()["detail"] == "Budgets is not found"
+        assert response.json()["detail"] == "Budget is not found"
 
 
 @pytest.mark.budget

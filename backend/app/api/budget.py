@@ -114,10 +114,15 @@ def update_one_budget(
     modify_budget_dict = modify_budget.model_dump(exclude_unset=True)
     # Actualiza los atributos del objeto existente
     for key, value in modify_budget_dict.items():
+        if key == "period":
+            value["start_date"] = str(value["start_date"])
+            value["end_date"] = str(value["end_date"])
         setattr(budget, key, value)
 
     db.commit()
     db.refresh(budget)
+    budget.period["start_date"] = str(budget.period["start_date"])
+    budget.period["end_date"] = str(budget.period["end_date"])
     return budget
 
 
