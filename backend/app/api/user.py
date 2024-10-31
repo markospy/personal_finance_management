@@ -1,37 +1,41 @@
 from typing import Annotated
 
-import requests
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Security
 from fastapi.routing import APIRouter
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db.dependencie import get_db
 from ..models.models import User
-from ..schemas.schemas import UserIn, UserOut
+from ..schemas.schemas import Scopes, UserIn, UserOut
 from .oauth import get_current_user, get_password_hash
 
 router = APIRouter(prefix="/user", tags=["user"])
 
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=201, response_model=UserOut)
 def create_user(user: UserIn, db: Session = Depends(get_db)):
-    try:
-        stmt = select(User).where(User.name == user.name)
-        database_user = db.scalar(stmt)
-        if database_user and database_user.__dict__["name"] == user.name:
-            raise HTTPException(status_code=409, detail="User already exists")
-        new_user = user.model_dump(exclude_unset=True)
-        new_user["password"] = get_password_hash(new_user["password"])
-        db.add(User(**new_user))
-        db.commit()
-        stmt = select(User).order_by(User.id.desc())
-        created_user = db.scalar(stmt)
-        return UserOut(**created_user.__dict__)
-    except requests.exceptions.HTTPError:
-        raise HTTPException(status_code=400, detail="error occured")
+    db_user = db.scalar(select(User).where(User.name == user.name))
+    if db_user:
+        raise HTTPException(status_code=409, detail="The user's name is already being used by another user")
+    new_user = user.model_dump(exclude_none=True)
+    new_user["password"] = get_password_hash(new_user["password"])
+    db.add(User(**new_user))
+    db.commit()
+    created_user = db.scalar(select(User).order_by(User.id.desc()))
+    return created_user
 
 
 @router.get("/me")
-def get_user_me(current_user: Annotated[UserOut, Depends(get_current_user)]):
+def get_me(current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])]):
     return UserOut(**current_user.model_dump())
+
+
+@router.delete("/me", status_code=204)
+def delete_me(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+):
+    db_user = db.scalar(select(User).where(User.id == current_user.id))
+    db.delete(db_user)
+    db.commit()

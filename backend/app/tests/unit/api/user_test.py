@@ -17,10 +17,10 @@ class TestUserCreation:
     def test_create_user(self, client_some: TestClient):
         response = client_some.post(
             "/user/",
-            json={"name": "John Doe", "email": "john@gmail.com", "password": "123456"},
+            json={"name": "Jane Doe", "email": "john@gmail.com", "password": "123456"},
         )
         assert response.status_code == 201
-        assert response.json() == {"id": 1, "name": "John Doe", "email": "john@gmail.com"}
+        assert response.json() == {"id": 1, "name": "Jane Doe", "email": "john@gmail.com"}
 
     def test_create_user_name_less_than_2_letters(self, client_some: TestClient):
         response = client_some.post(
@@ -60,22 +60,35 @@ class TestUserCreation:
     def test_create_user_already_exists(self, client_some: TestClient):
         response = client_some.post(
             "/user/",
-            json={"name": "John Doe", "email": "john@gmail.com", "password": "123456"},
+            json={"name": "Jane Doe", "email": "john@gmail.com", "password": "123456"},
         )
         assert response.status_code == 201
 
         response = client_some.post(
             "/user/",
-            json={"name": "John Doe", "email": "john@gmail.com", "password": "123456"},
+            json={"name": "Jane Doe", "email": "john@gmail.com", "password": "123456"},
         )
 
         assert response.status_code == 409
-        assert response.json()["detail"] == "User already exists"
+        assert response.json()["detail"] == "The user's name is already being used by another user"
 
 
 class TestUserGet:
 
-    def test_user_name(self, client: TestClient, token: dict):
-        response = client.get("/user/me", headers=token)
+    def test_user_name(self, client: TestClient, token_user: dict):
+        response = client.get("/user/me", headers=token_user)
         assert response.status_code == 200
         assert response.json()["name"] == client.user["name"]
+
+
+class TestUserDelete:
+
+    def test_delete_me(self, client: TestClient, token_user: dict):
+
+        # Delete the user
+        response = client.delete("/user/me", headers=token_user)
+        assert response.status_code == 204
+
+        # Try to get the user again, should return 404
+        response = client.get("/user/me", headers=token_user)
+        assert response.status_code == 404

@@ -1,13 +1,64 @@
-## Hello!!!👋
+**Status:** **en** **desarrollo**
+# **Sistema de Gestión de Finanzas Personales**
 
-Be very careful.We are on construction 👨‍🔧 and a brick may fall. 
+Este proyecto es una aplicación web y móvil para ayudar a los usuarios a gestionar sus finanzas personales.
 
-You can switch to the developer branch and look at your own responsibility.
-Pantalla principal
+## **Características principales**
+* Registro de ingresos y gastos
+* Categorización de transacciones
+* Creación y seguimiento de presupuestos
+* Visualización de reportes y estadísticas
+* Versión web y móvil
 
-background-image: linear-gradient(to left, #4d4dff, #008dff, #00baff, #00dfff, #4dffff);
+## **Tecnologías utilizadas**
+### Backend
+* Python
+* FastAPI
+* PostgreSQL
+### Frontend Web
+* React
+* TypeScript
+* Vite
+### Frontend Móvil
+* React Native
+* Expo
+### Infraestructura
+* Docker
+* Docker Compose
 
+## **Estructura del proyecto**
 
-Menu lateral
+```
+personal_finance_management/
+├── backend/
+│   └── app/
+├── frontend/
+│   ├── web/
+│   └── movil/
+├── docker-compose-dev.yml
+└── README.md
+```
 
-background-image: linear-gradient(to right bottom, #4d4dff, #008dff, #00baff, #00dfff, #4dffff);
+## **Configuración del entorno de desarrollo**
+1. Clona el repositorio
+2. Instala Docker y Docker Compose
+3. Ejecuta docker-compose -f docker-compose-dev.yml up.
+
+Esto levantará los contenedores de:
+
+* Backend (FastAPI)
+* Frontend Web (React)
+* Frontend Móvil (React Native)
+* Base de datos (PostgreSQL)
+* PHPMyAdmin
+
+## **Contribuir**
+Si deseas contribuir al proyecto, por favor:
+
+1. Haz un fork del repositorio
+2. Crea una nueva rama con tu funcionalidad
+3. Haz commit de tus cambios
+4. Crea un pull request
+
+## **Licencia**
+Este proyecto está bajo la licencia MIT.
