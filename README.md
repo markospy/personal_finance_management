@@ -1,4 +1,7 @@
+* [Go to markospy](https://github.com/markospy)
+
 **Status:** **en** **desarrollo**
+
 # **Sistema de Gestión de Finanzas Personales**
 
 Este proyecto es una aplicación web y móvil para ayudar a los usuarios a gestionar sus finanzas personales.
@@ -51,6 +54,9 @@ Esto levantará los contenedores de:
 * Frontend Móvil (React Native)
 * Base de datos (PostgreSQL)
 * PHPMyAdmin
+
+## **Modelo entidad-relación**
+<img src='doc/MER.png' alt='Modelo entidad-relación de la app de Finanzas Personales' />
 
 ## **Contribuir**
 Si deseas contribuir al proyecto, por favor:
