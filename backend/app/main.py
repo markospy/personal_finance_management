@@ -8,6 +8,7 @@ from .api import (
     category,
     expected_transactions,
     oauth,
+    statistics,
     transaction,
     user,
 )
@@ -30,3 +31,4 @@ app.include_router(category.router)
 app.include_router(transaction.router)
 app.include_router(budget.router)
 app.include_router(expected_transactions.router)
+app.include_router(statistics.router)
