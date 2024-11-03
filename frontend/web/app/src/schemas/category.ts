@@ -6,13 +6,13 @@ const CategoryIn = z.object(
 	{
 		name: z.string({required_error: 'Name is required'}).max(50, 'Must be 50 or fewer characters long'),
 		type: TransactionType,
-		isGlobal: z.boolean()
 	}
 )
 
 const CategoryOut = CategoryIn.merge(
 	z.object({
     id: z.number(),
+		isGlobal: z.boolean(),
     userId: z.number()
 	})
 )
