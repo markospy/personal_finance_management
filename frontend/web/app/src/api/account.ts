@@ -1,7 +1,6 @@
 import axios from "axios";
 import { AccountIn, AccountOut } from "../schemas/account";
-
-const API_URL = 'http://localhost:8000'
+import { API_URL } from "./api_url";
 
 const axi = axios.create({
 	baseURL: API_URL,
