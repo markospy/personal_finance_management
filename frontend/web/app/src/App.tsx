@@ -6,14 +6,17 @@ import {
 } from '@tanstack/react-query'
 import { useState } from 'react';
 import { getUser } from './api/user'
-import { userOut } from './schemas/user';
+import { UserOut } from './schemas/user';
+import { codes } from "currency-codes-ts";
+
+const currency_list = codes()
 
 
 const queryClient = new QueryClient()
 
 function App() {
 
-  const [user, setUser] = useState<userOut|null>(null); // Estado para almacenar la información del usuario
+  const [user, setUser] = useState<UserOut|null>(null); // Estado para almacenar la información del usuario
   const [error, setError] = useState<string|null>(null); // Estado para manejar errores
 
   const handleGetUser  = () => {
@@ -38,6 +41,7 @@ function App() {
       {user && <h2>{user.name}</h2>} {/* Muestra el nombre del usuario si existe */}
       {user && <h2>{user.email}</h2>} {/* Muestra el nombre del usuario si existe */}
       {user && <h2>{user.id}</h2>} {/* Muestra el nombre del usuario si existe */}
+      {currency_list.map(currency => <p>{currency}</p>)}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )

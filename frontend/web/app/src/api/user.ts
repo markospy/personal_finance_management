@@ -1,5 +1,5 @@
 import axios from "axios";
-import { userIn, userOut } from "../schemas/user";
+import { UserIn, UserOut } from "../schemas/user";
 
 const API_URL = 'http://localhost:8000'
 
@@ -9,7 +9,7 @@ const axi = axios.create({
     headers: {'Accept': 'application/json'},
 });
 
-export const createUser = (user: userIn) => {
+export const createUser = (user: UserIn) => {
     axi.post(
         '/user',
         {
@@ -21,7 +21,7 @@ export const createUser = (user: userIn) => {
 };
 
 
-export const getUser: (token: string) => Promise<userOut> = (token) => {
+export const getUser: (token: string) => Promise<UserOut> = (token) => {
 
     return axi.get('/user/me', {headers: {'Authorization': `Bearer ${token}`}})
         .then(response => {
