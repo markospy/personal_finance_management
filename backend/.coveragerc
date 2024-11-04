@@ -1,0 +1,13 @@
+[run]
+source =
+    app/schemas/
+    app/schemas/__init__.py
+    app/api
+    app/api/__init__.py
+    app/db
+    app/db__init__.py
+    app/models
+    app/models__init__.py
+
+[html]
+directory = app/tests/coverage_html_report
