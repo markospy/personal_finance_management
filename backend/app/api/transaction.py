@@ -13,6 +13,7 @@ from ..schemas.schemas import (
     TransactionIn,
     TransactionOut,
     TransactionType,
+    TransactionUpdate,
     UserOut,
 )
 from .oauth import get_current_user
@@ -141,7 +142,7 @@ def get_transactions_by_account(
 @router.put("/{transaction_id}", response_model=TransactionOut)
 def update_transaction(
     transaction_id: int,
-    transaction: TransactionIn,
+    transaction: TransactionUpdate,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
@@ -163,29 +164,27 @@ def update_transaction(
         raise HTTPException(status_code=400, detail="Only the last transaction can be updated")
 
     # Verificar si la categoría existe y es válida
-    category = db.scalar(
-        select(Category).where(
-            and_(Category.id == transaction.category_id, or_(Category.is_global, Category.user_id == current_user.id))
+    if transaction.category_id:
+        category = db.scalar(
+            select(Category).where(
+                and_(
+                    Category.id == transaction.category_id,
+                    or_(Category.is_global, Category.user_id == current_user.id),
+                )
+            )
         )
-    )
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+        if not category:
+            raise HTTPException(status_code=404, detail="Category not found")
 
     # Actualizar la transacción
-    last_transaction.category_id = transaction.category_id
-    last_transaction.amount = transaction.amount
-    last_transaction.date = transaction.date
-    last_transaction.comments = transaction.comments
-    db.execute(
-        update(Transaction)
-        .where(Account.id == transaction.account_id, Account.user_id == current_user.id)
-        .values(
-            category_id=transaction.category_id,
-            amount=transaction.amount,
-            date=transaction.date,
-            comments=transaction.comments,
-        )
-    )
+    if transaction.category_id:
+        last_transaction.category_id = transaction.category_id
+    if transaction.amount:
+        last_transaction.amount = transaction.amount
+    if transaction.date:
+        last_transaction.date = transaction.date
+    if transaction.comments:
+        last_transaction.comments = transaction.comments
 
     db.commit()
     return last_transaction

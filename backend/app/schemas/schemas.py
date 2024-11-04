@@ -146,3 +146,11 @@ class TransactionOut(TransactionIn):
     id: int
     type: TransactionType
     date: datetime
+
+
+class TransactionUpdate(BaseModel):
+    category_id: int | None
+    account_id: int
+    amount: float | None = Field(ge=0)
+    date: datetime | None = Field(default=datetime.now())
+    comments: str | None = Field(max_length=250, default=None)
