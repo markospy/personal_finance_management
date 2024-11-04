@@ -1,12 +1,5 @@
-import axios from "axios";
 import { UserIn, UserOut } from "../schemas/user";
-import { API_URL } from "./api_url";
-
-const axi = axios.create({
-    baseURL: API_URL,
-    timeout: 1000,
-    headers: {'Accept': 'application/json'},
-});
+import { axi } from "./api_url";
 
 export const createUser = (user: UserIn) => {
     axi.post(

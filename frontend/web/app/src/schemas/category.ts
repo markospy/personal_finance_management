@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const TransactionType = z.enum(['expense', 'income'])
+export const TransactionType = z.enum(['expense', 'income']);
 
 const CategoryIn = z.object(
 	{
@@ -11,9 +11,9 @@ const CategoryIn = z.object(
 
 const CategoryOut = CategoryIn.merge(
 	z.object({
-    id: z.number(),
+    id: z.number().int(),
 		isGlobal: z.boolean(),
-    userId: z.number()
+    userId: z.number().int()
 	})
 )
 

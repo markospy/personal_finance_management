@@ -16,8 +16,8 @@ const AccountIn = z.object(
 
 const AccountOut = AccountIn.merge(
   z.object({
-    id: z.number(),
-    userId: z.number()
+    id: z.number().int(),
+    userId: z.number().int()
   })
 )
 

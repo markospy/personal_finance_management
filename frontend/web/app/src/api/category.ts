@@ -1,16 +1,7 @@
-import axios from "axios";
 import { CategoryIn, CategoryOut } from "../schemas/category";
-import { API_URL } from "./api_url";
+import { axi } from "./api_url";
 
 type CategoryType =  'global' | 'user';
-
-
-const axi = axios.create({
-	baseURL: API_URL,
-	timeout: 1000,
-	headers: {'Accept': 'application/json'},
-});
-
 
 export const createCategory: (token: string, type: CategoryType, category: CategoryIn) => Promise<CategoryOut> = (token, type, category) => {
     const is_global = type == 'global';

@@ -1,12 +1,5 @@
-import axios from "axios";
 import { AccountIn, AccountOut } from "../schemas/account";
-import { API_URL } from "./api_url";
-
-const axi = axios.create({
-	baseURL: API_URL,
-	timeout: 1000,
-	headers: {'Accept': 'application/json'},
-});
+import { axi } from "./api_url";
 
 
 export const getAccounts: (token: string) => Promise<AccountOut[]> = (token) => {

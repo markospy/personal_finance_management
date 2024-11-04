@@ -18,7 +18,7 @@ const UserIn = userBase.merge(
 const UserOut = userBase.merge(
   z.object(
     {
-      "id": z.number()
+      "id": z.number().int()
     }
   )
 )
