@@ -135,6 +135,10 @@ def get_transactions_by_account(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
+    account = db.scalar(select(Account).where(Account.id == account_id, Account.user_id == current_user.id))
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
     transactions = db.scalars(select(Transaction).join(Account).where(Transaction.account_id == account_id)).all()
     return transactions
 
