@@ -148,8 +148,9 @@ class TransactionOut(TransactionIn):
 
 
 class TransactionUpdate(BaseModel):
-    category_id: int | None
+    category_id: int | None = None
+    # El id de la cuenta siempre se debe proporcionar para poder comprobar si es la ultima transaccion.
     account_id: int
-    amount: float | None = Field(ge=0)
+    amount: float | None = Field(ge=0, default=None)
     date: datetime | None = Field(default=datetime.now())
     comments: str | None = Field(max_length=250, default=None)
