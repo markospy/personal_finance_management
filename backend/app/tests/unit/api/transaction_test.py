@@ -123,7 +123,6 @@ class TestCreateTransactions:
         assert transaction["amount"] == 200.0
         assert transaction["date"] == date_isoformat
         assert transaction["comments"] == "Pago de servicios"
-        assert transaction["type"] == "expense"
 
         response = client.get(f"/accounts/{create_account}", headers=token_user)
         assert response.status_code == 200
@@ -156,7 +155,6 @@ class TestCreateTransactions:
         assert transaction["amount"] == 200.0
         assert transaction["date"] == date_isoformat
         assert transaction["comments"] == "Pago de servicios"
-        assert transaction["type"] == "income"
 
         response = client.get(f"/accounts/{create_account}", headers=token_user)
         assert response.status_code == 200

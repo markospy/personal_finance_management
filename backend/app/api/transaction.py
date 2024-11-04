@@ -43,7 +43,7 @@ def create_transaction(
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    transaction = Transaction(**transaction.model_dump(), type=category.type)
+    transaction = Transaction(**transaction.model_dump())
     db.add(transaction)
 
     if category.type == TransactionType.EXPENSE.value:
