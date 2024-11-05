@@ -86,12 +86,18 @@ class ExpectedTransactionIn(BaseModel):
     amount: float = Field(ge=0)
     frequency: Frecuency
     date: datetime = Field(ge=datetime.now())
-    type: TransactionType
 
 
 class ExpectedTransactionOut(ExpectedTransactionIn):
     id: int
     user_id: int
+
+
+class ExpectedTransactionUpdate(BaseModel):
+    category_id: int | None = None
+    amount: float = Field(ge=0, default=None)
+    frequency: Frecuency | None = None
+    date: datetime = Field(ge=datetime.now(), default=None)
 
 
 class CategoryIn(BaseModel):

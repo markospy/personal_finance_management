@@ -10,6 +10,7 @@ from ..models.models import ExpectedTransaction
 from ..schemas.schemas import (
     ExpectedTransactionIn,
     ExpectedTransactionOut,
+    ExpectedTransactionUpdate,
     Scopes,
     UserOut,
 )
@@ -72,7 +73,7 @@ def get_expected_transaction(
 def update_expected_transaction(
     expected_transaction_id: int,
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
-    expected_transaction: ExpectedTransactionIn,
+    expected_transaction: ExpectedTransactionUpdate,
     db: Session = Depends(get_db),
 ):
     db_expected_transaction = db.scalar(

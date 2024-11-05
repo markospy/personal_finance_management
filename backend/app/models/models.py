@@ -49,7 +49,6 @@ class ExpectedTransaction(Base):
     amount: Mapped[float]
     frequency: Mapped[Frecuency | None] = mapped_column(default=None)
     date: Mapped[datetime | None] = mapped_column(default=None)
-    type: Mapped[TransactionType]
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
     user: Mapped["User"] = relationship(back_populates="expected_transaction")

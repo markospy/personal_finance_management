@@ -46,7 +46,6 @@ class TestExpectedTransaction:
         assert expected_transaction["category_id"] == expected_transaction_data["category_id"]
         assert expected_transaction["date"] == date.isoformat()
         assert expected_transaction["frequency"] == expected_transaction_data["frequency"]
-        assert expected_transaction["type"] == expected_transaction_data["type"]
 
     def test_create_expected_transaction_already_exists(
         self, client: TestClient, token_user: dict, create_expected_transaction
