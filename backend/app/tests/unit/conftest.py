@@ -91,3 +91,29 @@ def token_admin(client):
     name = {"sub": client.user["name"], "scopes": ["admin"]}
     token = create_access_token(name)
     return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def other_user(db: Session):
+    user = UserIn(name="Jane Doe", email="john@gmail.com", password="123456")
+    new_user = user.model_dump(exclude_unset=True)
+    db.add(User(**new_user))
+    db.commit()
+    stmt = select(User).order_by(User.id.desc())
+    created_user = db.scalar(stmt)
+    user_data = UserOut(**created_user.__dict__).model_dump()
+    return user_data
+
+
+@pytest.fixture
+def other_client(other_user):
+    client = TestClient(app)
+    client.user = other_user
+    return client
+
+
+@pytest.fixture
+def other_token_user(other_client):
+    name = {"sub": other_client.user["name"], "scopes": ["user"]}
+    token = create_access_token(name)
+    return {"Authorization": f"Bearer {token}"}

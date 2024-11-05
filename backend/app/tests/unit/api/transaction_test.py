@@ -19,6 +19,18 @@ def create_account(client: TestClient, token_user: dict):
 
 
 @pytest.fixture
+def create_account_of_other_user(other_client: TestClient, other_token_user: dict):
+    # Crear una cuenta de prueba para el usuario
+    response = other_client.post(
+        "/accounts/",
+        headers=other_token_user,
+        json={"name": "Cuenta Ahorros", "currency": "USD", "balance": 5000},
+    )
+    assert response.status_code == 201
+    return response.json()["id"]
+
+
+@pytest.fixture
 def create_categories(client: TestClient, token_admin: dict, token_user: dict):
     # Crear categorías de prueba para el administrador y el usuario
     global_category = client.post(
@@ -73,6 +85,29 @@ def create_transactions(
     )
     assert transaction_2.status_code == 201
     return (transaction_1.json()["id"], transaction_2.json()["id"])
+
+
+@pytest.fixture
+def create_transactions_other_user(
+    other_client: TestClient,
+    other_token_user: dict,
+    create_account_of_other_user: int,
+    create_categories: tuple[int],
+):
+    date = str(datetime.now())
+    transaction = other_client.post(
+        "/transactions",
+        headers=other_token_user,
+        json={
+            "category_id": create_categories[0],
+            "account_id": create_account_of_other_user,
+            "amount": 200.0,
+            "date": date,
+            "comments": "Pago de servicios",
+        },
+    )
+    assert transaction.status_code == 201
+    return transaction.json()["id"]
 
 
 @pytest.mark.transaction
@@ -288,6 +323,17 @@ class TestGetTransactions:
         assert isinstance(transactions, list)
         assert len(transactions) == len(create_transactions)
 
+    def test_transactions_not_founds(
+        self,
+        client: TestClient,
+        token_user: dict,
+    ):
+
+        # Obtener todas las transacciones del usuario
+        response = client.get("/transactions/", headers=token_user)
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Transactions not found"
+
     def test_get_transactions_by_account(
         self,
         client: TestClient,
@@ -302,6 +348,16 @@ class TestGetTransactions:
         assert isinstance(transactions, list)
         for transaction in transactions:
             assert transaction["account_id"] == create_account
+
+    def test_get_transactions_by_account_not_found(
+        self,
+        client: TestClient,
+        token_user: dict,
+    ):
+
+        response = client.get("/transactions/account/999", headers=token_user)
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Account not found"
 
     def test_get_transaction_by_id(
         self,
@@ -355,6 +411,151 @@ class TestUpdateTransaction:
         assert updated_transaction["id"] == create_transactions[1]
         assert updated_transaction["amount"] == 250.0
         assert updated_transaction["comments"] == "Pago de servicios actualizado"
+
+    def test_update_balance_of_account_income_to_expense(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Datos de la transacción actualizada
+        updated_data = {
+            "category_id": 1,  # Asegúrate de que esta categoría existe
+            "account_id": 1,  # Asegúrate de que esta cuenta existe
+            "amount": 250.0,
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+
+        # Actualizar la última transacción
+        response = client.put(f"/transactions/{create_transactions[1]}", headers=token_user, json=updated_data)
+        response = client.get(f"/accounts/{1}", headers=token_user)
+        assert response.status_code == 200
+        assert response.json()["balance"] == 4550
+
+    def test_update_balance_of_account_income_to_expense_without_amount(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Datos de la transacción actualizada
+        updated_data = {
+            "category_id": 1,  # Asegúrate de que esta categoría existe
+            "account_id": 1,  # Asegúrate de que esta cuenta existe
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+
+        # Actualizar la última transacción
+        response = client.put(f"/transactions/{create_transactions[1]}", headers=token_user, json=updated_data)
+        response = client.get(f"/accounts/{1}", headers=token_user)
+        assert response.status_code == 200
+        assert response.json()["balance"] == 4600
+
+    def test_update_balance_of_account_income_to_income(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Datos de la transacción actualizada
+        updated_data = {
+            "category_id": 2,  # Asegúrate de que esta categoría existe
+            "account_id": 1,  # Asegúrate de que esta cuenta existe
+            "amount": 250.0,
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+
+        # Actualizar la última transacción
+        response = client.put(f"/transactions/{create_transactions[1]}", headers=token_user, json=updated_data)
+        response = client.get(f"/accounts/{1}", headers=token_user)
+        assert response.status_code == 200
+        assert response.json()["balance"] == 5050
+
+    def test_update_balance_of_account_expense_to_expense(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Eliminar una transacción
+        delete_response = client.delete(
+            f"/transactions/{create_transactions[1]}",
+            headers=token_user,
+        )
+        assert delete_response.status_code == 204
+
+        # Datos de la transacción actualizada
+        updated_data = {
+            "category_id": 1,  # Asegúrate de que esta categoría existe
+            "account_id": 1,  # Asegúrate de que esta cuenta existe
+            "amount": 250.0,
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+
+        # Actualizar la última transacción
+        response = client.put(f"/transactions/{create_transactions[0]}", headers=token_user, json=updated_data)
+        response = client.get(f"/accounts/{1}", headers=token_user)
+        assert response.status_code == 200
+        assert response.json()["balance"] == 4750
+
+    def test_update_balance_of_account_expense_to_income(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Datos de la transacción actualizada
+        updated_data = {
+            "category_id": 2,  # Asegúrate de que esta categoría existe
+            "account_id": 1,  # Asegúrate de que esta cuenta existe
+            "amount": 250.0,
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+
+        # Eliminar una transacción
+        delete_response = client.delete(
+            f"/transactions/{create_transactions[1]}",
+            headers=token_user,
+        )
+        assert delete_response.status_code == 204
+
+        # Actualizar la última transacción
+        response = client.put(f"/transactions/{create_transactions[0]}", headers=token_user, json=updated_data)
+        response = client.get(f"/accounts/{1}", headers=token_user)
+        assert response.status_code == 200
+        assert response.json()["balance"] == 5250
+
+    def test_update_balance_of_account_expense_to_income_without_amount(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Datos de la transacción actualizada
+        updated_data = {
+            "category_id": 2,  # Asegúrate de que esta categoría existe
+            "account_id": 1,  # Asegúrate de que esta cuenta existe
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+
+        # Eliminar una transacción
+        delete_response = client.delete(
+            f"/transactions/{create_transactions[1]}",
+            headers=token_user,
+        )
+        assert delete_response.status_code == 204
+
+        # Actualizar la última transacción
+        response = client.put(f"/transactions/{create_transactions[0]}", headers=token_user, json=updated_data)
+        response = client.get(f"/accounts/{1}", headers=token_user)
+        assert response.status_code == 200
+        assert response.json()["balance"] == 5200
 
     def test_update_transaction_not_found(
         self,
@@ -413,12 +614,32 @@ class TestUpdateTransaction:
         assert response.status_code == 404
         assert response.json()["detail"] == "Account not found"
 
+    def test_update_transaction_category_not_found(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions: tuple[int],
+    ):
+        # Datos de la transacción actualizada con un ID de cuenta que no existe
+        updated_data = {
+            "category_id": 999,  # Esta categoria no existe
+            "account_id": 1,  # ID de cuenta inexistente
+            "amount": 250.0,
+            "date": str(datetime.now()),
+            "comments": "Pago de servicios actualizado",
+        }
+
+        # Intentar actualizar la última transacción
+        response = client.put(f"/transactions/{create_transactions[1]}", headers=token_user, json=updated_data)
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Category not found"
+
 
 @pytest.mark.transaction
 @pytest.mark.delete_transaction
 class TestDeleteTransactions:
 
-    def test_delete_transaction(
+    def test_delete_transaction_income(
         self,
         client: TestClient,
         token_user: dict,
@@ -426,7 +647,7 @@ class TestDeleteTransactions:
         create_transactions: tuple[int],
     ):
 
-        # Eliminar una transacción
+        # Eliminar una transacción income
         delete_response = client.delete(
             f"/transactions/{create_transactions[1]}",
             headers=token_user,
@@ -445,6 +666,26 @@ class TestDeleteTransactions:
         response = client.get(f"/accounts/{create_account}", headers=token_user)
         assert response.status_code == 200
         assert response.json()["balance"] == 4800
+
+        # Eliminar una transacción expense
+        delete_response = client.delete(
+            f"/transactions/{create_transactions[0]}",
+            headers=token_user,
+        )
+        assert delete_response.status_code == 204
+
+        # Verificar que la transacción ya no exista
+        get_response = client.get(
+            f"/transactions/{create_transactions[0]}",
+            headers=token_user,
+        )
+        assert get_response.status_code == 404
+        assert get_response.json()["detail"] == "Transaction not found"
+
+        # Verifica que el saldo de la cuenta se haya restaurado
+        response = client.get(f"/accounts/{create_account}", headers=token_user)
+        assert response.status_code == 200
+        assert response.json()["balance"] == 5000
 
     def test_delete_transaction_not_found(
         self,
@@ -480,4 +721,18 @@ class TestDeleteTransactions:
         last_transaction_response = client.get(f"/transactions/{create_transactions[1]}", headers=token_user)
         assert last_transaction_response.status_code == 200
 
-    # TODO: Agregar test que compruebe la funcionalidad que impide que se eliminen transacciones de la cuenta de otro usuario.
+    def test_delete_transaction_of_other_user_account(
+        self,
+        client: TestClient,
+        token_user: dict,
+        create_transactions_other_user: int,
+    ):
+
+        # Intentamos eliminar la primera transacción, que no es la última
+        response = client.delete(
+            f"/transactions/{create_transactions_other_user}",
+            headers=token_user,
+        )
+
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Transaction not found"

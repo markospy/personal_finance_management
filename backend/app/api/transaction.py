@@ -187,13 +187,22 @@ def update_transaction(
                 if transaction.amount:
                     account.balance = amount + transaction.amount
                 else:
-                    account.balance = amount
+                    account.balance = amount + transaction_existing.amount
             else:
                 amount = account.balance - transaction_existing.amount
                 if transaction.amount:
                     account.balance = amount - transaction.amount
                 else:
-                    account.balance = amount
+                    account.balance = amount - transaction_existing.amount
+        else:
+            if category_of_transaction_existing.type == TransactionType.EXPENSE.value:
+                amount = account.balance + transaction_existing.amount
+                if transaction.amount:
+                    account.balance = amount - transaction.amount
+            else:
+                amount = account.balance - transaction_existing.amount
+                if transaction.amount:
+                    account.balance = amount + transaction.amount
 
     # Actualizar la transacción
     if transaction.category_id:
