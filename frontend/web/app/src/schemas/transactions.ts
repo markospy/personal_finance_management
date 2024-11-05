@@ -6,7 +6,7 @@ const TransactionIn = z.object({
     account_id: z.number().int(),
     amount: z.number().nonnegative(),
     date: z.date().optional().default(() => new Date()),
-    comments: z.string().max(250).optional().nullable(),
+    comments: z.string().max(250).optional(),
 });
 
 const TransactionOut = TransactionIn.extend({
@@ -15,11 +15,11 @@ const TransactionOut = TransactionIn.extend({
 });
 
 const TransactionUpdate = z.object({
-    category_id: z.number().int().optional().nullable(),
-    account_id: z.number().int(),
-    amount: z.number().nonnegative().optional().nullable(),
-    date: z.date().optional().default(() => new Date()),
-    comments: z.string().max(250).optional().nullable(),
+    category_id: z.number().int().optional(),
+    account_id: z.number().int().optional(),
+    amount: z.number().nonnegative().optional(),
+    date: z.date().default(() => new Date()).optional(),
+    comments: z.string().max(250).optional(),
 });
 
 export type TransactionIn = z.infer<typeof TransactionIn>
