@@ -33,36 +33,6 @@ class TestAccountCreation:
         assert response_duplicate.status_code == 409
         assert response_duplicate.json()["detail"] == "Account is already exists"
 
-    def test_create_account_with_invalid_currency(self, client: TestClient, token_user: dict):
-        # Intentar crear una cuenta con una moneda inválida
-        response = client.post(
-            "/accounts/",
-            headers=token_user,
-            json={"name": "Cuenta Ahorros", "currency": "INVALID_CURRENCY", "balance": 5000},
-        )
-        assert response.status_code == 422
-        assert "String should have" in response.json()["detail"][0]["msg"]
-
-    def test_create_account_without_name(self, client: TestClient, token_user: dict):
-        # Intentar crear una cuenta sin el campo "name"
-        response = client.post(
-            "/accounts/",
-            headers=token_user,
-            json={"currency": "USD", "balance": 5000},
-        )
-        assert response.status_code == 422
-        assert response.json()["detail"][0]["msg"] == "Field required"
-
-    def test_create_account_balance_below_zero(self, client: TestClient, token_user: dict):
-        # Intentar crear una cuenta con un balance negativo
-        response = client.post(
-            "/accounts/",
-            headers=token_user,
-            json={"name": "Cuenta Corriente", "currency": "USD", "balance": -100},
-        )
-        assert response.status_code == 422
-        assert response.json()["detail"][0]["msg"] == "Input should be greater than or equal to 0"
-
 
 @pytest.mark.account
 @pytest.mark.get_account

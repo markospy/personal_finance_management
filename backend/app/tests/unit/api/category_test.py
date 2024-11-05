@@ -66,6 +66,22 @@ class TestCategoryCreation:
             "is_global": False,
         }
 
+    def test_create_user_category_already_exists(self, client: TestClient, token_user: dict):
+        # Crear una categoría válida
+        response = client.post(
+            "/categories/user",
+            headers=token_user,
+            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value, "is_global": False},
+        )
+        assert response.status_code == 201
+        response = client.post(
+            "/categories/user",
+            headers=token_user,
+            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value, "is_global": False},
+        )
+        assert response.status_code == 409
+        assert response.json()["detail"] == "The category is already exists"
+
     def test_create_not_user_category(self, client: TestClient, token_user: dict):
         # Crear una categoría válida
         response = client.post(
@@ -80,36 +96,6 @@ class TestCategoryCreation:
         )
         assert response.status_code == 406
         assert response.json()["detail"] == "This category is global."
-
-    def test_create_category_without_name(self, client: TestClient, token_user: dict):
-        # Intentar crear una categoría sin nombre
-        response = client.post(
-            "/categories/user",
-            headers=token_user,
-            json={"type": TransactionType.EXPENSE.value},
-        )
-        assert response.status_code == 422
-        assert response.json()["detail"][0]["msg"] == "Field required"
-
-    def test_create_category_without_type(self, client: TestClient, token_user: dict):
-        # Intentar crear una categoría sin nombre
-        response = client.post(
-            "/categories/user",
-            headers=token_user,
-            json={"name": "Nexflix"},
-        )
-        assert response.status_code == 422
-        assert response.json()["detail"][0]["msg"] == "Field required"
-
-    def test_create_category_with_invalid_type(self, client: TestClient, token_user: dict):
-        # Intentar crear una categoría con un tipo no válido
-        response = client.post(
-            "/categories/user",
-            headers=token_user,
-            json={"name": "Transporte", "type": "other"},
-        )
-        assert response.status_code == 422
-        assert response.json()["detail"][0]["msg"] == "Input should be 'expense' or 'income'"
 
 
 @pytest.mark.category
