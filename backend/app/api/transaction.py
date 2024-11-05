@@ -50,11 +50,7 @@ def create_transaction(
         balance = account.balance - transaction.amount
         if balance < 0:
             raise HTTPException(status_code=400, detail="Insufficient funds")
-        db.execute(
-            update(Account)
-            .where(Account.id == transaction.account_id, Account.user_id == current_user.id)
-            .values(balance=balance)
-        )
+        account.balance = balance
 
         budget = db.scalar(
             select(Budget).where(Budget.user_id == current_user.id, Budget.category_id == transaction.category_id)
@@ -88,11 +84,7 @@ def create_transaction(
                     )
 
     else:
-        db.execute(
-            update(Account)
-            .where(Account.id == transaction.account_id, Account.user_id == current_user.id)
-            .values(balance=account.balance + transaction.amount)
-        )
+        account.balance += transaction.amount
 
     db.commit()
     db.refresh(transaction)
@@ -179,6 +171,29 @@ def update_transaction(
         )
         if not category:
             raise HTTPException(status_code=404, detail="Category not found")
+
+        category_of_transaction_existing = db.scalar(
+            select(Category).where(
+                and_(
+                    Category.id == transaction_existing.category_id,
+                    or_(Category.is_global, Category.user_id == current_user.id),
+                )
+            )
+        )
+        # Comprobar si el tipo de las categorías han cambiado:
+        if category.type != category_of_transaction_existing.type:
+            if category_of_transaction_existing.type == TransactionType.EXPENSE.value:
+                amount = account.balance + transaction_existing.amount
+                if transaction.amount:
+                    account.balance = amount + transaction.amount
+                else:
+                    account.balance = amount
+            else:
+                amount = account.balance - transaction_existing.amount
+                if transaction.amount:
+                    account.balance = amount - transaction.amount
+                else:
+                    account.balance = amount
 
     # Actualizar la transacción
     if transaction.category_id:
