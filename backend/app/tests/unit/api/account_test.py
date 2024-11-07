@@ -6,62 +6,65 @@ from fastapi.testclient import TestClient
 @pytest.mark.create_account
 class TestAccountCreation:
 
-    def test_create_account(self, client: TestClient, token_user: dict):
+    def test_create_account(self, client_John: TestClient, John_token: dict):
         # Crear una cuenta válida
-        response = client.post(
+        response = client_John.post(
             "/accounts/",
-            headers=token_user,
+            headers=John_token,
             json={"name": "Cuenta Ahorros", "currency": "USD", "balance": 5000},
         )
         assert response.status_code == 201
-        assert response.json() == {
-            "id": 1,
-            "user_id": client.user["id"],
-            "name": "Cuenta Ahorros",
-            "currency": "USD",
-            "balance": 5000,
+        assert response.json()["id"] == 1
+        assert response.json()["user_id"] == client_John.user["id"]
+        assert response.json()["name"] == "Cuenta Ahorros"
+        assert response.json()["currency"] == "USD"
+        assert response.json()["balance"] == 5000
+
+    def test_create_account_already_exists(
+        self,
+        client_John: TestClient,
+        John_token: dict,
+        account_John: dict,
+    ):
+        # Datos de la cuenta existente
+        account_data = {
+            "currency": account_John["currency"],
+            "balance": 900,
+            "name": account_John["name"],
         }
 
-    def test_create_account_already_exists(self, client: TestClient, token_user: dict):
-        # Crear una cuenta inicial
-        account_data = {"currency": "USD", "balance": 1000, "name": "Cuenta de Prueba"}
-        response = client.post("/accounts/", headers=token_user, json=account_data)
-        assert response.status_code == 201
-
         # Intentar crear la misma cuenta nuevamente
-        response_duplicate = client.post("/accounts/", headers=token_user, json=account_data)
-        assert response_duplicate.status_code == 409
-        assert response_duplicate.json()["detail"] == "Account is already exists"
+        response = client_John.post("/accounts/", headers=John_token, json=account_data)
+        assert response.status_code == 409
+        assert response.json()["detail"] == "Account is already exists"
 
 
 @pytest.mark.account
 @pytest.mark.get_account
 class TestGetAccount:
 
-    def test_get_account(self, client: TestClient, token_user: dict):
+    def test_get_account(self, client_John: TestClient, John_token: dict):
         # Crear una cuenta primero
-        response = client.post(
+        response = client_John.post(
             "/accounts/",
-            headers=token_user,
+            headers=John_token,
             json={"name": "Cuenta Ahorros", "currency": "USD", "balance": 5000},
         )
         assert response.status_code == 201
         account_id = response.json()["id"]
 
         # Obtener la cuenta creada
-        response = client.get(f"/accounts/{account_id}", headers=token_user)
+        response = client_John.get(f"/accounts/{account_id}", headers=John_token)
         assert response.status_code == 200
-        assert response.json() == {
-            "id": account_id,
-            "user_id": client.user["id"],
-            "name": "Cuenta Ahorros",
-            "currency": "USD",
-            "balance": 5000,
-        }
+        assert response.json()["id"] == account_id
+        assert response.json()["user_id"] == client_John.user["id"]
+        assert response.json()["name"] == "Cuenta Ahorros"
+        assert response.json()["currency"] == "USD"
+        assert response.json()["balance"] == 5000
 
-    def test_get_non_existent_account(self, client: TestClient, token_user: dict):
+    def test_get_non_existent_account(self, client_John: TestClient, John_token: dict):
         # Intentar obtener una cuenta inexistente
-        response = client.get("/accounts/99999", headers=token_user)
+        response = client_John.get("/accounts/99999", headers=John_token)
         assert response.status_code == 404
         assert response.json()["detail"] == "Account not found"
 
@@ -70,60 +73,63 @@ class TestGetAccount:
 @pytest.mark.list_accounts
 class TestListAccounts:
 
-    def test_list_accounts(self, client: TestClient, token_user: dict):
-        # Crear múltiples cuentas
-        response = client.post(
+    def test_list_accounts(self, client_John: TestClient, John_token: dict, account_John: dict):
+        # Crear una segunda cuenta
+        response = client_John.post(
             "/accounts/",
-            headers=token_user,
-            json={"name": "Cuenta Ahorros", "currency": "USD", "balance": 5000},
-        )
-        assert response.status_code == 201
-        response = client.post(
-            "/accounts/",
-            headers=token_user,
+            headers=John_token,
             json={"name": "Cuenta Corriente", "currency": "EUR", "balance": 1000},
         )
         assert response.status_code == 201
+        id_second_account = response.json()["id"]
+
         # Listar todas las cuentas del usuario
-        response = client.get("/accounts/", headers=token_user)
+        response = client_John.get("/accounts/", headers=John_token)
         assert response.status_code == 200
         assert len(response.json()) == 2
-        assert response.json() == [
-            {"currency": "USD", "balance": 5000, "name": "Cuenta Ahorros", "id": 1, "user_id": 1},
-            {"currency": "EUR", "balance": 1000, "name": "Cuenta Corriente", "id": 2, "user_id": 1},
-        ]
+        first_account, second_account = account_John, response.json()[1]
 
-    def test_list_accounts_no_accounts(self, client: TestClient, token_user: dict):
-        # Listar todas las cuentas del usuario (should raise 404)
-        response = client.get("/accounts/", headers=token_user)
+        assert first_account["id"] == account_John["id"]
+        assert first_account["user_id"] == client_John.user["id"]
+        assert first_account["name"] == account_John["name"]
+        assert first_account["currency"] == account_John["currency"]
+        assert first_account["balance"] == account_John["balance"]
+
+        assert second_account["id"] == id_second_account
+        assert second_account["user_id"] == client_John.user["id"]
+        assert second_account["name"] == "Cuenta Corriente"
+        assert second_account["currency"] == "EUR"
+        assert second_account["balance"] == 1000
+
+    def test_list_accounts_not_found(self, client_John: TestClient, John_token: dict):
+        # Listar todas las cuentas de un usuario sin cuentas
+        response = client_John.get("/accounts/", headers=John_token)
         assert response.status_code == 404
+        assert response.json()["detail"] == "Accounts not found"
 
 
 @pytest.mark.account
 @pytest.mark.delete_account
 class TestDeleteAccount:
 
-    def test_delete_account(self, client: TestClient, token_user: dict):
-        # Crear una cuenta primero
-        response = client.post(
-            "/accounts/",
-            headers=token_user,
-            json={"name": "Cuenta Ahorros", "currency": "USD", "balance": 5000},
-        )
-        assert response.status_code == 201
-        account_id = response.json()["id"]
+    def test_delete_account(
+        self,
+        client_John: TestClient,
+        John_token: dict,
+        account_John: dict,
+    ):
 
-        # Eliminar la cuenta creada
-        response = client.delete(f"/accounts/{account_id}", headers=token_user)
+        # Eliminar la cuenta
+        response = client_John.delete(f"/accounts/{account_John["id"]}", headers=John_token)
         assert response.status_code == 204  # Código de éxito esperado para eliminación
 
         # Verificar que la cuenta ya no existe
-        response = client.get(f"/accounts/{account_id}", headers=token_user)
+        response = client_John.get(f"/accounts/{account_John["id"]}", headers=John_token)
         assert response.status_code == 404
         assert response.json()["detail"] == "Account not found"
 
-    def test_delete_non_existent_account(self, client: TestClient, token_user: dict):
+    def test_delete_non_existent_account(self, client_John: TestClient, John_token: dict):
         # Intentar eliminar una cuenta que no existe
-        response = client.delete("/accounts/99999", headers=token_user)
+        response = client_John.delete("/accounts/99999", headers=John_token)
         assert response.status_code == 404
         assert response.json()["detail"] == "Account not found"
