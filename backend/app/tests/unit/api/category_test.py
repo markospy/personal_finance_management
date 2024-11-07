@@ -8,25 +8,23 @@ from ....schemas.schemas import TransactionType
 @pytest.mark.create_category
 class TestCategoryCreation:
 
-    def test_create_global_category(self, client: TestClient, token_admin: dict):
+    def test_create_global_category(self, client_John: TestClient, token_admin: dict):
         # Crear una categoría válida
-        response = client.post(
+        response = client_John.post(
             "/categories/global",
             headers=token_admin,
             json={"name": "Alimentos", "type": TransactionType.EXPENSE.value},
         )
         assert response.status_code == 201
-        assert response.json() == {
-            "id": 1,
-            "name": "Alimentos",
-            "type": TransactionType.EXPENSE.value,
-            "user_id": None,
-            "is_global": True,
-        }
+        assert response.json()["id"] == 1
+        assert response.json()["name"] == "Alimentos"
+        assert response.json()["type"] == TransactionType.EXPENSE.value
+        assert response.json()["user_id"] is None
+        assert response.json()["is_global"] is True
 
-    def test_create_not_global_category(self, client: TestClient, token_admin: dict):
+    def test_create_not_global_category(self, client_John: TestClient, token_admin: dict):
         # Crear una categoría no global en la ruta para crear categorias globales
-        response = client.post(
+        response = client_John.post(
             "/categories/global",
             headers=token_admin,
             json={"name": "Alimentos", "type": TransactionType.EXPENSE.value, "is_global": False},
@@ -34,27 +32,24 @@ class TestCategoryCreation:
         assert response.status_code == 406
         assert response.json()["detail"] == "This category is not global."
 
-    def test_create_global_category_already_exists(self, client: TestClient, token_admin: dict):
-        # Crear una categoría válida
-        response = client.post(
-            "/categories/global",
-            headers=token_admin,
-            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value},
-        )
-        assert response.status_code == 201
-        response = client.post(
-            "/categories/global",
-            headers=token_admin,
-            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value},
-        )
+    def test_create_global_category_already_exists(
+        self, client_John: TestClient, token_admin: dict, global_expense_category: dict
+    ):
+        # Datos de categoria existente
+        category_data = {
+            "name": global_expense_category["name"],
+            "type": global_expense_category["type"],
+        }
+        # Crear una categoría igual a la existente
+        response = client_John.post("/categories/global", headers=token_admin, json=category_data)
         assert response.status_code == 409
         assert response.json()["detail"] == "The category is already exists"
 
-    def test_create_user_category(self, client: TestClient, token_user: dict):
+    def test_create_user_category(self, client_John: TestClient, John_token: dict):
         # Crear una categoría válida
-        response = client.post(
+        response = client_John.post(
             "/categories/user",
-            headers=token_user,
+            headers=John_token,
             json={"name": "Alimentos", "type": TransactionType.EXPENSE.value, "is_global": False},
         )
         assert response.status_code == 201
@@ -62,36 +57,37 @@ class TestCategoryCreation:
             "id": 1,
             "name": "Alimentos",
             "type": TransactionType.EXPENSE.value,
-            "user_id": client.user["id"],
+            "user_id": client_John.user["id"],
             "is_global": False,
         }
 
-    def test_create_user_category_already_exists(self, client: TestClient, token_user: dict):
-        # Crear una categoría válida
-        response = client.post(
+    def test_create_user_category_already_exists(
+        self, client_John: TestClient, John_token: dict, John_income_category: dict
+    ):
+        # Datos de categoria existente
+        category_data = {
+            "name": John_income_category["name"],
+            "type": John_income_category["type"],
+        }
+        # Crear una categoría igual a la existente
+        response = client_John.post(
             "/categories/user",
-            headers=token_user,
-            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value, "is_global": False},
-        )
-        assert response.status_code == 201
-        response = client.post(
-            "/categories/user",
-            headers=token_user,
-            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value, "is_global": False},
+            headers=John_token,
+            json=category_data,
         )
         assert response.status_code == 409
         assert response.json()["detail"] == "The category is already exists"
 
-    def test_create_not_user_category(self, client: TestClient, token_user: dict):
+    def test_create_not_user_category(self, client_John: TestClient, John_token: dict):
         # Crear una categoría válida
-        response = client.post(
+        response = client_John.post(
             "/categories/user",
-            headers=token_user,
+            headers=John_token,
             json={
                 "name": "Alimentos",
                 "type": TransactionType.EXPENSE.value,
                 "is_global": True,
-                "user_id": client.user["id"],
+                "user_id": client_John.user["id"],
             },
         )
         assert response.status_code == 406
@@ -102,32 +98,26 @@ class TestCategoryCreation:
 @pytest.mark.get_category
 class TestGetCategory:
 
-    def test_get_category(self, client: TestClient, token_admin: dict, token_user: dict):
-        # Crear una categoría
-        category_response = client.post(
-            "/categories/global",
-            headers=token_admin,
-            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value},
-        )
-        assert category_response.status_code == 201
-        category_id = category_response.json()["id"]
-
-        # Obtener la categoría creada
-        response = client.get(f"/categories/{category_id}", headers=token_user)
+    def test_get_category(
+        self,
+        client_John: TestClient,
+        John_token: dict,
+        global_expense_category: dict,
+    ):
+        # Obtener la categoría existente
+        response = client_John.get(f"/categories/{global_expense_category["id"]}", headers=John_token)
         assert response.status_code == 200
-        assert response.json() == {
-            "id": category_id,
-            "name": "Alimentos",
-            "type": TransactionType.EXPENSE.value,
-            "user_id": None,
-            "is_global": True,
-        }
+        assert response.json()["id"] == global_expense_category["id"]
+        assert response.json()["name"] == global_expense_category["name"]
+        assert response.json()["type"] == global_expense_category["type"]
+        assert response.json()["user_id"] == global_expense_category["user_id"]
+        assert response.json()["is_global"] == global_expense_category["is_global"]
 
-    def test_get_non_existent_category(self, client: TestClient, token_user: dict):
+    def test_get_non_existent_category(self, client_John: TestClient, John_token: dict):
         # Intentar obtener una categoría que no existe
-        response = client.get(
+        response = client_John.get(
             "/categories/99999",
-            headers=token_user,
+            headers=John_token,
         )
         assert response.status_code == 404
         assert response.json()["detail"] == "Category not found"
@@ -137,42 +127,51 @@ class TestGetCategory:
 @pytest.mark.list_categories
 class TestListCategories:
 
-    def test_list_categories(self, client: TestClient, token_user: dict, token_admin: dict):
-        # Crear varias categorías
-        response = client.post(
-            "/categories/global",
-            headers=token_admin,
-            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value},
-        )
-        assert response.status_code == 201
-
-        response = client.post(
-            "/categories/user",
-            headers=token_user,
-            json={"name": "Cine", "type": TransactionType.EXPENSE.value, "is_global": False},
-        )
-        assert response.status_code == 201
-
-        response = client.post(
-            "/categories/user",
-            headers=token_user,
-            json={"name": "Coche", "type": TransactionType.EXPENSE.value, "is_global": False},
-        )
-        assert response.status_code == 201
+    def test_list_categories(
+        self,
+        client_John: TestClient,
+        John_token: dict,
+        global_expense_category: dict,
+        John_income_category: dict,
+    ):
 
         # Listar todas las categorías
-        response = client.get(
+        response = client_John.get(
             "/categories",
-            headers=token_user,
+            headers=John_token,
         )
         assert response.status_code == 200
-        assert len(response.json()) == 3
+        assert len(response.json()) == 2
 
-    def test_not_found_list_categories(self, client: TestClient, token_user: dict):
+        categories = response.json()
+        # Verificar que las categorías listadas son las esperadas
+        print(categories[0])
+        print(categories[1])
+        assert any(
+            [
+                cat["name"] == global_expense_category["name"]
+                and cat["type"] == global_expense_category["type"]
+                and cat["user_id"] == global_expense_category["user_id"]
+                and cat["is_global"]
+                for cat in categories
+            ]
+        )
+
+        assert any(
+            [
+                cat["name"] == John_income_category["name"]
+                and cat["type"] == John_income_category["type"]
+                and cat["user_id"] == John_income_category["user_id"]
+                and not cat["is_global"]
+                for cat in categories
+            ]
+        )
+
+    def test_not_found_list_categories(self, client_John: TestClient, John_token: dict):
         # Listar todas las categorías
-        response = client.get(
+        response = client_John.get(
             "/categories",
-            headers=token_user,
+            headers=John_token,
         )
         assert response.status_code == 404
         assert response.json()["detail"] == "Category not found"
@@ -182,68 +181,53 @@ class TestListCategories:
 @pytest.mark.delete_category
 class TestDeleteCategory:
 
-    def test_delete_user_category(self, client: TestClient, token_user: dict):
-        # Crear una categoría
-        category_response = client.post(
-            "/categories/user",
-            headers=token_user,
-            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value, "is_global": False},
-        )
-        assert category_response.status_code == 201
-        category_id = category_response.json()["id"]
-
+    def test_delete_user_category(self, client_John: TestClient, John_token: dict, John_income_category: dict):
         # Eliminar la categoría creada
-        response = client.delete(
-            f"/categories/{category_id}/user",
-            headers=token_user,
+        response = client_John.delete(
+            f"/categories/{John_income_category["id"]}/user",
+            headers=John_token,
         )
         assert response.status_code == 204
 
         # Verificar que la categoría ya no existe
-        response = client.get(
-            f"/categories/{category_id}",
-            headers=token_user,
+        response = client_John.get(
+            f"/categories/{John_income_category["id"]}",
+            headers=John_token,
         )
         assert response.status_code == 404
         assert response.json()["detail"] == "Category not found"
 
-    def test_delete_non_existent_user_category(self, client: TestClient, token_user: dict):
+    def test_delete_non_existent_user_category(self, client_John: TestClient, John_token: dict):
         # Intentar eliminar una categoría que no existe
-        response = client.delete(
-            "/categories/99999/user",
-            headers=token_user,
-        )
+        response = client_John.delete("/categories/99999/user", headers=John_token)
         assert response.status_code == 404
         assert response.json()["detail"] == "Category not found"
 
-    def test_delete_global_category(self, client: TestClient, token_admin: dict, token_user: dict):
-        # Crear una categoría
-        category_response = client.post(
-            "/categories/global",
-            headers=token_admin,
-            json={"name": "Alimentos", "type": TransactionType.EXPENSE.value},
-        )
-        assert category_response.status_code == 201
-        category_id = category_response.json()["id"]
-
-        # Eliminar la categoría creada
-        response = client.delete(
-            f"/categories/{category_id}/global",
+    def test_delete_global_category(
+        self,
+        client_John: TestClient,
+        token_admin: dict,
+        John_token: dict,
+        global_expense_category: dict,
+    ):
+        # Eliminar la categoría existente
+        response = client_John.delete(
+            f"/categories/{global_expense_category["id"]}/global",
             headers=token_admin,
         )
         assert response.status_code == 204
 
         # Verificar que la categoría ya no existe
-        response = client.get(
-            f"/categories/{category_id}",
-            headers=token_user,
+        response = client_John.get(
+            f"/categories/{global_expense_category["id"]}",
+            headers=John_token,
         )
         assert response.status_code == 404
         assert response.json()["detail"] == "Category not found"
 
-    def test_delete_non_existent_global_category(self, client: TestClient, token_admin: dict):
+    def test_delete_non_existent_global_category(self, client_John: TestClient, token_admin: dict):
         # Intentar eliminar una categoría que no existe
-        response = client.delete(
+        response = client_John.delete(
             "/categories/99999/global",
             headers=token_admin,
         )
