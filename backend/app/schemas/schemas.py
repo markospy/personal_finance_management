@@ -84,8 +84,8 @@ class AccountOut(AccountIn):
 class ExpectedTransactionIn(BaseModel):
     category_id: int
     amount: float = Field(ge=0)
-    frequency: Frecuency
-    date: datetime = Field(ge=datetime.now())
+    frequency: Frecuency | None = None
+    date: datetime | None = Field(ge=datetime.now(), default=None)
 
 
 class ExpectedTransactionOut(ExpectedTransactionIn):
