@@ -6,4 +6,4 @@ source =
     app/models
 
 [html]
-directory = app/tests/coverage_html_report
+directory = app\tests\coverage_html_report

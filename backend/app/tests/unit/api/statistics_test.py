@@ -61,7 +61,15 @@ class TestStatistics:
         assert data["total_expenses"] == 1800.0  # 1000 + 500 + 300
         assert data["total_income"] == 3500.0  # 2000 + 1500
 
-    def test_get_expenses_by_category(self, client_John: TestClient, John_token: dict, setup_transactions: None):
+    def test_get_expenses_by_category(
+        self,
+        client_John: TestClient,
+        John_token: dict,
+        setup_transactions: None,
+        account_John: dict,
+        global_expense_category: dict,
+        John_income_category: dict,
+    ):
         """Test para obtener las categorías ordenadas por gastos"""
         response = client_John.get(
             "/statistics/expenses-by-category",
@@ -82,7 +90,15 @@ class TestStatistics:
         # Verificar la primera categoría (la de mayor gasto)
         assert categories[0]["total_amount"] == 1800.0  # 1000 + 500
 
-    def test_get_incomes_by_category(self, client_John: TestClient, John_token: dict, setup_transactions: None):
+    def test_get_incomes_by_category(
+        self,
+        client_John: TestClient,
+        John_token: dict,
+        setup_transactions: None,
+        account_John: dict,
+        global_expense_category: dict,
+        John_income_category: dict,
+    ):
         """Test para obtener las categorías ordenadas por gastos"""
         response = client_John.get(
             "/statistics/incomes-by-category",
@@ -102,3 +118,103 @@ class TestStatistics:
 
         # Verificar la primera categoría (la de mayor gasto)
         assert categories[0]["total_amount"] == 3500.0  # 1000 + 500
+
+    def test_get_monthly_summary_invalid_date(self, client_John: TestClient, John_token: dict):
+        """Test para obtener el resumen mensual con fecha inválida"""
+        response = client_John.get(
+            "/statistics/monthly-summary",
+            headers=John_token,
+            params={"year": 2023, "month": 13},  # Mes inválido
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Invalid year or month"
+
+    def test_get_expenses_by_category_invalid_date(self, client_John: TestClient, John_token: dict):
+        """Test para obtener las categorías por gastos con fecha inválida"""
+        response = client_John.get(
+            "/statistics/expenses-by-category",
+            headers=John_token,
+            params={"year": 2023, "month": 0},  # Mes inválido
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Invalid year or month"
+
+    def test_get_incomes_by_category_invalid_date(self, client_John: TestClient, John_token: dict):
+        """Test para obtener las categorías por ingresos con fecha inválida"""
+        response = client_John.get(
+            "/statistics/incomes-by-category",
+            headers=John_token,
+            params={"year": 2023, "month": 14},  # Mes inválido
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Invalid year or month"
+
+    def test_get_monthly_summary_no_transactions(self, client_John: TestClient, John_token: dict, account_John: dict):
+        """Test para obtener el resumen mensual sin transacciones"""
+        # Asegúrate de que no haya transacciones para el mes actual
+        response = client_John.get(
+            "/statistics/monthly-summary",
+            headers=John_token,
+            params={"year": datetime.now().year, "month": datetime.now().month},
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Transactions not found"
+
+    def test_get_expenses_by_category_no_transactions(
+        self, client_John: TestClient, John_token: dict, account_John: dict
+    ):
+        """Test para obtener las categorías por gastos sin transacciones"""
+        # Asegúrate de que no haya transacciones para el mes actual
+        response = client_John.get(
+            "/statistics/expenses-by-category",
+            headers=John_token,
+            params={"year": datetime.now().year, "month": datetime.now().month},
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Transactions not found"
+
+    def test_get_incomes_by_category_no_transactions(
+        self, client_John: TestClient, John_token: dict, account_John: dict
+    ):
+        """Test para obtener las categorías por ingresos sin transacciones"""
+        # Asegúrate de que no haya transacciones para el mes actual
+        response = client_John.get(
+            "/statistics/incomes-by-category",
+            headers=John_token,
+            params={"year": datetime.now().year, "month": datetime.now().month},
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Transactions not found"
+
+    def test_get_monthly_summary_no_accounts(self, client_John: TestClient, John_token: dict):
+        """Test para obtener el resumen mensual sin cuentas"""
+        # Simular que no hay cuentas para el usuario actual
+        response = client_John.get(
+            "/statistics/monthly-summary",
+            headers=John_token,
+            params={"year": datetime.now().year, "month": datetime.now().month},
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Accounts not found"
+
+    def test_get_expenses_by_category_no_accounts(self, client_John: TestClient, John_token: dict):
+        """Test para obtener las categorías por gastos sin cuentas"""
+        # Simular que no hay cuentas para el usuario actual
+        response = client_John.get(
+            "/statistics/expenses-by-category",
+            headers=John_token,
+            params={"year": datetime.now().year, "month": datetime.now().month},
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Accounts not found"
+
+    def test_get_incomes_by_category_no_accounts(self, client_John: TestClient, John_token: dict):
+        """Test para obtener las categorías por ingresos sin cuentas"""
+        # Simular que no hay cuentas para el usuario actual
+        response = client_John.get(
+            "/statistics/incomes-by-category",
+            headers=John_token,
+            params={"year": datetime.now().year, "month": datetime.now().month},
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Accounts not found"

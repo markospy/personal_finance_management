@@ -30,8 +30,9 @@ async def get_monthly_summary(
         raise HTTPException(status_code=400, detail="Invalid year or month")
 
     accounts = db.scalars(select(Account).where(Account.user_id == current_user.id)).all()
+    if not accounts:
+        raise HTTPException(status_code=404, detail="Accounts not found")
 
-    transactions_list = []
     for account in accounts:
         transactions = db.scalars(
             select(Transaction).where(
@@ -40,20 +41,18 @@ async def get_monthly_summary(
                 func.extract("month", Transaction.date) == month,
             )
         ).all()
-        for translation in transactions:
-            transactions_list.append(translation)
-    if not transactions_list:
-        raise HTTPException(status_code=404, detail="Transactions not found")
+        if not transactions:
+            raise HTTPException(status_code=404, detail="Transactions not found")
 
-    total_expenses, total_income = 0, 0
+        total_expenses, total_income = 0, 0
 
-    for transaction in transactions_list:
-        category = db.scalar(select(Category).where(Category.id == transaction.category_id))
+        for transaction in transactions:
+            category = db.scalar(select(Category).where(Category.id == transaction.category_id))
 
-        if category.type == TransactionType.EXPENSE.value:
-            total_expenses += transaction.amount
-        else:
-            total_income += transaction.amount
+            if category.type == TransactionType.EXPENSE.value:
+                total_expenses += transaction.amount
+            else:
+                total_income += transaction.amount
 
     return {"total_expenses": float(total_expenses), "total_income": float(total_income)}
 
@@ -75,8 +74,9 @@ async def get_expenses_by_category(
         raise HTTPException(status_code=400, detail="Invalid year or month")
 
     accounts = db.scalars(select(Account).where(Account.user_id == current_user.id)).all()
+    if not accounts:
+        raise HTTPException(status_code=404, detail="Accounts not found")
 
-    transactions_list = []
     for account in accounts:
         transactions = db.scalars(
             select(Transaction).where(
@@ -87,36 +87,30 @@ async def get_expenses_by_category(
         ).all()
 
         if not transactions:
-            raise HTTPException(status_code=404, detail="transactions not found")
+            raise HTTPException(status_code=404, detail="Transactions not found")
 
+        expenses_by_category = {}
         for transaction in transactions:
-            transactions_list.append(transaction)
-
-    expenses_by_category = {}
-    for transaction in transactions_list:
-        category = db.scalar(
-            select(Category).where(
-                Category.id == transaction.category_id, Category.type == TransactionType.EXPENSE.value
+            category = db.scalar(
+                select(Category).where(
+                    Category.id == transaction.category_id, Category.type == TransactionType.EXPENSE.value
+                )
             )
-        )
-        if category:
-            if category.name not in expenses_by_category:
-                expenses_by_category[category.name] = {"id": category.id, "amount": float(transaction.amount)}
-            else:
-                expenses_by_category[category.name]["amount"] += float(transaction.amount)
+            if category:
+                if category.name not in expenses_by_category:
+                    expenses_by_category[category.name] = {"id": category.id, "amount": float(transaction.amount)}
+                else:
+                    expenses_by_category[category.name]["amount"] += float(transaction.amount)
 
-            # Ordenar el diccionario por cantidad (de mayor a menor)
-            sorted_expenses = dict(
-                sorted(expenses_by_category.items(), key=lambda item: item[1]["amount"], reverse=True)
-            )
+                # Ordenar el diccionario por cantidad (de mayor a menor)
+                sorted_expenses = dict(
+                    sorted(expenses_by_category.items(), key=lambda item: item[1]["amount"], reverse=True)
+                )
 
-    if not sorted_expenses:
-        raise HTTPException(status_code=404, detail="transactions not found")
-
-    return [
-        {"category_id": value["id"], "category_name": cat, "total_amount": value["amount"]}
-        for cat, value in sorted_expenses.items()
-    ]
+        return [
+            {"category_id": value["id"], "category_name": cat, "total_amount": value["amount"]}
+            for cat, value in sorted_expenses.items()
+        ]
 
 
 @router.get("/incomes-by-category")
@@ -136,8 +130,9 @@ async def get_incomes_by_category(
         raise HTTPException(status_code=400, detail="Invalid year or month")
 
     accounts = db.scalars(select(Account).where(Account.user_id == current_user.id)).all()
+    if not accounts:
+        raise HTTPException(status_code=404, detail="Accounts not found")
 
-    transactions_list = []
     for account in accounts:
         transactions = db.scalars(
             select(Transaction).where(
@@ -148,34 +143,27 @@ async def get_incomes_by_category(
         ).all()
 
         if not transactions:
-            raise HTTPException(status_code=404, detail="transactions not found")
+            raise HTTPException(status_code=404, detail="Transactions not found")
 
+        incomes_by_category = {}
         for transaction in transactions:
-            transactions_list.append(transaction)
-
-    incomes_by_category = {}
-    for transaction in transactions_list:
-        category = db.scalar(
-            select(Category).where(
-                Category.id == transaction.category_id, Category.type == TransactionType.INCOME.value
+            category = db.scalar(
+                select(Category).where(
+                    Category.id == transaction.category_id, Category.type == TransactionType.INCOME.value
+                )
             )
-        )
-        print(category)
-        if category:
-            if category.name not in incomes_by_category:
-                incomes_by_category[category.name] = {"id": category.id, "amount": float(transaction.amount)}
-            else:
-                incomes_by_category[category.name]["amount"] += float(transaction.amount)
+            if category:
+                if category.name not in incomes_by_category:
+                    incomes_by_category[category.name] = {"id": category.id, "amount": float(transaction.amount)}
+                else:
+                    incomes_by_category[category.name]["amount"] += float(transaction.amount)
 
-            # Ordenar el diccionario por cantidad (de mayor a menor)
-            sorted_incomes = dict(
-                sorted(incomes_by_category.items(), key=lambda item: item[1]["amount"], reverse=True)
-            )
+                # Ordenar el diccionario por cantidad (de mayor a menor)
+                sorted_incomes = dict(
+                    sorted(incomes_by_category.items(), key=lambda item: item[1]["amount"], reverse=True)
+                )
 
-    if not sorted_incomes:
-        raise HTTPException(status_code=404, detail="transactions not found")
-
-    return [
-        {"category_id": value["id"], "category_name": cat, "total_amount": value["amount"]}
-        for cat, value in sorted_incomes.items()
-    ]
+        return [
+            {"category_id": value["id"], "category_name": cat, "total_amount": value["amount"]}
+            for cat, value in sorted_incomes.items()
+        ]
