@@ -58,7 +58,7 @@ def get_one_budget(
 ):
     budget = db.scalar(select(Budget).where(Budget.id == budget_id, Budget.user_id == current_user.id))
     if not budget:
-        raise HTTPException(status_code=404, detail="Budgets is not found")
+        raise HTTPException(status_code=404, detail="Budget is not found")
 
     return budget
 
@@ -71,7 +71,7 @@ def get_one_budget_status(
 ):
     budget = db.scalar(select(Budget).where(Budget.id == budget_id, Budget.user_id == current_user.id))
     if not budget:
-        raise HTTPException(status_code=404, detail="Budgets is not found")
+        raise HTTPException(status_code=404, detail="Budget is not found")
 
     total_expenses = (
         db.scalar(
@@ -134,7 +134,7 @@ def delete_one_budget(
 ):
     budget = db.scalar(select(Budget).where(Budget.id == budget_id, Budget.user_id == current_user.id))
     if not budget:
-        raise HTTPException(status_code=404, detail="Budgets is not found")
+        raise HTTPException(status_code=404, detail="Budget is not found")
 
     db.delete(budget)
     db.commit()

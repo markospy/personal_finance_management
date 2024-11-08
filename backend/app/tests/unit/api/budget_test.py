@@ -78,6 +78,42 @@ class TestBudgetCreation:
         assert data["remaining_amount"] == 800.0
         assert not data["is_exceeded"]
 
+    def test_create_budget_already_exists(
+        self, client_John: TestClient, John_token: dict, global_expense_category: dict
+    ):
+        # Crear un presupuesto válido
+        start_date = datetime.now()
+        end_date = start_date + timedelta(days=30)
+        response = client_John.post(
+            "/budgets/",
+            headers=John_token,
+            json={
+                "category_id": global_expense_category["id"],
+                "amount": 1000.0,
+                "period": {
+                    "start_date": str(start_date),
+                    "end_date": str(end_date),
+                },
+            },
+        )
+        assert response.status_code == 201  # Asegúrate de que el presupuesto se creó correctamente
+
+        # Intentar crear el mismo presupuesto nuevamente
+        response_duplicate = client_John.post(
+            "/budgets/",
+            headers=John_token,
+            json={
+                "category_id": global_expense_category["id"],
+                "amount": 1000.0,
+                "period": {
+                    "start_date": str(start_date),
+                    "end_date": str(end_date),
+                },
+            },
+        )
+        assert response_duplicate.status_code == 409  # Debe devolver un conflicto
+        assert response_duplicate.json()["detail"] == "The budget is already exists"
+
 
 @pytest.mark.budget
 @pytest.mark.get_budget
@@ -150,7 +186,13 @@ class TestGetBudget:
     def test_get_one_budget_not_found(self, client_John: TestClient, John_token: dict):
         response = client_John.get("/budgets/1", headers=John_token)
         assert response.status_code == 404
-        assert response.json()["detail"] == "Budgets is not found"
+        assert response.json()["detail"] == "Budget is not found"
+
+    def test_get_status_of_budget_not_found(self, client_John: TestClient, John_token: dict):
+        # Intentar obtener un presupuesto que no pertenece al usuario actual
+        response = client_John.get("/budgets/1/status", headers=John_token)
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Budget is not found"
 
 
 @pytest.mark.budget
@@ -222,10 +264,10 @@ class TestDeleteBudget:
         # Intentar obtener el presupuesto eliminado
         response_get = client_John.get(f"/budgets/{budget_John['id']}", headers=John_token)
         assert response_get.status_code == 404
-        assert response_get.json()["detail"] == "Budgets is not found"
+        assert response_get.json()["detail"] == "Budget is not found"
 
     def test_delete_budget_not_found(self, client_John: TestClient, John_token: dict):
         # Intentar eliminar un presupuesto inexistente
         response = client_John.delete("/budgets/99999", headers=John_token)
         assert response.status_code == 404
-        assert response.json()["detail"] == "Budgets is not found"
+        assert response.json()["detail"] == "Budget is not found"
