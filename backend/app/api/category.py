@@ -84,6 +84,9 @@ def create_category_user(
     return category
 
 
+# Eliminar las categorias eliminara las transacciones asociadas pero no restaurara el saldo en las cuentas.
+
+
 @router.delete("/{category_id}/user", status_code=204)
 def delete_category(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
