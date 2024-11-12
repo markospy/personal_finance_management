@@ -7,7 +7,7 @@ const userBase = z.object(
   }
 )
 
-const UserIn = userBase.merge(
+export const zodUserIn = userBase.merge(
   z.object(
     {
       "password": z.string({required_error: 'Name is required'}).min(6, 'Must be 6 or more characters long')
@@ -15,7 +15,7 @@ const UserIn = userBase.merge(
   )
 )
 
-const UserOut = userBase.merge(
+const zodUserOut = userBase.merge(
   z.object(
     {
       "id": z.number().int()
@@ -23,7 +23,7 @@ const UserOut = userBase.merge(
   )
 )
 
-const UserUpdate = z.object(
+const zodUserUpdate = z.object(
   {
     "name": z.string().min(2, 'Must be 2 or more characters long').max(50, 'Must be 50 or fewer characters long').optional(),
     "email": z.string().email().optional(),
@@ -32,6 +32,6 @@ const UserUpdate = z.object(
 )
 
 
-export type UserIn = z.infer<typeof UserIn>
-export type UserOut = z.infer<typeof UserOut>
-export type UserUpdate = z.infer<typeof UserUpdate>
+export type UserIn = z.infer<typeof zodUserIn>
+export type UserOut = z.infer<typeof zodUserOut>
+export type UserUpdate = z.infer<typeof zodUserUpdate>
