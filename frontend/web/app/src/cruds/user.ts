@@ -1,15 +1,6 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { createUser, getUser } from "../api/user";
-import { UserIn } from "../schemas/user";
+import { useQuery } from "@tanstack/react-query";
+import { getUser } from "../api/user";
 
-
-export function CreateUser() {
-    const mutate = useMutation(
-        {
-            mutationFn: (user: UserIn) => createUser(user),
-        });
-    return mutate;
-}
 
 export function GetUser(token: string) {
     return useQuery({
