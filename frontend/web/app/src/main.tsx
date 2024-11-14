@@ -7,7 +7,7 @@ import './index.css'
 
 import ErrorPage from "./error-page";
 import { Home } from './routes/home'
-import { LoginForm, loader as loaderUser } from './routes/login'
+import { LoginForm, loader as loaderUser, action as actionLogin } from './routes/login'
 import { CreateUserForm, action as actionRegister } from './routes/register-user'
 
 
@@ -24,7 +24,8 @@ const router = createBrowserRouter([
         {
           path: "/login",
           element: <LoginForm />,
-          loader: loaderUser(queryClient)
+          loader: loaderUser(queryClient),
+          action: actionLogin,
         },
         {
           path: "/register",
