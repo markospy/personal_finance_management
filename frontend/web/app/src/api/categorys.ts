@@ -3,7 +3,7 @@ import { axi } from "./api_url";
 
 type CategoryType =  'global' | 'user';
 
-export const createCategory: (token: string, type: CategoryType, category: CategoryIn) => Promise<CategoryOut> = (token, type, category) => {
+export const createCategory = (token: string, type: CategoryType, category: CategoryIn): Promise<CategoryOut> => {
     const is_global = type == 'global';
 
 	return axi.post('/categories/' + type,
@@ -37,7 +37,7 @@ export const createCategory: (token: string, type: CategoryType, category: Categ
 	});
 }
 
-export const getCategories: (token: string) => Promise<CategoryOut[]> = (token) => {
+export const getCategories = (token: string): Promise<CategoryOut[]> => {
 
 	return axi.get('/categories/', {headers: {'Authorization': `Bearer ${token}`}})
 	.then( response =>
@@ -63,7 +63,7 @@ export const getCategories: (token: string) => Promise<CategoryOut[]> = (token) 
 	});
 }
 
-export const getCategory: (token: string, id: number) => Promise<CategoryOut> = (token, id) => {
+export const getCategory = (token: string, id: number): Promise<CategoryOut> => {
 
 	return axi.get('/categories/' + id, {headers: {'Authorization': `Bearer ${token}`}})
 	.then( response =>
@@ -90,7 +90,7 @@ export const getCategory: (token: string, id: number) => Promise<CategoryOut> = 
 }
 
 
-export const deleteCategory: (token: string, id: number, type: CategoryType,) => Promise<string> = (token, id, type) => {
+export const deleteCategory = (token: string, id: number, type: CategoryType): Promise<string> => {
 
 	return axi.delete(`/categories/${id}/${type}`, {headers: {'Authorization': `Bearer ${token}`}})
 	.then( response =>
