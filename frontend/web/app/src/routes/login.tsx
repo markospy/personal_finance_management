@@ -1,4 +1,4 @@
-import { Form, useLoaderData, ActionFunctionArgs } from 'react-router-dom';
+import { Form, useLoaderData, ActionFunctionArgs, redirect } from 'react-router-dom';
 import { QueryClient } from '@tanstack/react-query';
 import { getToken } from '../api/auth';
 
@@ -30,7 +30,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     await getToken(username, password);
 
     // Aquí puedes manejar la respuesta o el redireccionamiento
-    return { success: true }; // O cualquier otra respuesta que necesites
+    return redirect('/protected'); // O cualquier otra respuesta que necesites
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Error al obtener el token:', error);
