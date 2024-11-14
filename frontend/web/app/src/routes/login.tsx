@@ -24,8 +24,8 @@ export function LoginForm() {
       <h2 className="text-2xl font-bold mb-4">Login</h2>
       <form>
         <div className="mb-4">
-          <label className="block text-gray-700">Email</label>
-          <input className="w-full p-2 border border-gray-300 rounded mt-1" value={user?.email && user?.email} placeholder='Enter your email'/>
+          <label className="block text-gray-700">Username</label>
+          <input className="w-full p-2 border border-gray-300 rounded mt-1" value={user?.name && user?.name} placeholder='Enter your username'/>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700">Password</label>
