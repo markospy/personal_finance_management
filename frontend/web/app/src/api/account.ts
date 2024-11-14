@@ -1,5 +1,5 @@
 import { AccountIn, AccountOut } from "../schemas/account";
-import { axi } from "./api_url";
+import { axi } from "./config";
 
 
 export const getAccounts: (token: string) => Promise<AccountOut[]> = (token) => {

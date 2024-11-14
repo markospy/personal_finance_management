@@ -1,4 +1,4 @@
-import { axi } from "./api_url";
+import { axi } from "./config";
 import { BudgetIn, BudgetOut, BudgetStatus, BudgetUpdate } from "../schemas/budget";
 
 

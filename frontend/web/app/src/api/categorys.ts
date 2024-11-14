@@ -1,5 +1,5 @@
 import { CategoryIn, CategoryOut } from "../schemas/category";
-import { axi } from "./api_url";
+import { axi } from "./config";
 
 type CategoryType =  'global' | 'user';
 

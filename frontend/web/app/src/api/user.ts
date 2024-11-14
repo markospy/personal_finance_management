@@ -1,5 +1,5 @@
 import { UserIn, UserOut } from "../schemas/user";
-import { axi } from "./api_url";
+import { axi } from "./config";
 
 export const createUser = (user: UserIn): Promise<UserOut | Error> => {
     return axi.post('/user', user)
@@ -23,7 +23,7 @@ export const createUser = (user: UserIn): Promise<UserOut | Error> => {
 };
 
 
-export const getUser: (token: string) => Promise<UserOut> = (token) => {
+export const getUser = (token: string): Promise<UserOut> => {
 
     return axi.get('/user/me', {headers: {'Authorization': `Bearer ${token}`}})
         .then(response => {

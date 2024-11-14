@@ -1,5 +1,5 @@
 import { TransactionIn, TransactionOut, TransactionUpdate } from "../schemas/transactions";
-import { axi } from "./api_url";
+import { axi } from "./config";
 
 
 export const createTransaction: (toke: string, transaction: TransactionIn) => Promise<TransactionOut> = (token, transaction) => {

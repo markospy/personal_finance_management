@@ -1,6 +1,6 @@
 import { Form, useLoaderData, ActionFunctionArgs } from 'react-router-dom';
 import { QueryClient } from '@tanstack/react-query';
-import { getToken } from '../api/token';
+import { getToken } from '../api/auth';
 
 export type userCache = {
   id: number,

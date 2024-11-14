@@ -1,4 +1,4 @@
-import { axi } from "./api_url";
+import { axi } from "./config";
 
 type TokenOut = {
     acces_token: string;
