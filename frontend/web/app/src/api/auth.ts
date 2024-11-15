@@ -5,6 +5,8 @@ type TokenOut = {
     token_type: string
 }
 
+axi.defaults.timeout = 5000
+
 export const getToken = (username: string, password: string): Promise<TokenOut | Error> => {
     return axi.post(
         '/token',
@@ -12,7 +14,8 @@ export const getToken = (username: string, password: string): Promise<TokenOut |
         {headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
-        }}
+        }},
+
     ).then(response => {
             console.log(response.data.access_token)
             window.localStorage.setItem('jwt', response.data.access_token)
