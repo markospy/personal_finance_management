@@ -1,6 +1,14 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, redirect } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthProvider";
+
+export const action = () => {
+  window.localStorage.removeItem('jwt')
+  return redirect('/');
+}
 
 export function Home() {
+  const isTokenExpired = useContext(AuthContext);
 
   return (
     <div className="min-h-screen w-full bg-gray-100 flex flex-col">
@@ -9,12 +17,19 @@ export function Home() {
           <h1 className="text-xl font-bold md:text-2xl">Personal Finance Management</h1>
           <nav>
             <ul className="flex space-x-4">
-              <li>
-                <NavLink to={'login'}>Login</NavLink>
-              </li>
-              <li>
-                <NavLink to={'register'}>Register</NavLink>
-              </li>
+              { isTokenExpired ? (
+                  <>
+                    <li>
+                      <NavLink to={'/login'}>Login</NavLink>
+                    </li>
+                    <li>
+                      <NavLink to={'/register'}>Register</NavLink>
+                    </li>
+                  </>
+                ) : (
+                  <NavLink to={'/logout'}>Logout</NavLink>
+                )
+              }
             </ul>
           </nav>
         </div>
