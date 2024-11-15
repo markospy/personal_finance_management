@@ -1,19 +1,12 @@
-import { useState } from "react";
+import { useContext } from "react";
 import { Outlet, Navigate } from "react-router-dom";
-import { getUser } from "../api/user";
-
+import { AuthContext } from "../context/AuthProvider";
 
 export const ProtectedRoutes = () => {
-    const [token, setToken] = useState<string|null>(window.localStorage.getItem('jwt'))
+  const isTokenExpired = useContext(AuthContext);
 
-    if(token) {
-      const usuario =getUser(token)
-      if (!usuario) {
-        return <Navigate to="/login" />;
-      }
-    } else {
+    if(isTokenExpired) {
       return <Navigate to="/login" />;
     }
-
     return <Outlet />;
   };
