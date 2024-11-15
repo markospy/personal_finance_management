@@ -19,18 +19,11 @@ export const loader = (queryClient: QueryClient) => () => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
-    // Espera a que se resuelva la promesa de formData
     const formData = await request.formData();
-
-    // Obtén los valores de username y password
     const username = formData.get('username');
     const password = formData.get('password');
-    // Llama a la función getToken con los valores obtenidos
-
     await getToken(username, password);
-
-    // Aquí puedes manejar la respuesta o el redireccionamiento
-    return redirect('/protected'); // O cualquier otra respuesta que necesites
+    return redirect('/protected');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Error al obtener el token:', error);
