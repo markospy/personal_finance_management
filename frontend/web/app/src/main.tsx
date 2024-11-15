@@ -10,6 +10,8 @@ import { Home } from './routes/Layout'
 import { LoginForm, loader as loaderUser, action as actionLogin } from './routes/Login'
 import { CreateUserForm, action as actionRegister } from './routes/Register'
 import { ProtectedRoutes } from './components/ProtectedRoutes'
+import { AuthProvider } from './context/AuthProvider'
+import { action as logoutUser } from './routes/Layout'
 
 const queryClient = new QueryClient()
 
@@ -33,13 +35,14 @@ const router = createBrowserRouter([
           action: actionRegister(queryClient),
         },
         {
+          path: "/logout",
+          action: logoutUser,
+        },
+        {
           element: <ProtectedRoutes />, // Aquí agregas tu componente de rutas protegidas
+          path: "/protected",
           children: [
-            {
-              path: "/protected", // Ruta protegida
-              element: <h1>USUARIO LOGUEADO</h1>, // Componente protegido
-            },
-            // Agrega más rutas protegidas aquí
+            {index: true, element: <h1>USUARIO LOGUEADO</h1>},
           ],
         },
       ]
@@ -51,8 +54,12 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <ReactQueryDevtools initialIsOpen={false} />
+      <AuthProvider>
+        <>
+          <RouterProvider router={router} />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </>
+      </AuthProvider>
     </QueryClientProvider>
   </StrictMode>
 );
