@@ -5,6 +5,7 @@ import { useSubmit, redirect, ActionFunctionArgs } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zodUserIn } from "../schemas/user";
 import { createUser } from "../api/user";
+import { getToken } from '../api/auth';
 
 export const action = (queryClient: QueryClient) => async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData()
@@ -14,11 +15,9 @@ export const action = (queryClient: QueryClient) => async ({ request }: ActionFu
       password: formData.get('password')
     };
 
-    const user = await createUser(newUser);
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    !!user && queryClient.setQueryData(['me'], {...user, password: formData.get('password')})
-
-    return redirect('/login')
+    await createUser(newUser);
+    await getToken(newUser.name, newUser.password);
+    return redirect('/protected');
   }
 
 
