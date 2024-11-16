@@ -6,19 +6,18 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 
 import ErrorPage from "./error-page";
-import { Home } from './routes/Layout'
-import { LoginForm, loader as loaderUser, action as actionLogin } from './routes/Login'
-import { CreateUserForm, action as actionRegister } from './routes/Register'
+import { Layout } from './routes/Layout'
+import { LoginForm, loader as loaderUser } from './routes/Login'
+import { CreateUserForm } from './routes/Register'
 import { ProtectedRoutes } from './components/ProtectedRoutes'
 import { AuthProvider } from './context/AuthProvider'
-import { action as logoutUser } from './routes/Layout'
 
 const queryClient = new QueryClient()
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <Layout />,
     errorElement: <ErrorPage />,
     children:[{
       errorElement: <ErrorPage />,
@@ -27,16 +26,10 @@ const router = createBrowserRouter([
           path: "/login",
           element: <LoginForm />,
           loader: loaderUser(queryClient),
-          action: actionLogin,
         },
         {
           path: "/register",
           element: <CreateUserForm />,
-          action: actionRegister(queryClient),
-        },
-        {
-          path: "/logout",
-          action: logoutUser,
         },
         {
           element: <ProtectedRoutes />, // Aquí agregas tu componente de rutas protegidas
