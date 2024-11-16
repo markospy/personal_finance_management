@@ -1,13 +1,13 @@
 import { axi } from "./config";
 
-type TokenOut = {
-    acces_token: string;
+export type TokenOut = {
+    access_token: string;
     token_type: string
 }
 
 axi.defaults.timeout = 5000
 
-export const getToken = (username: string, password: string): Promise<TokenOut | Error> => {
+export const getToken = (username: string, password: string): Promise<TokenOut> => {
     return axi.post(
         '/token',
         `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&scope=user`,
@@ -18,8 +18,9 @@ export const getToken = (username: string, password: string): Promise<TokenOut |
 
     ).then(response => {
             console.log(response.data.access_token)
-            window.localStorage.setItem('jwt', response.data.access_token)
             return response.data
         }
-    ).catch(error => Promise.reject(error));
+    ).catch(() => {
+        throw new Error('Error al obtener el token')
+    });
 };
