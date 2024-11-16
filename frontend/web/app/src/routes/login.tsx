@@ -1,6 +1,8 @@
-import { Form, useLoaderData, ActionFunctionArgs, redirect } from 'react-router-dom';
+/* eslint-disable react-refresh/only-export-components */
+import { useLoaderData, useNavigate } from 'react-router-dom';
 import { QueryClient } from '@tanstack/react-query';
 import { getToken } from '../api/auth';
+import { useAuth } from "../context/AuthProvider";
 
 export type userCache = {
   id: number,
@@ -17,27 +19,31 @@ export const loader = (queryClient: QueryClient) => () => {
     return null
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  try {
-    const formData = await request.formData();
-    const username = formData.get('username');
-    const password = formData.get('password');
-    await getToken(username, password);
-    return redirect('/protected');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.error('Error al obtener el token:', error);
-    return { success: false, error: error.message }; // Manejo de errores
-  }
-};
 
 export function LoginForm() {
   const user = useLoaderData() as userCache | null;
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const loginAction = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const formData = new FormData(event.currentTarget);
+      const username = formData.get('username') as string;
+      const password = formData.get('password') as string;
+      getToken(username, password).then(response => login(response.access_token))
+      navigate('/protected');
+
+    } catch (error) {
+      const typedError = error as Error; // Casting a Error
+      console.error('Error al intentar autenticarse:', typedError);
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4">Login</h2>
-      <Form method='post' action='/login'>
+      <form onSubmit={loginAction}>
         <div className="mb-4">
           <label className="block text-gray-700">Username</label>
           <input name='username' className="w-full p-2 border border-gray-300 rounded mt-1" value={user?.name && user?.name} placeholder='Enter your username'/>
@@ -49,7 +55,7 @@ export function LoginForm() {
         <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded mt-4">
           Login
         </button>
-      </Form>
+      </form>
     </div>
   );
 }

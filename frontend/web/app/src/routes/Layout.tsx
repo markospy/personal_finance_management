@@ -1,14 +1,13 @@
-import { Outlet, NavLink, redirect } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthProvider";
+import { Outlet, NavLink } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
 
-export const action = () => {
-  window.localStorage.removeItem('jwt')
-  return redirect('/');
-}
+export function Layout() {
+  const { isAuthenticated, logout, user } = useAuth();
 
-export function Home() {
-  const isTokenExpired = useContext(AuthContext);
+  const logoutAction = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    logout()
+  }
 
   return (
     <div className="min-h-screen w-full bg-gray-100 flex flex-col">
@@ -17,7 +16,14 @@ export function Home() {
           <h1 className="text-xl font-bold md:text-2xl">Personal Finance Management</h1>
           <nav>
             <ul className="flex space-x-4">
-              { isTokenExpired ? (
+              { isAuthenticated ? (
+                  <div className="flex gap-6">
+                    <span className="font-semibold">{user.name}</span>
+                    <form onSubmit={logoutAction}>
+                      <button type="submit">Logout</button>
+                    </form>
+                  </div>
+                ) : (
                   <>
                     <li>
                       <NavLink to={'/login'}>Login</NavLink>
@@ -26,8 +32,6 @@ export function Home() {
                       <NavLink to={'/register'}>Register</NavLink>
                     </li>
                   </>
-                ) : (
-                  <NavLink to={'/logout'}>Logout</NavLink>
                 )
               }
             </ul>

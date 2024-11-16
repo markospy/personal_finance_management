@@ -1,53 +1,58 @@
-/* eslint-disable react-refresh/only-export-components */
-import { QueryClient } from '@tanstack/react-query';
-import { useForm, FieldValues } from "react-hook-form";
-import { useSubmit, redirect, ActionFunctionArgs } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zodUserIn } from "../schemas/user";
 import { createUser } from "../api/user";
+import { useAuth } from "../context/AuthProvider";
 import { getToken } from '../api/auth';
-
-export const action = (queryClient: QueryClient) => async ({ request }: ActionFunctionArgs) => {
-    const formData = await request.formData()
-    const newUser = {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      password: formData.get('password')
-    };
-
-    await createUser(newUser);
-    await getToken(newUser.name, newUser.password);
-    return redirect('/protected');
-  }
 
 
 export function CreateUserForm() {
-
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const { register, formState: { errors } } = useForm({
     resolver: zodResolver(zodUserIn),
   })
-  const submit = useSubmit();
 
-  const onSubmit = (data: FieldValues) => submit(data, { method: "post", action: "/register" })
+  const registerAction = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const formData = new FormData(event.currentTarget); // Obtiene los datos del formulario
+      const newUser = {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        password: formData.get('password')  as string
+      };
+
+      const user = await createUser(newUser);
+      const responseToken = await getToken(user.name, newUser.password);
+      login(responseToken.access_token)
+      navigate('/protected');
+    } catch (error) {
+      const typedError = error as Error; // Casting a Error
+      console.error('Error al intentar registrarse:', typedError);
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4">Create User</h2>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={registerAction}>
         <div className="mb-4">
           <label className="block text-gray-700">Name</label>
           <input {...register("name")} className="w-full p-2 border border-gray-300 rounded mt-1" placeholder="Enter your name"/>
-          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+          {errors.name && typeof errors.name.message === 'string' && <p className="text-red-500">{errors.name.message}</p>}
         </div>
         <div className="mb-4">
           <label className="block text-gray-700">Email</label>
-          <input {...register("email")} className="w-full p-2 border border-gray-300 rounded mt-1" placeholder="Enter your email"/>
-          {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+          <input {...register("email")} className="w-full p-2 border border-gray-300 rounded mt-
+          1" placeholder="Enter your email"/>
+          {errors.email && typeof errors.email.message === 'string' && <p className="text-red-500">{errors.email.message}</p>}
         </div>
         <div className="mb-4">
           <label className="block text-gray-700">Password</label>
           <input {...register("password")} type="password" className="w-full p-2 border border-gray-300 rounded mt-1" placeholder="Enter your password"/>
-          {errors.password && <p className="text-red-500">{errors.password.message}</p>}
+          {errors.password && typeof errors.password.message === 'string' && <p className="text-red-500">{errors.password.message}</p>}
         </div>
         <input type="submit" className="w-full bg-blue-600 text-white p-2 rounded mt-4" />
       </form>
