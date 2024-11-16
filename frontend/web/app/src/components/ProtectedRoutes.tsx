@@ -1,11 +1,10 @@
-import { useContext } from "react";
 import { Outlet, Navigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthProvider";
+import { useAuth } from "../context/AuthProvider";
 
 export const ProtectedRoutes = () => {
-  const isTokenExpired = useContext(AuthContext);
+  const { isAuthenticated } = useAuth();
 
-    if(isTokenExpired) {
+    if(!isAuthenticated) {
       return <Navigate to="/login" />;
     }
     return <Outlet />;

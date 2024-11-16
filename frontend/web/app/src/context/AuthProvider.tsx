@@ -1,28 +1,56 @@
-import { createContext, useState, useEffect, PropsWithChildren } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useState, PropsWithChildren, useContext, useEffect } from 'react';
 import { getUser  } from "../api/user";
+import { UserOut } from '../schemas/user';
 
-export const AuthContext = createContext(false);
+// Crear el contexto
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const AuthContext = createContext<any>(null);
 
-export const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [tokenExpired, setTokenExpired] = useState<boolean>(false);
+// Proveedor del contexto
+export const AuthProvider =  ({ children }: PropsWithChildren) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser ] = useState<UserOut | null>(null);
+
+  const existingUser  = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+          const userData = await getUser (token);
+          return userData;
+      }
+      return null;
+  };
 
   useEffect(() => {
-    const checkToken = async () => {
-      const token = window.localStorage.getItem('jwt');
-      if (token) {
-        const usuario = await getUser(token);
-        setTokenExpired(!usuario); // true si el token ha expirado
-      } else {
-        setTokenExpired(true); // No hay token
-      }
-    };
-
-    checkToken();
+      const checkExistingUser  = async () => {
+          const userData = await existingUser ();
+          setUser(userData);
+          setIsAuthenticated(!!userData);
+      };
+      checkExistingUser ();
   }, []);
 
-  return (
-    <AuthContext.Provider value={tokenExpired}>
-      { children }
-    </AuthContext.Provider>
-  );
+  const login = async (token: string) => {
+      localStorage.setItem('token', token);
+      const userData = await getUser (token);
+      setIsAuthenticated(true);
+      setUser(userData);
+  };
+
+  const logout = () => {
+      localStorage.removeItem('token');
+      setIsAuthenticated(false);
+      setUser(null);
+  };
+
+    return (
+        <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
+
+// Hook para usar el contexto
+export const useAuth = () => {
+    return useContext(AuthContext);
 };
