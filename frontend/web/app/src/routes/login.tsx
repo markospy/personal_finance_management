@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { Navigate, useLoaderData, useNavigate } from 'react-router-dom';
 import { QueryClient } from '@tanstack/react-query';
 import { getToken } from '../api/auth';
 import { useAuth } from "../context/AuthProvider";
@@ -22,7 +22,7 @@ export const loader = (queryClient: QueryClient) => () => {
 
 export function LoginForm() {
   const user = useLoaderData() as userCache | null;
-  const { login } = useAuth();
+  const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
 
   const loginAction = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -31,14 +31,24 @@ export function LoginForm() {
       const formData = new FormData(event.currentTarget);
       const username = formData.get('username') as string;
       const password = formData.get('password') as string;
-      getToken(username, password).then(response => login(response.access_token))
-      navigate('/protected');
+      // Espera a que la promesa se resuelva
+      const response = await getToken(username, password);
 
+      // Realiza el login
+      await login(response.access_token);
+
+      // Ahora navega a la ruta protegida
+      navigate('/protected');
     } catch (error) {
       const typedError = error as Error; // Casting a Error
       console.error('Error al intentar autenticarse:', typedError);
     }
   };
+
+  // Si ya está autenticado, redirige
+  if (isAuthenticated) {
+    return <Navigate to='/protected' replace={true} />;
+  }
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">

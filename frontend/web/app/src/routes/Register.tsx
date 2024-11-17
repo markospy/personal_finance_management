@@ -8,7 +8,7 @@ import { getToken } from '../api/auth';
 
 
 export function CreateUserForm() {
-  const { login } = useAuth();
+  const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
   const { register, formState: { errors } } = useForm({
     resolver: zodResolver(zodUserIn),
@@ -33,6 +33,11 @@ export function CreateUserForm() {
       console.error('Error al intentar registrarse:', typedError);
     }
   };
+
+  // Si ya está autenticado, redirige
+  if (isAuthenticated) {
+    return <Navigate to='/protected' replace={true} />;
+  }
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">

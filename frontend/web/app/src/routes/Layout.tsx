@@ -1,8 +1,21 @@
-import { Outlet, NavLink } from "react-router-dom";
+/* eslint-disable react-refresh/only-export-components */
+import { Outlet, NavLink, useLoaderData } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
+import { getUser } from "../api/user";
+
+export const loader = async () => {
+  try {
+    const token = window.localStorage.getItem('token') as string;
+    const response = await getUser(token); // Llama a la función getUser  directamente
+    return response.name || 'Unknown'; // Asegúrate de manejar el caso donde no hay nombre
+  } catch {
+    return 'Unknown';
+  }
+};
 
 export function Layout() {
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
+  const user = useLoaderData() as string;
 
   const logoutAction = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -18,7 +31,7 @@ export function Layout() {
             <ul className="flex space-x-4">
               { isAuthenticated ? (
                   <div className="flex gap-6">
-                    <span className="font-semibold">{user.name}</span>
+                    <span className="font-semibold">{user}</span>
                     <form onSubmit={logoutAction}>
                       <button type="submit">Logout</button>
                     </form>
