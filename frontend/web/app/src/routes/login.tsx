@@ -56,11 +56,11 @@ export function LoginForm() {
       <form onSubmit={loginAction}>
         <div className="mb-4">
           <label className="block text-gray-700">Username</label>
-          <input name='username' className="w-full p-2 border border-gray-300 rounded mt-1" value={user?.name && user?.name} placeholder='Enter your username'/>
+          <input name='username' className="w-full p-2 border border-gray-300 rounded mt-1" placeholder='Enter your username'/>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700">Password</label>
-          <input name='password' type='password' className="w-full p-2 border border-gray-300 rounded mt-1" value={user?.password && user?.password} placeholder='Enter your password'/>
+          <input name='password' type='password' className="w-full p-2 border border-gray-300 rounded mt-1" placeholder='Enter your password'/>
         </div>
         <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded mt-4">
           Login
