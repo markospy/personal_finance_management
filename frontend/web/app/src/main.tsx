@@ -6,10 +6,10 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 
 import ErrorPage from "./error-page";
-import { Layout } from './routes/Layout'
+import { Layout, loader as userLayout } from './routes/Layout'
 import { LoginForm, loader as loaderUser } from './routes/Login'
 import { CreateUserForm } from './routes/Register'
-import { ProtectedRoutes } from './components/ProtectedRoutes'
+import { ProtectedRoutes } from './utils/ProtectedRoutes'
 import { AuthProvider } from './context/AuthProvider'
 
 const queryClient = new QueryClient()
@@ -18,6 +18,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
+    loader: userLayout,
     errorElement: <ErrorPage />,
     children:[{
       errorElement: <ErrorPage />,
