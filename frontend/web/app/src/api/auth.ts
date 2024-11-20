@@ -17,7 +17,6 @@ export const getToken = (username: string, password: string): Promise<TokenOut> 
         }},
 
     ).then(response => {
-            console.log(response.data.access_token)
             return response.data
         }
     ).catch(() => {
