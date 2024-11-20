@@ -19,7 +19,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
-    loader: userLayout,
+    loader: userLayout(queryClient),
     errorElement: <ErrorPage />,
     children:[{
       errorElement: <ErrorPage />,
