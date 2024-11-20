@@ -8,7 +8,7 @@ import './index.css'
 import ErrorPage from "./error-page";
 import { Layout, loader as userLayout } from './routes/Layout'
 import { LoginForm, loader as loaderUser } from './routes/Login'
-import { DashboardCenter } from './routes/Dashboard'
+import { DashboardCenter, loader as loaderSumary } from './routes/Dashboard'
 import { CreateUserForm } from './routes/Register'
 import { ProtectedRoutes } from './utils/ProtectedRoutes'
 import { AuthProvider } from './context/AuthProvider'
@@ -35,9 +35,13 @@ const router = createBrowserRouter([
         },
         {
           element: <ProtectedRoutes />, // Aquí agregas tu componente de rutas protegidas
-          path: "/protected",
+          path: "/dashboard",
           children: [
-            {index: true, element: <DashboardCenter />},
+            {
+              index: true,
+              element: <DashboardCenter />,
+              loader: loaderSumary(queryClient),
+            },
           ],
         },
       ]

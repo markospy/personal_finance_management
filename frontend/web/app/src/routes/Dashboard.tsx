@@ -9,10 +9,29 @@ import { FutureExpenses } from "@/components/custom/future-expenses";
 import { CustomCategories } from "@/components/custom/custom-categories";
 import { AccountSettings } from "@/components/custom/account-setting";
 import { Support } from "@/components/custom/support";
+import { GetMonthlySumary } from "@/services/statistic";
+import { QueryClient } from "@tanstack/react-query";
+import { useLoaderData } from "react-router-dom";
+
+export const loader = (queryClient: QueryClient) => async () => {
+  const token = window.localStorage.getItem('token') as string;
+  const date = {
+    year: 2024,
+    month: 11
+  };
+  console.log(date.month);
+  const sumary =  await queryClient.fetchQuery(GetMonthlySumary(token, date))
+  console.log(sumary)
+
+  return sumary
+}
+
 
 export const DashboardCenter = () => {
   const [transactions, setTransactions] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const sumary = useLoaderData()
+  console.log(sumary)
 
   const addTransaction = (transaction) => {
     setTransactions([...transactions, transaction]);
@@ -24,7 +43,7 @@ export const DashboardCenter = () => {
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-6">
-          <FinancialSummary />
+          <FinancialSummary sumary={sumary} />
           <button 
             className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
             onClick={() => setShowModal(true)}
