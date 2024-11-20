@@ -1,7 +1,15 @@
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
+from pydantic import (
+    AliasGenerator,
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    model_validator,
+)
+from pydantic.alias_generators import to_camel
 from pydantic_extra_types.currency_code import Currency
 from typing_extensions import Annotated, Self
 
@@ -80,6 +88,12 @@ class AccountOut(AccountIn):
     id: int
     user_id: int
 
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            serialization_alias=to_camel,
+        )
+    )
+
 
 class ExpectedTransactionIn(BaseModel):
     category_id: int
@@ -91,6 +105,12 @@ class ExpectedTransactionIn(BaseModel):
 class ExpectedTransactionOut(ExpectedTransactionIn):
     id: int
     user_id: int
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            serialization_alias=to_camel,
+        )
+    )
 
 
 class ExpectedTransactionUpdate(BaseModel):
@@ -110,10 +130,22 @@ class CategoryOut(CategoryIn):
     id: int
     user_id: int | None = None
 
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            serialization_alias=to_camel,
+        )
+    )
+
 
 class Period(BaseModel):
     start_date: datetime
     end_date: datetime
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            serialization_alias=to_camel,
+        )
+    )
 
     @model_validator(mode="before")
     def start_date_must_be_before_end_date(self) -> Self:
@@ -131,6 +163,12 @@ class BudgetIn(BaseModel):
 class BudgetOut(BudgetIn):
     id: int
     user_id: int
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            serialization_alias=to_camel,
+        )
+    )
 
 
 class BudgetUpdate(BaseModel):
@@ -151,6 +189,12 @@ class TransactionOut(TransactionIn):
     model_config = ConfigDict(from_attributes=True)
     id: int
     date: datetime
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            serialization_alias=to_camel,
+        )
+    )
 
 
 class TransactionUpdate(BaseModel):

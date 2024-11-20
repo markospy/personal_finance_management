@@ -33,11 +33,11 @@ class TestBudgetCreation:
         assert response.status_code == 201
         budget = response.json()
         assert budget["id"] == 1
-        assert budget["user_id"] == client_John.user["id"]
-        assert budget["category_id"] == global_expense_category["id"]
+        assert budget["userId"] == client_John.user["id"]
+        assert budget["categoryId"] == global_expense_category["id"]
         assert budget["amount"] == 1000.0
-        assert "start_date" in budget["period"]
-        assert "end_date" in budget["period"]
+        assert "startDate" in budget["period"]
+        assert "endDate" in budget["period"]
 
     def test_create_budget_invalid_category(self, client_John: TestClient, John_token: dict):
         # Intentar crear un presupuesto con una categoría inexistente
@@ -72,11 +72,11 @@ class TestBudgetCreation:
         data = response.json()
 
         # Verificar la respuesta
-        assert data["category_id"] == budget_John["category_id"]
-        assert data["budget_amount"] == 1000.0
-        assert data["spent_amount"] == 200.0
-        assert data["remaining_amount"] == 800.0
-        assert not data["is_exceeded"]
+        assert data["categoryId"] == budget_John["categoryId"]
+        assert data["budgetAmount"] == 1000.0
+        assert data["spentAmount"] == 200.0
+        assert data["remainingAmount"] == 800.0
+        assert not data["isExceeded"]
 
     def test_create_budget_already_exists(
         self, client_John: TestClient, John_token: dict, global_expense_category: dict
@@ -154,12 +154,12 @@ class TestGetBudget:
         # Verificar que cada presupuesto tenga los campos esperados
         for budget in budgets:
             assert "id" in budget
-            assert "user_id" in budget
-            assert "category_id" in budget
+            assert "userId" in budget
+            assert "categoryId" in budget
             assert "amount" in budget
             assert "period" in budget
-            assert "start_date" in budget["period"]
-            assert "end_date" in budget["period"]
+            assert "startDate" in budget["period"]
+            assert "endDate" in budget["period"]
 
     def test_get_all_budgets_not_found(self, client_John: TestClient, John_token: dict):
         response = client_John.get("/budgets/", headers=John_token)
@@ -177,11 +177,11 @@ class TestGetBudget:
         budget = response_budget.json()
         assert response_budget.status_code == 200
         assert budget["id"] == 1
-        assert budget["user_id"] == client_John.user["id"]
-        assert budget["category_id"] == global_expense_category["id"]
+        assert budget["userId"] == client_John.user["id"]
+        assert budget["categoryId"] == global_expense_category["id"]
         assert budget["amount"] == 1000
-        assert budget["period"]["start_date"] == budget_John["period"]["start_date"]
-        assert budget["period"]["end_date"] == budget_John["period"]["end_date"]
+        assert budget["period"]["startDate"] == budget_John["period"]["startDate"]
+        assert budget["period"]["endDate"] == budget_John["period"]["endDate"]
 
     def test_get_one_budget_not_found(self, client_John: TestClient, John_token: dict):
         response = client_John.get("/budgets/1", headers=John_token)
@@ -225,11 +225,11 @@ class TestUpdateBudget:
         assert response_update.status_code == 201
         updated_budget = response_update.json()
         assert updated_budget["id"] == 1
-        assert updated_budget["category_id"] == income_transaction_John["id"]
-        assert updated_budget["user_id"] == client_John.user["id"]
+        assert updated_budget["categoryId"] == income_transaction_John["id"]
+        assert updated_budget["userId"] == client_John.user["id"]
         assert updated_budget["amount"] == 1500.0
-        assert updated_budget["period"]["start_date"] == str(new_start_date.isoformat())
-        assert updated_budget["period"]["end_date"] == str(new_end_date.isoformat())
+        assert updated_budget["period"]["startDate"] == str(new_start_date.isoformat())
+        assert updated_budget["period"]["endDate"] == str(new_end_date.isoformat())
 
     def test_update_budget_not_found(self, client_John: TestClient, John_token: dict):
         # Intentar actualizar un presupuesto inexistente

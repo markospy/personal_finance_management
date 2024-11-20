@@ -19,8 +19,8 @@ class TestCategoryCreation:
         assert response.json()["id"] == 1
         assert response.json()["name"] == "Alimentos"
         assert response.json()["type"] == TransactionType.EXPENSE.value
-        assert response.json()["user_id"] is None
-        assert response.json()["is_global"] is True
+        assert response.json()["userId"] is None
+        assert response.json()["isGlobal"] is True
 
     def test_create_not_global_category(self, client_John: TestClient, token_admin: dict):
         # Crear una categoría no global en la ruta para crear categorias globales
@@ -57,8 +57,8 @@ class TestCategoryCreation:
             "id": 1,
             "name": "Alimentos",
             "type": TransactionType.EXPENSE.value,
-            "user_id": client_John.user["id"],
-            "is_global": False,
+            "userId": client_John.user["id"],
+            "isGlobal": False,
         }
 
     def test_create_user_category_already_exists(
@@ -110,8 +110,8 @@ class TestGetCategory:
         assert response.json()["id"] == global_expense_category["id"]
         assert response.json()["name"] == global_expense_category["name"]
         assert response.json()["type"] == global_expense_category["type"]
-        assert response.json()["user_id"] == global_expense_category["user_id"]
-        assert response.json()["is_global"] == global_expense_category["is_global"]
+        assert response.json()["userId"] == global_expense_category["userId"]
+        assert response.json()["isGlobal"] == global_expense_category["isGlobal"]
 
     def test_get_non_existent_category(self, client_John: TestClient, John_token: dict):
         # Intentar obtener una categoría que no existe
@@ -151,8 +151,8 @@ class TestListCategories:
             [
                 cat["name"] == global_expense_category["name"]
                 and cat["type"] == global_expense_category["type"]
-                and cat["user_id"] == global_expense_category["user_id"]
-                and cat["is_global"]
+                and cat["userId"] == global_expense_category["userId"]
+                and cat["isGlobal"]
                 for cat in categories
             ]
         )
@@ -161,8 +161,8 @@ class TestListCategories:
             [
                 cat["name"] == John_income_category["name"]
                 and cat["type"] == John_income_category["type"]
-                and cat["user_id"] == John_income_category["user_id"]
-                and not cat["is_global"]
+                and cat["userId"] == John_income_category["userId"]
+                and not cat["isGlobal"]
                 for cat in categories
             ]
         )

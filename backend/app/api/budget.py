@@ -89,12 +89,12 @@ def get_one_budget_status(
 
     # Preparar el estado del presupuesto
     status = {
-        "category_id": budget.category_id,
-        "category_name": budget.category.name,
-        "budget_amount": budget.amount,
-        "spent_amount": total_expenses,
-        "is_exceeded": total_expenses > budget.amount,
-        "remaining_amount": budget.amount - total_expenses,
+        "categoryId": budget.category_id,
+        "categoryName": budget.category.name,
+        "budgetAmount": budget.amount,
+        "spentAmount": total_expenses,
+        "isExceeded": total_expenses > budget.amount,
+        "remainingAmount": budget.amount - total_expenses,
     }
 
     return status

@@ -56,10 +56,10 @@ class TestStatistics:
         assert response.status_code == 200
         data = response.json()
 
-        assert "total_expenses" in data
-        assert "total_incomes" in data
-        assert data["total_expenses"] == 1800.0  # 1000 + 500 + 300
-        assert data["total_incomes"] == 3500.0  # 2000 + 1500
+        assert "totalExpenses" in data
+        assert "totalIncomes" in data
+        assert data["totalExpenses"] == 1800.0  # 1000 + 500 + 300
+        assert data["totalIncomes"] == 3500.0  # 2000 + 1500
 
     def test_get_expenses_by_category(
         self,
@@ -85,10 +85,10 @@ class TestStatistics:
 
         # Verificar que las categorías están ordenadas por gasto (de mayor a menor)
         for i in range(len(categories) - 1):
-            assert categories[i]["total_amount"] >= categories[i + 1]["total_amount"]
+            assert categories[i]["totalAmount"] >= categories[i + 1]["totalAmount"]
 
         # Verificar la primera categoría (la de mayor gasto)
-        assert categories[0]["total_amount"] == 1800.0  # 1000 + 500
+        assert categories[0]["totalAmount"] == 1800.0  # 1000 + 500
 
     def test_get_incomes_by_category(
         self,
@@ -114,10 +114,10 @@ class TestStatistics:
 
         # Verificar que las categorías están ordenadas por gasto (de mayor a menor)
         for i in range(len(categories) - 1):
-            assert categories[i]["total_amount"] >= categories[i + 1]["total_amount"]
+            assert categories[i]["totalAmount"] >= categories[i + 1]["totalAmount"]
 
         # Verificar la primera categoría (la de mayor gasto)
-        assert categories[0]["total_amount"] == 3500.0  # 1000 + 500
+        assert categories[0]["totalAmount"] == 3500.0  # 1000 + 500
 
     def test_get_monthly_summary_invalid_date(self, client_John: TestClient, John_token: dict):
         """Test para obtener el resumen mensual con fecha inválida"""

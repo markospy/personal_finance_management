@@ -15,7 +15,7 @@ class TestAccountCreation:
         )
         assert response.status_code == 201
         assert response.json()["id"] == 1
-        assert response.json()["user_id"] == client_John.user["id"]
+        assert response.json()["userId"] == client_John.user["id"]
         assert response.json()["name"] == "Cuenta Ahorros"
         assert response.json()["currency"] == "USD"
         assert response.json()["balance"] == 5000
@@ -57,7 +57,7 @@ class TestGetAccount:
         response = client_John.get(f"/accounts/{account_id}", headers=John_token)
         assert response.status_code == 200
         assert response.json()["id"] == account_id
-        assert response.json()["user_id"] == client_John.user["id"]
+        assert response.json()["userId"] == client_John.user["id"]
         assert response.json()["name"] == "Cuenta Ahorros"
         assert response.json()["currency"] == "USD"
         assert response.json()["balance"] == 5000
@@ -90,13 +90,13 @@ class TestListAccounts:
         first_account, second_account = account_John, response.json()[1]
 
         assert first_account["id"] == account_John["id"]
-        assert first_account["user_id"] == client_John.user["id"]
+        assert first_account["userId"] == client_John.user["id"]
         assert first_account["name"] == account_John["name"]
         assert first_account["currency"] == account_John["currency"]
         assert first_account["balance"] == account_John["balance"]
 
         assert second_account["id"] == id_second_account
-        assert second_account["user_id"] == client_John.user["id"]
+        assert second_account["userId"] == client_John.user["id"]
         assert second_account["name"] == "Cuenta Corriente"
         assert second_account["currency"] == "EUR"
         assert second_account["balance"] == 1000

@@ -30,8 +30,8 @@ class TestCreateTransactions:
         )
         assert response.status_code == 201
         transaction = response.json()
-        assert transaction["category_id"] == global_expense_category["id"]
-        assert transaction["account_id"] == account_John["id"]
+        assert transaction["categoryId"] == global_expense_category["id"]
+        assert transaction["accountId"] == account_John["id"]
         assert transaction["amount"] == 200.0
         assert transaction["date"] == date_isoformat
         assert transaction["comments"] == "Pago de servicios"
@@ -63,8 +63,8 @@ class TestCreateTransactions:
         )
         assert response.status_code == 201
         transaction = response.json()
-        assert transaction["category_id"] == John_income_category["id"]
-        assert transaction["account_id"] == account_John["id"]
+        assert transaction["categoryId"] == John_income_category["id"]
+        assert transaction["accountId"] == account_John["id"]
         assert transaction["amount"] == 200.0
         assert transaction["date"] == date_isoformat
         assert transaction["comments"] == "Cobro de servicios"
@@ -187,7 +187,7 @@ class TestGetTransactions:
         assert isinstance(transactions, list)
         assert any(
             [
-                transaction["account_id"] == 1
+                transaction["accountId"] == 1
                 and transaction["amount"] == income_transaction_John["amount"]
                 and transaction["date"] == income_transaction_John["date"]
                 and transaction["comments"] == income_transaction_John["comments"]
@@ -197,7 +197,7 @@ class TestGetTransactions:
 
         assert any(
             [
-                transaction["account_id"] == 1
+                transaction["accountId"] == 1
                 and transaction["amount"] == expense_transaction_John["amount"]
                 and transaction["date"] == expense_transaction_John["date"]
                 and transaction["comments"] == expense_transaction_John["comments"]
@@ -234,7 +234,7 @@ class TestGetTransactions:
         assert isinstance(transactions, list)
         assert any(
             [
-                transaction["account_id"] == 1
+                transaction["accountId"] == 1
                 and transaction["amount"] == income_transaction_John["amount"]
                 and transaction["date"] == income_transaction_John["date"]
                 and transaction["comments"] == income_transaction_John["comments"]
@@ -244,7 +244,7 @@ class TestGetTransactions:
 
         assert any(
             [
-                transaction["account_id"] == 1
+                transaction["accountId"] == 1
                 and transaction["amount"] == expense_transaction_John["amount"]
                 and transaction["date"] == expense_transaction_John["date"]
                 and transaction["comments"] == expense_transaction_John["comments"]

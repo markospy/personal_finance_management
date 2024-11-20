@@ -33,7 +33,7 @@ async def get_monthly_summary(
     if not accounts:
         raise HTTPException(status_code=404, detail="Accounts not found")
 
-    total_expenses, total_incomes = 0, 0
+    totalExpenses, totalIncomes = 0, 0
     for account in accounts:
         transactions = db.scalars(
             select(Transaction).where(
@@ -47,14 +47,14 @@ async def get_monthly_summary(
             category = db.scalar(select(Category).where(Category.id == transaction.category_id))
 
             if category.type == TransactionType.EXPENSE.value:
-                total_expenses += transaction.amount
+                totalExpenses += transaction.amount
             else:
-                total_incomes += transaction.amount
+                totalIncomes += transaction.amount
 
-    if not (total_expenses and total_incomes):
+    if not (totalExpenses and totalIncomes):
         raise HTTPException(status_code=404, detail="Transactions not found")
 
-    return {"total_expenses": float(total_expenses), "total_incomes": float(total_incomes)}
+    return {"totalExpenses": float(totalExpenses), "totalIncomes": float(totalIncomes)}
 
 
 @router.get("/expenses-by-category")
@@ -108,7 +108,7 @@ async def get_expenses_by_category(
                 )
 
         return [
-            {"category_id": value["id"], "category_name": cat, "total_amount": value["amount"]}
+            {"categoryId": value["id"], "categoryName": cat, "totalAmount": value["amount"]}
             for cat, value in sorted_expenses.items()
         ]
 
@@ -164,6 +164,6 @@ async def get_incomes_by_category(
                 )
 
         return [
-            {"category_id": value["id"], "category_name": cat, "total_amount": value["amount"]}
+            {"categoryId": value["id"], "categoryName": cat, "totalAmount": value["amount"]}
             for cat, value in sorted_incomes.items()
         ]

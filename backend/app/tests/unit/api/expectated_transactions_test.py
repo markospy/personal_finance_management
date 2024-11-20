@@ -43,7 +43,7 @@ class TestExpectedTransaction:
         expected_transaction = response.json()
         assert response.status_code == 201
         assert expected_transaction["amount"] == expected_transaction_data["amount"]
-        assert expected_transaction["category_id"] == expected_transaction_data["category_id"]
+        assert expected_transaction["categoryId"] == expected_transaction_data["category_id"]
         assert expected_transaction["date"] == date.isoformat()
         assert expected_transaction["frequency"] == expected_transaction_data["frequency"]
 
