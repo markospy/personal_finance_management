@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Navigate, useLoaderData, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient } from '@tanstack/react-query';
 import { getToken } from '../api/auth';
 import { useAuth } from "../context/AuthProvider";
@@ -21,7 +21,6 @@ export const loader = (queryClient: QueryClient) => () => {
 
 
 export function LoginForm() {
-  const user = useLoaderData() as userCache | null;
   const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
 
