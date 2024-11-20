@@ -3,6 +3,11 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient } from '@tanstack/react-query';
 import { getToken } from '../api/auth';
 import { useAuth } from "../context/AuthProvider";
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { LockKeyholeOpen } from "lucide-react"
 
 export type userCache = {
   id: number,
@@ -23,6 +28,7 @@ export const loader = (queryClient: QueryClient) => () => {
 export function LoginForm() {
   const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
+  const [error, setError] = useState<boolean>(false)
 
   const loginAction = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,6 +45,7 @@ export function LoginForm() {
       // Ahora navega a la ruta protegida
       navigate('/protected');
     } catch (error) {
+      setError(true)
       const typedError = error as Error; // Casting a Error
       console.error('Error al intentar autenticarse:', typedError);
     }
@@ -49,21 +56,33 @@ export function LoginForm() {
     return <Navigate to='/protected' replace={true} />;
   }
 
+  const handleChange = () => {
+    setError(false)
+  }
+
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Login</h2>
+      <div className='flex justify-between'>
+        <h2 className="text-2xl font-bold mb-4">Login</h2>
+        {error && 
+        <div className='text-red-500 font-normal'>
+          <span>Nombre de usuario </span>
+          <br />
+          <span>o contraseña incorrecta.</span>
+        </div>}
+      </div>
       <form onSubmit={loginAction}>
         <div className="mb-4">
-          <label className="block text-gray-700">Username</label>
-          <input name='username' className="w-full p-2 border border-gray-300 rounded mt-1" placeholder='Enter your username'/>
+          <Label>Username</Label>
+          <Input onChange={handleChange} name='username' placeholder='Enter your username' />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700">Password</label>
-          <input name='password' type='password' className="w-full p-2 border border-gray-300 rounded mt-1" placeholder='Enter your password'/>
+          <Label>Password</Label>
+          <Input onChange={handleChange} name='password' type='password' placeholder='Enter your password' />
         </div>
-        <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded mt-4">
-          Login
-        </button>
+        <Button variant="default" type="submit" className="w-full mt-4">
+          <LockKeyholeOpen /> LOGIN
+        </Button>
       </form>
     </div>
   );
