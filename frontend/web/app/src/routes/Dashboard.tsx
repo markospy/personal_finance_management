@@ -12,18 +12,23 @@ import { Support } from "@/components/custom/support";
 import { GetMonthlySumary } from "@/services/statistic";
 import { QueryClient } from "@tanstack/react-query";
 import { useLoaderData } from "react-router-dom";
+import { GetAccounts } from "@/services/account";
+
 
 export const loader = (queryClient: QueryClient) => async () => {
   const token = window.localStorage.getItem('token') as string;
   const date = {
-    year: 2024,
-    month: 11
+    year: new Date().getFullYear(),
+    month: new Date().getMonth()+1,
   };
-  console.log(date.month);
-  const sumary =  await queryClient.fetchQuery(GetMonthlySumary(token, date))
-  console.log(sumary)
-
-  return sumary
+  const sumary =  await queryClient.fetchQuery(GetMonthlySumary(token, date));
+  const accounts = await queryClient.fetchQuery(GetAccounts(token));
+  let balance: number = 0;
+  accounts.forEach(account => balance += account.balance)
+  return {
+    ...sumary,
+    balance
+  }
 }
 
 

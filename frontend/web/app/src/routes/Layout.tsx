@@ -1,12 +1,14 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Outlet, NavLink, useLoaderData } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
-import { getUser } from "../api/user";
+import { GetUser } from "../services/user";
+import { QueryClient } from "@tanstack/react-query";
 
-export const loader = async () => {
+export const loader = (queryClient: QueryClient) => async () => {
   try {
     const token = window.localStorage.getItem('token') as string;
-    const response = await getUser(token); // Llama a la función getUser  directamente
+    const response = await queryClient.fetchQuery(GetUser(token)); 
+    console.log(response)
     return response.name || 'Unknown'; // Asegúrate de manejar el caso donde no hay nombre
   } catch {
     return 'Unknown';

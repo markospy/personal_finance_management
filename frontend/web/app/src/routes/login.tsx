@@ -43,7 +43,7 @@ export function LoginForm() {
       await login(response.access_token);
 
       // Ahora navega a la ruta protegida
-      navigate('/protected');
+      navigate('/dashboard');
     } catch (error) {
       setError(true)
       const typedError = error as Error; // Casting a Error
