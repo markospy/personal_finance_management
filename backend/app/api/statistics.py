@@ -33,7 +33,7 @@ async def get_monthly_summary(
     if not accounts:
         raise HTTPException(status_code=404, detail="Accounts not found")
 
-    total_expenses, total_income = 0, 0
+    total_expenses, total_incomes = 0, 0
     for account in accounts:
         transactions = db.scalars(
             select(Transaction).where(
@@ -49,12 +49,12 @@ async def get_monthly_summary(
             if category.type == TransactionType.EXPENSE.value:
                 total_expenses += transaction.amount
             else:
-                total_income += transaction.amount
+                total_incomes += transaction.amount
 
-    if not (total_expenses and total_income):
+    if not (total_expenses and total_incomes):
         raise HTTPException(status_code=404, detail="Transactions not found")
 
-    return {"total_expenses": float(total_expenses), "total_income": float(total_income)}
+    return {"total_expenses": float(total_expenses), "total_incomes": float(total_incomes)}
 
 
 @router.get("/expenses-by-category")

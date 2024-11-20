@@ -57,9 +57,9 @@ class TestStatistics:
         data = response.json()
 
         assert "total_expenses" in data
-        assert "total_income" in data
+        assert "total_incomes" in data
         assert data["total_expenses"] == 1800.0  # 1000 + 500 + 300
-        assert data["total_income"] == 3500.0  # 2000 + 1500
+        assert data["total_incomes"] == 3500.0  # 2000 + 1500
 
     def test_get_expenses_by_category(
         self,
