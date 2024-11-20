@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zodUserIn } from "../schemas/user";
 import { createUser } from "../api/user";
@@ -27,7 +27,7 @@ export function CreateUserForm() {
       const user = await createUser(newUser);
       const responseToken = await getToken(user.name, newUser.password);
       login(responseToken.access_token)
-      navigate('/protected');
+      navigate('/dashboard');
     } catch (error) {
       const typedError = error as Error; // Casting a Error
       console.error('Error al intentar registrarse:', typedError);
@@ -36,7 +36,7 @@ export function CreateUserForm() {
 
   // Si ya está autenticado, redirige
   if (isAuthenticated) {
-    return <Navigate to='/protected' replace={true} />;
+    return <Navigate to='/dashboard' replace={true} />;
   }
 
   return (

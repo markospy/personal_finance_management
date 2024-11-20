@@ -53,7 +53,7 @@ export function LoginForm() {
 
   // Si ya está autenticado, redirige
   if (isAuthenticated) {
-    return <Navigate to='/protected' replace={true} />;
+    return <Navigate to='/dashboard' replace={true} />;
   }
 
   const handleChange = () => {
