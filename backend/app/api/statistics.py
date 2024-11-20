@@ -33,6 +33,7 @@ async def get_monthly_summary(
     if not accounts:
         raise HTTPException(status_code=404, detail="Accounts not found")
 
+    total_expenses, total_income = 0, 0
     for account in accounts:
         transactions = db.scalars(
             select(Transaction).where(
@@ -41,10 +42,6 @@ async def get_monthly_summary(
                 func.extract("month", Transaction.date) == month,
             )
         ).all()
-        if not transactions:
-            raise HTTPException(status_code=404, detail="Transactions not found")
-
-        total_expenses, total_income = 0, 0
 
         for transaction in transactions:
             category = db.scalar(select(Category).where(Category.id == transaction.category_id))
@@ -53,6 +50,9 @@ async def get_monthly_summary(
                 total_expenses += transaction.amount
             else:
                 total_income += transaction.amount
+
+    if not (total_expenses and total_income):
+        raise HTTPException(status_code=404, detail="Transactions not found")
 
     return {"total_expenses": float(total_expenses), "total_income": float(total_income)}
 
