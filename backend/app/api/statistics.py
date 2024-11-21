@@ -57,7 +57,7 @@ async def get_monthly_summary(
     return {"totalExpenses": float(totalExpenses), "totalIncomes": float(totalIncomes)}
 
 
-@router.get("/expenses-by-category")
+@router.get("/monthly-expenses")
 async def get_expenses_by_category(
     year: int,
     month: int,
@@ -113,7 +113,7 @@ async def get_expenses_by_category(
         ]
 
 
-@router.get("/incomes-by-category")
+@router.get("/monthly-incomes")
 async def get_incomes_by_category(
     year: int,
     month: int,
