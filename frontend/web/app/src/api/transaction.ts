@@ -1,4 +1,4 @@
-import { TransactionIn, TransactionOut, TransactionUpdate } from "../schemas/transactions";
+import { TransactionIn, TransactionOut, TransactionUpdate } from "../schemas/transaction";
 import { axi } from "./config";
 
 
