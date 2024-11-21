@@ -1,4 +1,4 @@
-import { ExpTransactionIn, ExpTransactionOut, ExpTransactionUpdate } from "../schemas/expected_transactions";
+import { ExpTransactionIn, ExpTransactionOut, ExpTransactionUpdate } from "../schemas/expected_transaction";
 import { axi } from "./config";
 
 
