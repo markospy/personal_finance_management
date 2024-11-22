@@ -1,5 +1,5 @@
 import { FinancialSummary } from "@/components/custom/financial-sumary";
-import { Sidebar } from "@/components/custom/Slidebar";
+import { Sidebar } from "@/components/custom/slidebar";
 import { useState } from "react";
 import { TransactionModal } from "@/components/custom/transaction-modal";
 import { Charts } from "@/components/custom/charts";
@@ -11,12 +11,31 @@ import { AccountSettings } from "@/components/custom/account-setting";
 import { Support } from "@/components/custom/support";
 import { GetMonthlySumary } from "@/services/statistic";
 import { QueryClient } from "@tanstack/react-query";
-import { useLoaderData } from "react-router-dom";
+import { redirect, useLoaderData } from "react-router-dom";
 import { GetAccounts } from "@/services/account";
+
+function isTokenExpired(token: string): boolean {
+  // Decodifica el token para obtener su contenido
+  const payload = JSON.parse(atob(token.split('.')[1]));
+
+  // Obtiene la fecha de expiración
+  const exp = payload.exp;
+
+  // Comprueba si la fecha de expiración es menor que la fecha actual
+  return exp < Math.floor(Date.now() / 1000);
+}
 
 
 export const loader = (queryClient: QueryClient) => async () => {
   const token = window.localStorage.getItem('token') as string;
+  if(token){
+    if (isTokenExpired(token)) {
+      return redirect('/login');
+    }
+  } else {
+    return redirect('/login');
+  }
+
   const date = {
     year: new Date().getFullYear(),
     month: new Date().getMonth()+1,
