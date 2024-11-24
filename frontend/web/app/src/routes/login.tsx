@@ -1,6 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Navigate, useNavigate } from 'react-router-dom';
-import { QueryClient } from '@tanstack/react-query';
 import { getToken } from '../api/auth';
 import { useAuth } from "../context/AuthProvider";
 import { useState } from 'react';
@@ -15,14 +14,6 @@ export type userCache = {
   email: string,
   password: string,
 }
-
-export const loader = (queryClient: QueryClient) => () => {
-    const data = queryClient.getQueryData(['me']);
-    if(data) {
-      return data
-    }
-    return null
-};
 
 
 export function LoginForm() {

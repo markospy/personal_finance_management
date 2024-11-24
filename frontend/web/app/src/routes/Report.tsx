@@ -61,12 +61,6 @@ export const loader = (queryClient: QueryClient) => async () => {
     // summary seguirá siendo null si hay un error
   }
 
-  // Calcular el balance si accounts no es null
-  let balance = 0;
-  if (accounts) {
-    accounts.forEach(account => balance += account.balance);
-  }
-
   // Devolver el resultado, con summary y balance
   return {
     summary: {...summary},
@@ -79,23 +73,28 @@ export const loader = (queryClient: QueryClient) => async () => {
 export function ReportMain() {
   const [showModal, setShowModal] = useState(false);
   const [transactions, setTransactions] = useState([]);
-  const sumary = useLoaderData()
-  console.log(sumary)
+  const data = useLoaderData()
+  console.log(data.accounts)
+
 
   const addTransaction = (transaction) => {
     setTransactions([...transactions, transaction]);
     setShowModal(false);
   };
 
-  if(!sumary) {
+  const isEmpty = (obj) => {
+    return Object.keys(obj).length === 0;
+  };
+
+  if(isEmpty(data.accounts)) {
     return (
       <AccountForm />
     )
   }
 
   return (
-    <main className="flex-1 p-6">
-      <FinancialSummary sumary={sumary} />
+    <main className="flex-1 p-6 bg-blue-50">
+      <FinancialSummary data={data} />
       <button
         className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
         onClick={() => setShowModal(true)}
