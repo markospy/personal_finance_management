@@ -11,7 +11,8 @@ import { LoginForm } from './routes/Login'
 import { DashboardCenter } from './routes/Dashboard'
 import { CreateUserForm } from './routes/Register'
 import { ReportMain, loader as loaderSumary } from './routes/Report'
-import { action as newAccount} from './components/custom/account-modal'
+import { action as newAccount} from './components/custom/AccountModal'
+import { action as newTransaction } from './components/custom/TransactionModal'
 
 import { ProtectedRoutes } from './utils/ProtectedRoutes'
 import { AuthProvider } from './context/AuthProvider'
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
                 {
                   path: "/account/new-account",
                   action: newAccount(queryClient),
+                },
+                {
+                  path: "/transaction/new-transaction",
+                  action: newTransaction(queryClient),
                 }
               ]
             },
