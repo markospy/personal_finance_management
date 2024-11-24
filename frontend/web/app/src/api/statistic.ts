@@ -1,9 +1,9 @@
 import { axi } from "./config";
 import { DateIn } from "@/schemas/date";
 
-type MonthlySumary = {
+export type MonthlySumary = {
     totalExpenses: number,
-    totalIncome: number
+    totalIncomes: number
 }
 
 type MonthlyExpenses = {
