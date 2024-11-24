@@ -5,11 +5,11 @@ export const TransactionModal = ({ onClose, onSave }) => {
     const [category, setCategory] = useState('');
     const [date, setDate] = useState('');
     const [notes, setNotes] = useState('');
-  
+
     const handleSubmit = () => {
       onSave({ amount, category, date, notes });
     };
-  
+
     return (
       <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
         <div className="bg-white p-6 rounded shadow-md w-1/3">
