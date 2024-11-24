@@ -3,11 +3,11 @@ import { codes } from 'currency-codes-ts';
 import { ActionFunctionArgs, useFetcher  } from "react-router-dom";
 import { QueryClient } from "@tanstack/react-query";
 import { createAccount } from "@/api/account";
+import { Input, InputObtions } from "./Inputs";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const action  = (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
-    console.log(23)
     const token = window.localStorage.getItem('token') as string;
     const formData = await request.formData()
     const account = {
@@ -20,12 +20,11 @@ export const action  = (queryClient: QueryClient) =>
     return null
   }
 
+
 export function AccountForm() {
   const fetcher = useFetcher();
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [currency, setCurrency] = useState('');
-  const [balance, setBalance] = useState('');
+
 
   const currencies = codes();
 
@@ -41,49 +40,11 @@ export function AccountForm() {
     {isOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Add Account</h2>
+            <h2 className="text-2xl font-bold mb-4 text-blue-900">Add Account</h2>
             <fetcher.Form method="post" action="/account/new-account">
-              <div className="mb-4">
-                <label className="block text-gray-700">Account Name</label>
-                <input
-                  name="name"
-                  type="text"
-                  className="w-full px-3 py-2 border rounded"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Currency</label>
-                <input
-                  name="currency"
-                  type="text"
-                  className="w-full px-3 py-2 border rounded"
-                  list="currencies"
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                  required
-                />
-                <datalist id="currencies">
-                  {currencies.map((cur, index) => (
-                      <option key={index} value={cur} />
-                  ))}
-                </datalist>
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Balance</label>
-                <input
-                  name="balance"
-                  type="number"
-                  className="w-full px-3 py-2 border rounded"
-                  value={balance}
-                  onChange={(e) => setBalance(e.target.value)}
-                  required
-                  step={1000}
-                  min={0}
-                />
-              </div>
+              <Input title="Account Name" name="name" type="text" required={true} />
+              <InputObtions title="Currency" name="currency" type="text" options={currencies} required={true}  />
+              <Input title="Balance" name="balance" type="number" required={true} />
               <div className="flex justify-end">
                 <button
                   type="button"
