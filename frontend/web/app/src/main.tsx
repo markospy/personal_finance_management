@@ -6,10 +6,13 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 
 import ErrorPage from "./error-page";
-import { Layout, loader as userLayout } from './routes/Layout'
-import { LoginForm, loader as loaderUser } from './routes/Login'
-import { DashboardCenter, loader as loaderSumary } from './routes/Dashboard'
+import { Layout } from './routes/Layout'
+import { LoginForm } from './routes/Login'
+import { DashboardCenter } from './routes/Dashboard'
 import { CreateUserForm } from './routes/Register'
+import { ReportMain, loader as loaderSumary } from './routes/Report'
+import { action as newAccount} from './components/custom/account-modal'
+
 import { ProtectedRoutes } from './utils/ProtectedRoutes'
 import { AuthProvider } from './context/AuthProvider'
 
@@ -18,8 +21,7 @@ const queryClient = new QueryClient()
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
-    loader: userLayout(queryClient),
+    element: <Layout queryClient={queryClient} />,
     errorElement: <ErrorPage />,
     children:[{
       errorElement: <ErrorPage />,
@@ -27,20 +29,49 @@ const router = createBrowserRouter([
         {
           path: "/login",
           element: <LoginForm />,
-          loader: loaderUser(queryClient),
         },
         {
           path: "/register",
           element: <CreateUserForm />,
         },
         {
-          element: <ProtectedRoutes />, // Aquí agregas tu componente de rutas protegidas
-          path: "/dashboard",
+          element: <ProtectedRoutes />,
           children: [
             {
-              index: true,
               element: <DashboardCenter />,
-              loader: loaderSumary(queryClient),
+              children: [
+                {
+                  path: "/dashboard",
+                  element: <ReportMain />,
+                  loader: loaderSumary(queryClient),
+                  children: [
+                    {
+                      path: "/dashboard/accounts",
+                      element: <h1>Account</h1>
+                    },
+                    {
+                      path: "/dashboard/budget",
+                      element: <h1>Budget</h1>
+                    },
+                    {
+                      path: "/dashboard/expenses",
+                      element: <h1>Expenses</h1>
+                    },
+                    {
+                      path: "/dashboard/incomes",
+                      element: <h1>Incomes</h1>
+                    },
+                    {
+                      path: "/dashboard/categories",
+                      element: <h1>Categories</h1>
+                    },
+                  ]
+                },
+                {
+                  path: "/account/new-account",
+                  action: newAccount(queryClient),
+                }
+              ]
             },
           ],
         },
