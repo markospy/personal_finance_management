@@ -1,5 +1,5 @@
 import { FinancialSummary } from "@/components/custom/financial-sumary";
-import { TransactionModal } from "@/components/custom/transaction-modal";
+import { TransactionModal } from "@/components/custom/TransactionModal";
 import { Charts } from "@/components/custom/charts";
 import { TransactionList } from "@/components/custom/transactions-list";
 import { BudgetManagement } from "@/components/custom/budget-management";
@@ -12,7 +12,7 @@ import { GetMonthlySumary } from "@/services/statistic";
 import { QueryClient } from "@tanstack/react-query";
 import { GetAccounts } from "@/services/account";
 import { redirect, useLoaderData } from "react-router-dom";
-import { AccountForm } from "@/components/custom/account-modal";
+import { AccountForm } from "@/components/custom/AccountModal";
 
 function isTokenExpired(token: string): boolean {
   // Decodifica el token para obtener su contenido
