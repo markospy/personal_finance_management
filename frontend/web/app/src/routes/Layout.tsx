@@ -1,31 +1,22 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Outlet, NavLink, useLoaderData } from "react-router-dom";
+import { Outlet, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
-import { GetUser } from "../services/user";
 import { QueryClient } from "@tanstack/react-query";
 
-export const loader = (queryClient: QueryClient) => async () => {
-  try {
-    const token = window.localStorage.getItem('token') as string;
-    const response = await queryClient.fetchQuery(GetUser(token)); 
-    console.log(response)
-    return response.name || 'Unknown'; // Asegúrate de manejar el caso donde no hay nombre
-  } catch {
-    return 'Unknown';
-  }
-};
+export function Layout({queryClient}:{queryClient: QueryClient}) {
+  const { isAuthenticated, logout, user, loading } = useAuth();
 
-export function Layout() {
-  const { isAuthenticated, logout } = useAuth();
-  const user = useLoaderData() as string;
-
-  const logoutAction = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const logoutAction = async () => {
+    queryClient.removeQueries()
     logout()
   }
 
+  if(loading) {
+    return <h1>Loading...</h1>
+  }
+
   return (
-    <div className="min-h-screen w-full bg-gray-100 flex flex-col">
+    <div className="min-h-screen w-full bg-blue-50 flex flex-col">
       <header className="bg-blue-600 text-white p-4 shadow-md w-full">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold md:text-2xl">Personal Finance Management</h1>
@@ -33,7 +24,7 @@ export function Layout() {
             <ul className="flex space-x-4">
               { isAuthenticated ? (
                   <div className="flex gap-6">
-                    <span className="font-semibold">{user}</span>
+                    <span className="font-semibold">{user.name}</span>
                     <form onSubmit={logoutAction}>
                       <button type="submit">Logout</button>
                     </form>
