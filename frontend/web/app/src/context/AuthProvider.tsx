@@ -9,6 +9,8 @@ const AuthContext = createContext<any>(null);
 // Proveedor del contexto
 export const AuthProvider =  ({ children }: PropsWithChildren) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser ] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const existingUser  = async () => {
       const token = localStorage.getItem('token');
@@ -23,22 +25,29 @@ export const AuthProvider =  ({ children }: PropsWithChildren) => {
       const checkExistingUser  = async () => {
           const userData = await existingUser ();
           setIsAuthenticated(!!userData);
+          setUser (userData);
+          setLoading(false);
       };
       checkExistingUser ();
   }, []);
 
-  const login = (token: string) => {
+  const login = async (token: string) => {
       localStorage.setItem('token', token);
+       const userData =  await existingUser()
       setIsAuthenticated(true);
+      setUser(userData);
+      setLoading(false);
   };
 
   const logout = () => {
       localStorage.removeItem('token');
+      setUser (null);
+      setLoading(false);
       setIsAuthenticated(false);
   };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, login, logout, loading, user }}>
             {children}
         </AuthContext.Provider>
     );
