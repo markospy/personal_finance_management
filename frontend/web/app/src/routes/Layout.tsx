@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { Outlet, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import { QueryClient } from "@tanstack/react-query";
