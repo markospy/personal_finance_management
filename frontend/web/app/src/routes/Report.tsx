@@ -13,6 +13,10 @@ import { QueryClient } from "@tanstack/react-query";
 import { GetAccounts } from "@/services/account";
 import { redirect, useLoaderData } from "react-router-dom";
 import { AccountForm } from "@/components/custom/AccountModal";
+import { CategoryOut } from "@/schemas/category";
+import { AccountOut } from "@/schemas/account";
+import { MonthlySumary } from "@/api/statistic";
+import { GetCategories } from "@/services/category";
 
 function isTokenExpired(token: string): boolean {
   // Decodifica el token para obtener su contenido
@@ -42,8 +46,9 @@ export const loader = (queryClient: QueryClient) => async () => {
     month: new Date().getMonth() + 1,
   };
 
-  let accounts = null;
-  let summary = null;
+  let categories: CategoryOut[] | null = null;
+  let accounts: AccountOut[] | null = null;
+  let summary: MonthlySumary | null = null;
 
   // Intentar obtener las cuentas
   try {
@@ -53,6 +58,14 @@ export const loader = (queryClient: QueryClient) => async () => {
     // accounts seguirá siendo null si hay un error
   }
 
+  // Intentar obtener las categorias
+  try {
+    categories = await queryClient.ensureQueryData(GetCategories(token));
+  } catch (error) {
+    console.error('Error fetching monthly summary:', error);
+    // categories seguirá siendo null si hay un error
+  }
+
   // Intentar obtener el resumen mensual
   try {
     summary = await queryClient.ensureQueryData(GetMonthlySumary(token, date));
@@ -60,11 +73,10 @@ export const loader = (queryClient: QueryClient) => async () => {
     console.error('Error fetching monthly summary:', error);
     // summary seguirá siendo null si hay un error
   }
-
-  // Devolver el resultado, con summary y balance
   return {
     summary: {...summary},
     accounts: {...accounts},
+    categories: {...categories},
   };
 };
 
@@ -72,15 +84,8 @@ export const loader = (queryClient: QueryClient) => async () => {
 
 export function ReportMain() {
   const [showModal, setShowModal] = useState(false);
-  const [transactions, setTransactions] = useState([]);
   const data = useLoaderData()
-  console.log(data.accounts)
-
-
-  const addTransaction = (transaction) => {
-    setTransactions([...transactions, transaction]);
-    setShowModal(false);
-  };
+  console.log(data)
 
   const isEmpty = (obj) => {
     return Object.keys(obj).length === 0;
@@ -101,9 +106,9 @@ export function ReportMain() {
       >
         Add Transaction
       </button>
-      {showModal && <TransactionModal onClose={() => setShowModal(false)} onSave={addTransaction} />}
+      {showModal && <TransactionModal onClose={() => setShowModal(false)} data={data} />}
       <Charts />
-      <TransactionList transactions={transactions} />
+      {/* <TransactionList transactions={transactions} /> */}
       <BudgetManagement />
       <FutureExpenses />
       <CustomCategories />

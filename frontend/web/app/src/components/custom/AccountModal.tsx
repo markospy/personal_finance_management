@@ -3,7 +3,7 @@ import { codes } from 'currency-codes-ts';
 import { ActionFunctionArgs } from "react-router-dom";
 import { QueryClient } from "@tanstack/react-query";
 import { createAccount } from "@/api/account";
-import { Input, InputObtions } from "./Inputs";
+import { Input } from "./Inputs";
 import { WrapperForms } from "./WrapperForms";
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -41,7 +41,7 @@ export function AccountForm() {
         <WrapperForms title="Add Account" url="/account/new-account">
           <>
             <Input title="Account Name" name="name" type="text" required={true} />
-            <InputObtions title="Currency" name="currency" type="text" options={currencies} required={true} />
+
             <Input title="Balance" name="balance" type="number" required={true} min={0} />
             <div className="flex justify-end">
               <button
