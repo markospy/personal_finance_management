@@ -3,8 +3,9 @@ import { Input, InputDate, InputTextTarea, SelectScrollable } from "./Inputs";
 import { createTransaction } from "@/api/transaction";
 import { WrapperForms } from "./WrapperForms";
 import { ActionFunctionArgs } from "react-router-dom";
-import { GetCategories } from "@/services/category";
-import { GetAccounts } from "@/services/account";
+import { GetCategoriesTryCatch } from "@/services/category";
+import { GetAccountsTryCatch } from "@/services/account";
+import { TransactionIn } from "@/schemas/transaction";
 
 export const action  = (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -14,30 +15,28 @@ export const action  = (queryClient: QueryClient) =>
     let categoryId: number = 0;
     let accountId: number = 0;
 
-    try {
-      const categories = await queryClient.ensureQueryData(GetCategories(token));
-      categoryId = categories.filter(category => category.name === formData.get('category')).map(category => category.id)[0]
-    } catch (error) {
-      console.error('Error fetching monthly summary:', error);
-      // categories seguirá siendo null si hay un error
+
+    const categories = await GetCategoriesTryCatch(token, queryClient);
+    if(categories) {
+      const category = categories.find(category => category.name === formData.get('category'));
+      categoryId = category ? category.id : 0;
     }
 
-    try {
-      const accounts = await queryClient.ensureQueryData(GetAccounts(token));
-      accountId = accounts.filter(account => account.name === formData.get('account')).map(account => account.id)[0]
-    } catch (error) {
-      console.error('Error fetching accounts:', error);
-      // accounts seguirá siendo null si hay un error
+
+    const accounts = await GetAccountsTryCatch(token, queryClient);
+    if(accounts) {
+      const account = accounts.find(account => account.name === formData.get('account'))
+      accountId = account ? account.id : 0;
     }
 
-    const transaction = {
-      amount: formData.get('amount'),
+
+    const transaction: TransactionIn = {
+      amount: parseFloat(formData.get('amount') as string),
       category_id: categoryId,
       account_id: accountId,
-      date: formData.get('date'),
-      comments: comment ? comment : null,
+      date: new Date(formData.get('date') as string),
+      comments: comment ? comment : undefined,
     }
-
     await createTransaction(token, transaction)
     await queryClient.resetQueries({ queryKey: ['account', 'all'] })
     await queryClient.resetQueries({
