@@ -1,4 +1,4 @@
-import { Sidebar } from "@/components/custom/slidebar";
+import { Sidebar } from "@/components/custom/Slidebar";
 import { Outlet} from "react-router-dom";
 
 
