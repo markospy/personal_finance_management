@@ -39,8 +39,15 @@ export const action  = (queryClient: QueryClient) =>
     }
 
     await createTransaction(token, transaction)
-    await queryClient.invalidateQueries({ queryKey: ['account', 'all'] })
-    await queryClient.invalidateQueries({ queryKey: ['monthlySumary'] })
+    await queryClient.resetQueries({ queryKey: ['account', 'all'] })
+    await queryClient.resetQueries({
+      queryKey: ['monthlySumary',
+        {
+          year: new Date().getFullYear(),
+          month: new Date().getMonth()+1
+        }
+      ],
+    })
     return null
   }
 
