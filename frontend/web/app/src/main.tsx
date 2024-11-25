@@ -55,16 +55,12 @@ const router = createBrowserRouter([
                       element: <h1>Budget</h1>
                     },
                     {
-                      path: "/dashboard/expenses",
-                      element: <h1>Expenses</h1>
-                    },
-                    {
-                      path: "/dashboard/incomes",
-                      element: <h1>Incomes</h1>
-                    },
-                    {
                       path: "/dashboard/categories",
                       element: <h1>Categories</h1>
+                    },
+                    {
+                      path: "/dashboard/transactions",
+                      element: <h1>Transactions</h1>
                     },
                   ]
                 },
