@@ -77,14 +77,17 @@ export function InputDate({title, name}:{title:string, name: string}) {
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
+  const HH = String(today.getHours()).padStart(2, '0')
+  const MM = String(today.getMinutes()).padStart(2, '0')
+
   return (
     <div className="mb-2">
       <label className="block">{title}</label>
       <input
-        type="date"
+        type="datetime-local"
         name={name}
         className="w-full p-2 border rounded"
-        defaultValue={`${yyyy}-${mm}-${dd}`}
+        defaultValue={`${yyyy}-${mm}-${dd} ${HH}:${MM}`}
       />
     </div>
   );
