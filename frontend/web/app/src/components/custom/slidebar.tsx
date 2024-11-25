@@ -1,49 +1,32 @@
 import { NavLink } from "react-router-dom";
 
+interface LinkProps {
+  title: string;
+  to: string;
+}
+
+
+function Link({title, to}: LinkProps) {
+  return (
+    <li className="p-2 border-b-4 border-b-blue-50 rounded-xl font-semibold text-blue-900">
+      <NavLink
+        to={to}
+        className={({ isActive, isPending }) => isPending ? "bg-blue-100" : isActive ? "bg-blue-500" : ""}
+      >
+          {title}
+      </NavLink>
+    </li>
+  );
+}
+
 
 export const Sidebar = () => (
-    <aside className="w-64 bg-white shadow-md">
+    <aside className="mx-auto min-w-40 max-h-fit bg-blue-100 shadow-m rounded-sm">
       <ul>
-        <li className="p-4 border-b">
-          <NavLink
-            to="/dashboard/accounts"
-            className={({ isActive, isPending }) => isPending ? "bg-blue-200" : isActive ? "bg-blue-500" : ""}
-          >
-              Accounts
-          </NavLink>
-        </li>
-        <li className="p-4 border-b">
-          <NavLink
-            to="/dashboard/budget"
-            className={({ isActive, isPending }) => isPending ? "bg-blue-200" : isActive ? "bg-blue-500" : ""}
-          >
-              Budget
-          </NavLink>
-        </li>
-        <li className="p-4 border-b">
-          <NavLink
-            to="/dashboard/expenses"
-            className={({ isActive, isPending }) => isPending ? "bg-blue-200" : isActive ? "bg-blue-500" : ""}
-          >
-              Expenses
-          </NavLink>
-        </li>
-        <li className="p-4 border-b">
-          <NavLink
-            to="/dashboard/incomes"
-            className={({ isActive, isPending }) => isPending ? "bg-blue-200" : isActive ? "bg-blue-500" : ""}
-          >
-              Incomes
-          </NavLink>
-        </li>
-        <li className="p-4 border-b">
-          <NavLink
-            to="/dashboard/categories"
-            className={({ isActive, isPending }) => isPending ? "bg-blue-200" : isActive ? "bg-blue-500" : ""}
-          >
-              Categories
-          </NavLink>
-        </li>
+        <Link title="Accounts" to="/dashboard/accounts"/>
+        <Link title="Transactions" to="/dashboard/transactions"/>
+        <Link title="Budget" to="/dashboard/budget"/>
+        <Link title="Categories" to="/dashboard/categories"/>
       </ul>
     </aside>
   );
