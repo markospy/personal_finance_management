@@ -74,8 +74,8 @@ export function TransactionModal({ onClose, data }: {onClose: () => void, data: 
     <WrapperForms title="Add Transaction" url="/transaction/new-transaction">
       <>
         <Input title="Amount" name="amount" type="number" placeholder="Define the amount" required={true} />
-        <SelectScrollable title="Category" name="category" options={categories} description="Select a category" />
-        <SelectScrollable title="Account" name="account" options={{'accounts': accounts}} description="Select an account" />
+        <SelectScrollable title="Category" name="category" options={categories} placeholder="Select a category" />
+        <SelectScrollable title="Account" name="account" options={{'accounts': accounts}} placeholder="Select an account" />
         <InputDate title="Date" name="date" />
         <InputTextTarea title="Notes" name="note" />
         <div className="flex justify-end">

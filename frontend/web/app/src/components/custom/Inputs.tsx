@@ -32,14 +32,22 @@ export function Input({title, name, type, required, placeholder}: InputProps) {
   )
 }
 
-export function SelectScrollable({title, name, options, description}: {title: string, name: string, options: Record<string, string[]>, description: string}) {
+interface SelectScrollableProps {
+  title: string;
+  name: string;
+  options: Record<string, string[]>
+  placeholder: string;
+}
+
+
+export function SelectScrollable({title, name, options, placeholder}: SelectScrollableProps) {
 
 
   return (
     <Select name={name}>
       <label className="block text-gray-700">{title}</label>
       <SelectTrigger className="w-full mb-2 h-10">
-        <SelectValue placeholder={description} />
+        <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
         {options &&
@@ -57,6 +65,37 @@ export function SelectScrollable({title, name, options, description}: {title: st
       </SelectContent>
     </Select>
   )
+}
+
+type CurrencyCode = string; // Definición de CurrencyCode
+interface SelectCurrencyProps {
+  title: string;
+  name: string;
+  options: CurrencyCode[]; // Cambiar a un array de CurrencyCode
+  placeholder: string;
+}
+
+export function SelectCurrency({ title, name, options, placeholder }: SelectCurrencyProps) {
+  return (
+    <Select name={name}>
+      <label className="block text-gray-700">{title}</label>
+      <SelectTrigger className="w-full mb-2 h-10">
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {options && options.length > 0 && (
+          <SelectGroup>
+            <SelectLabel>{title.toUpperCase()}</SelectLabel>
+            {options.map((currency) => (
+              <SelectItem key={currency} value={currency}>
+                {currency} {/* Mostrar el código de la moneda */}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        )}
+      </SelectContent>
+    </Select>
+  );
 }
 
 export function InputTextTarea({title, name}:{title:string, name: string}) {
