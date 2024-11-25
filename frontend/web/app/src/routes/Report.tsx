@@ -1,22 +1,21 @@
 import { FinancialSummary } from "@/components/custom/financial-sumary";
 import { TransactionModal } from "@/components/custom/TransactionModal";
 import { Charts } from "@/components/custom/charts";
-import { TransactionList } from "@/components/custom/transactions-list";
 import { BudgetManagement } from "@/components/custom/budget-management";
 import { FutureExpenses } from "@/components/custom/future-expenses";
 import { CustomCategories } from "@/components/custom/custom-categories";
 import { AccountSettings } from "@/components/custom/account-setting";
 import { Support } from "@/components/custom/support";
 import { useState } from "react";
-import { GetMonthlySumary } from "@/services/statistic";
+import { GetMonthlySumaryTryCatch } from "@/services/statistic";
 import { QueryClient } from "@tanstack/react-query";
-import { GetAccounts } from "@/services/account";
+import {  GetAccountsTryCatch } from "@/services/account";
 import { redirect, useLoaderData } from "react-router-dom";
 import { AccountForm } from "@/components/custom/AccountModal";
 import { CategoryOut } from "@/schemas/category";
 import { AccountOut } from "@/schemas/account";
 import { MonthlySumary } from "@/api/statistic";
-import { GetCategories } from "@/services/category";
+import { GetCategoriesTryCatch } from "@/services/category";
 
 function isTokenExpired(token: string): boolean {
   // Decodifica el token para obtener su contenido
@@ -46,37 +45,14 @@ export const loader = (queryClient: QueryClient) => async () => {
     month: new Date().getMonth() + 1,
   };
 
-  let categories: CategoryOut[] | null = null;
-  let accounts: AccountOut[] | null = null;
-  let summary: MonthlySumary | null = null;
+  const accounts: AccountOut[] | null = await GetAccountsTryCatch(token, queryClient)
+  const categories: CategoryOut[] | null = await GetCategoriesTryCatch(token, queryClient)
+  const summary: MonthlySumary | null = await GetMonthlySumaryTryCatch(token, date, queryClient)
 
-  // Intentar obtener las cuentas
-  try {
-    accounts = await queryClient.ensureQueryData(GetAccounts(token));
-  } catch (error) {
-    console.error('Error fetching accounts:', error);
-    // accounts seguirá siendo null si hay un error
-  }
-
-  // Intentar obtener las categorias
-  try {
-    categories = await queryClient.ensureQueryData(GetCategories(token));
-  } catch (error) {
-    console.error('Error fetching monthly summary:', error);
-    // categories seguirá siendo null si hay un error
-  }
-
-  // Intentar obtener el resumen mensual
-  try {
-    summary = await queryClient.ensureQueryData(GetMonthlySumary(token, date));
-  } catch (error) {
-    console.error('Error fetching monthly summary:', error);
-    // summary seguirá siendo null si hay un error
-  }
   return {
-    summary: {...summary},
-    accounts: {...accounts},
-    categories: {...categories},
+    'summary': {...summary},
+    'accounts': {...accounts},
+    'categories': {...categories},
   };
 };
 
