@@ -1,20 +1,20 @@
 import { FinancialSummary } from "@/components/custom/financial-sumary";
 import { TransactionModal } from "@/components/custom/TransactionModal";
-import { Charts } from "@/components/custom/charts";
+import { Charts } from "@/components/custom/Charts";
 import { BudgetManagement } from "@/components/custom/budget-management";
 import { FutureExpenses } from "@/components/custom/future-expenses";
 import { CustomCategories } from "@/components/custom/custom-categories";
 import { AccountSettings } from "@/components/custom/account-setting";
 import { Support } from "@/components/custom/support";
 import { useState } from "react";
-import { GetMonthlySumaryTryCatch } from "@/services/statistic";
+import { GetMonthlyExpensesTryCatch, GetMonthlyIncomesTryCatch, GetMonthlySumaryTryCatch } from "@/services/statistic";
 import { QueryClient } from "@tanstack/react-query";
 import {  GetAccountsTryCatch } from "@/services/account";
 import { redirect, useLoaderData } from "react-router-dom";
 import { AccountForm } from "@/components/custom/AccountModal";
 import { CategoryOut } from "@/schemas/category";
 import { AccountOut } from "@/schemas/account";
-import { MonthlySumary } from "@/api/statistic";
+import { MonthlyExpenses, MonthlyIncomes, MonthlySumary } from "@/api/statistic";
 import { GetCategoriesTryCatch } from "@/services/category";
 
 function isTokenExpired(token: string): boolean {
@@ -48,15 +48,17 @@ export const loader = (queryClient: QueryClient) => async () => {
   const accounts: AccountOut[] | null = await GetAccountsTryCatch(token, queryClient)
   const categories: CategoryOut[] | null = await GetCategoriesTryCatch(token, queryClient)
   const summary: MonthlySumary | null = await GetMonthlySumaryTryCatch(token, date, queryClient)
+  const summaryExpenses: MonthlyExpenses[] | null = await GetMonthlyExpensesTryCatch(token, date, queryClient)
+  const summaryIncomes: MonthlyIncomes[] | null = await GetMonthlyIncomesTryCatch(token, date, queryClient)
 
   return {
     'summary': {...summary},
+    'summaryExpenses': {...summaryExpenses},
+    'summaryIncomes': {...summaryIncomes},
     'accounts': {...accounts},
     'categories': {...categories},
   };
 };
-
-
 
 export function ReportMain() {
   const [showModal, setShowModal] = useState(false);
@@ -83,7 +85,18 @@ export function ReportMain() {
         Add Transaction
       </button>
       {showModal && <TransactionModal onClose={() => setShowModal(false)} data={data} />}
-      <Charts />
+      <Charts
+        data1={data.summaryExpenses}
+        data2={data.summaryIncomes}
+        title1="November Expenses"
+        title2="November Incomes"
+        label1="Expenses"
+        label2="Incomes"
+        dataKey1="totalAmount"
+        dataKey2="totalAmount"
+        nameKey1="categoryName"
+        nameKey2="categoryName"
+      />
       {/* <TransactionList transactions={transactions} /> */}
       <BudgetManagement />
       <FutureExpenses />
