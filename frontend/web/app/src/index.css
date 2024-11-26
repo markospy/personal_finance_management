@@ -23,11 +23,17 @@
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%}
+    --chart-1: 210 100% 50%;  /* Azul brillante */
+    --chart-2: 210 90% 60%;   /* Azul claro */
+    --chart-3: 210 80% 40%;   /* Azul medio oscuro */
+    --chart-4: 210 70% 70%;   /* Azul suave */
+    --chart-5: 210 60% 30%;   /* Azul oscuro */
+    --chart-6: 210 95% 85%;   /* Azul muy claro */
+    --chart-7: 210 80% 50%;   /* Azul estándar */
+    --chart-8: 210 75% 55%;   /* Azul intermedio */
+    --chart-9: 210 85% 75%;   /* Azul pastel */
+    --chart-10: 210 50% 90%;  /* Azul pálido */
+  }
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -48,11 +54,16 @@
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    --chart-1: 210 100% 40%;  /* Azul brillante (más oscuro) */
+    --chart-2: 210 90% 50%;   /* Azul claro (más oscuro) */
+    --chart-3: 210 80% 35%;   /* Azul medio oscuro */
+    --chart-4: 210 70% 50%;   /* Azul suave (más oscuro) */
+    --chart-5: 210 60% 25%;   /* Azul oscuro */
+    --chart-6: 210 95% 70%;   /* Azul muy claro (más suave) */
+    --chart-7: 210 80% 45%;   /* Azul estándar (más oscuro) */
+    --chart-8: 210 75% 40%;   /* Azul intermedio (más oscuro) */
+    --chart-9: 210 85% 60%;   /* Azul pastel (más oscuro) */
+    --chart-10: 210 50% 80%;  /* Azul pálido (más oscuro) */
   }
 }
 @layer base {
