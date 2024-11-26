@@ -6,13 +6,13 @@ export type MonthlySumary = {
     totalIncomes: number
 }
 
-type MonthlyExpenses = {
+export type MonthlyExpenses = {
 	categoryId: number,
 	categoryName: string,
 	totalAmount: number
 }
 
-type MonthlyIncomes = MonthlyExpenses;
+export type MonthlyIncomes = MonthlyExpenses;
 
 export const getMonthlySumary = (token: string, date:  DateIn): Promise<MonthlySumary> => {
     return axi.get('/statistics/monthly-summary',
