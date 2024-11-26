@@ -1,16 +1,25 @@
 import { useFetcher } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+
 
 export function WrapperForms({title, url, children}: {title: string, url: string, children: React.ReactNode}) {
   const fetcher = useFetcher();
 
   return (
-    <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4 text-blue-900">{title}</h2>
+    <Card className="fixed z-50 inset-y-20 inset-x-1/3 bg-white rounded-lg shadow-lg p-2 max-w-md max-h-fit">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-blue-900">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
         <fetcher.Form method="post" action={url}>
           {children}
         </fetcher.Form>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
