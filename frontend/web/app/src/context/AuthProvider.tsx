@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, PropsWithChildren, useContext, useEffect } from 'react';
 import { getUser  } from "../api/user";
+import { UserOut } from '@/schemas/user';
 
 // Crear el contexto
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -9,14 +10,19 @@ const AuthContext = createContext<any>(null);
 // Proveedor del contexto
 export const AuthProvider =  ({ children }: PropsWithChildren) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser ] = useState(null);
+  const [user, setUser ] = useState<UserOut | null>(null);
   const [loading, setLoading] = useState(true);
 
   const existingUser  = async () => {
       const token = localStorage.getItem('token');
       if (token) {
-          const userData = await getUser (token);
-          return userData;
+        try {
+          const userData = await getUser(token);
+          return userData
+        } catch (error) {
+          console.log('Error al obtener el usuario', (error as Error).message)
+          return null
+        }
       }
       return null;
   };
@@ -25,7 +31,7 @@ export const AuthProvider =  ({ children }: PropsWithChildren) => {
       const checkExistingUser  = async () => {
           const userData = await existingUser ();
           setIsAuthenticated(!!userData);
-          setUser (userData);
+          setUser(userData);
           setLoading(false);
       };
       checkExistingUser ();

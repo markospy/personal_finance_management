@@ -7,7 +7,7 @@ import './index.css'
 
 import ErrorPage from "./error-page";
 import { Layout } from './routes/Layout'
-import { LoginForm } from './routes/login'
+import { LoginForm } from './routes/Login'
 import { DashboardCenter } from './routes/Dashboard'
 import { CreateUserForm } from './routes/Register'
 import { ReportMain, loader as loaderSumary } from './routes/Report'
