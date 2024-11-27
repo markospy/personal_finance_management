@@ -61,7 +61,6 @@ export const loader = (queryClient: QueryClient) => async () => {
 };
 
 export function ReportMain() {
-  const [showModal, setShowModal] = useState(false);
   const data = useLoaderData()
   console.log(data)
 
@@ -89,14 +88,8 @@ export function ReportMain() {
         nameKey1="categoryName"
         nameKey2="categoryName"
       />
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-4 shadow-md font-medium hover:shadow-xl hover:bg-white hover:text-blue-500 hover:font-bold hover:outline"
-        onClick={() => setShowModal(true)}
-      >
-        Add Transaction
-      </button>
       <FinancialSummary data={data} />
-      {showModal && <TransactionModal onClose={() => setShowModal(false)} data={data} />}
+      <TransactionModal data={data} />
       {/* <TransactionList transactions={transactions} /> */}
       <BudgetManagement />
       <FutureExpenses />

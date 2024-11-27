@@ -6,6 +6,8 @@ import { ActionFunctionArgs } from "react-router-dom";
 import { GetCategoriesTryCatch } from "@/services/category";
 import { GetAccountsTryCatch } from "@/services/account";
 import { TransactionIn } from "@/schemas/transaction";
+import { useState } from "react";
+import { ButtonShowForm } from "./ShowForm";
 
 export const action  = (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -52,7 +54,8 @@ export const action  = (queryClient: QueryClient) =>
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function TransactionModal({ onClose, data }: {onClose: () => void, data: any}) {
+export function TransactionModal({ data }: {data: any}) {
+  const [isOpen, setIsOpen] = useState(false);
 
   const categoriesExpenses = Object.values(data.categories)
   .filter(category => category.type==='expense')
@@ -71,27 +74,33 @@ export function TransactionModal({ onClose, data }: {onClose: () => void, data: 
 
 
   return (
-    <WrapperForms title="Add Transaction" url="/transaction/new-transaction">
-      <>
-        <Input title="Amount" name="amount" type="number" placeholder="Define the amount" required={true} />
-        <SelectScrollable title="Category" name="category" options={categories} placeholder="Select a category" />
-        <SelectScrollable title="Account" name="account" options={{'accounts': accounts}} placeholder="Select an account" />
-        <InputDate title="Date" name="date" />
-        <InputTextTarea title="Notes" name="note" />
-        <div className="flex justify-end">
-          <button
-            className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
-            onClick={onClose}
-          >
-              Cancel
-          </button>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Save
-          </button>
-        </div>
-      </>
-    </ WrapperForms>
+    <div className="h-full w-full flex items-center justify-center bg-gray-100">
+      <ButtonShowForm title="Add Transaction" onClick={() => setIsOpen(true)} />
+
+      {isOpen && (
+        <WrapperForms title="Add Transaction" url="/transaction/new-transaction">
+          <>
+            <Input title="Amount" name="amount" type="number" placeholder="Define the amount" required={true} />
+            <SelectScrollable title="Category" name="category" options={categories} placeholder="Select a category" />
+            <SelectScrollable title="Account" name="account" options={{'accounts': accounts}} placeholder="Select an account" />
+            <InputDate title="Date" name="date" />
+            <InputTextTarea title="Notes" name="note" />
+            <div className="flex justify-end">
+              <button
+                className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+                onClick={() => setIsOpen(false)}
+              >
+                  Cancel
+              </button>
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+            </div>
+          </>
+        </ WrapperForms>
+      )};
+    </div>
   );
 };
