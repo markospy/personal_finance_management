@@ -1,5 +1,3 @@
-import { FinancialSummary } from "@/components/custom/financial-sumary";
-import { TransactionModal } from "@/components/custom/TransactionModal";
 import { Charts } from "@/components/custom/Charts";
 import { BudgetManagement } from "@/components/custom/budget-management";
 import { FutureExpenses } from "@/components/custom/future-expenses";
@@ -76,14 +74,12 @@ export function ReportMain() {
   return (
     <main className="flex-1 pl-6 bg-blue-50">
       <Charts
-        data={[data.accounts, data.summary, data.summaryExpenses, data.summaryIncomes]}
+        data={data}
         title={["November Expenses", "November Incomes"]}
         label={["Expenses", "Incomes"]}
         dataKey={["totalAmount", "totalAmount"]}
         nameKey={["categoryName", "categoryName"]}
       />
-      <FinancialSummary data={data} />
-      <TransactionModal data={data} />
       {/* <TransactionList transactions={transactions} /> */}
       <BudgetManagement />
       <FutureExpenses />

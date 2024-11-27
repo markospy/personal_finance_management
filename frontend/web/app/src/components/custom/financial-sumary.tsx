@@ -9,9 +9,9 @@ type Data = {
 
 export function CardInfo({title, data}: {title: string, data:string}) {
   return (
-    <div className="p-4 bg-blue-900 rounded flex flex-col-reverse justify-between items-center shadow-blue-900 shadow-md">
-      <h3 className="text-sm font-medium text-white">{title}</h3>
-      <p className="text-2xl text-white">{data}</p>
+    <div className="p-4 bg-white rounded flex flex-col justify-between items-center shadow-md">
+      <p className="text-2xl font-semibold text-blue-600">{data}</p>
+      <h3 className="text-sm font-medium text-gray-500">{title}</h3>
     </div>
   );
 };
