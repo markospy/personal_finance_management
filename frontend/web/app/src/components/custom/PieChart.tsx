@@ -21,28 +21,32 @@ interface InfoChart {
     title: string;
     description?: string;
     label: string;
-    chartData: any;
+    chartData: object;
     nameKey: string;
     dataKey: string;
 }
 
 interface Info {
-    dataArray: any;
+    dataArray: Record<string, string|number>[];
     nameKey: string;
     label: string;
 }
 
-function capitalizeFirstLetter(string: string) {
-    if (!string) return string; // Manejar el caso de cadena vacía
-    return string.charAt(0).toUpperCase() + string.slice(1);
+function capitalizeFirstLetter(str: string) {
+  if (typeof str !== 'string') {
+      throw new Error('Input must be a string');
+  }
+
+  if (!str) return str; // Handle empty string case
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function createConfig({dataArray, nameKey, label}: Info) {
     // Esta funcion sirve para crear el objeto chartConfig
-    let chartConfig = {}
+    const chartConfig: Record<string, Record<string, string>> = {}
     dataArray.map((data, index) => {
       chartConfig[data[nameKey]] = {
-          label: capitalizeFirstLetter(data[nameKey]),
+          label: capitalizeFirstLetter(data[nameKey] as string),
           color: `hsl(var(--chart-${index+1}))`
       };
   });
@@ -52,19 +56,19 @@ function createConfig({dataArray, nameKey, label}: Info) {
 };
 
 export function PieChartCustom({title, description, label, chartData, dataKey, nameKey}: InfoChart) {
-  const dataArray = Object.values(chartData)
+  const dataArray: Record<string, string|number>[] = Object.values(chartData)
   // La siguiente linea es para agregar la propiedad fill, la cual es necesaria para darle color a cada una las variables representadas en el grafico
-  dataArray.map(data => data['fill'] = `var(--color-${data['categoryName']})`)
+  dataArray.map((data: object ) => data['fill'] = `var(--color-${data['categoryName']})`)
 
 
   const total = React.useMemo(() => {
-    return dataArray.map(data => data[dataKey]).reduce((acc, curr) => acc + curr, 0)
+    return dataArray.map((data: object ) => data[dataKey]).reduce((acc, curr) => acc + curr, 0)
   }, [dataArray, dataKey])
 
   const chartConfig = createConfig({dataArray, nameKey, label}) satisfies ChartConfig
 
   return (
-    <Card className="flex flex-col ">
+    <Card className="flex flex-col min-w-80 min-h-80 shadow-md">
       <CardHeader className="items-center pb-0">
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -101,7 +105,7 @@ export function PieChartCustom({title, description, label, chartData, dataKey, n
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {total.toLocaleString()}
+                          {`$${total}`}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
