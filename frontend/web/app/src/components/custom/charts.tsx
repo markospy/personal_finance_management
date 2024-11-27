@@ -16,7 +16,7 @@ interface ChartsInfo {
 }
 
 export const Charts = ({data1, data2, title1, title2, description1, description2, label1, label2, dataKey1, dataKey2, nameKey1, nameKey2}: ChartsInfo) => (
-    <div className="mb-6">
+    <div className="mb-4">
       <div className='flex flex-row gap-4'>
           <PieChartCustom
             title={title1}
