@@ -51,7 +51,7 @@ async def get_monthly_summary(
             else:
                 totalIncomes += transaction.amount
 
-    if not (totalExpenses and totalIncomes):
+    if not totalExpenses and not totalIncomes:
         raise HTTPException(status_code=404, detail="Transactions not found")
 
     return {"totalExpenses": float(totalExpenses), "totalIncomes": float(totalIncomes)}
