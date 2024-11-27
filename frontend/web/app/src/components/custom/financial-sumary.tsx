@@ -7,7 +7,7 @@ type Data = {
   accounts: AccountOut[]
 };
 
-function CardInfo({title, data}: {title: string, data:string}) {
+export function CardInfo({title, data}: {title: string, data:string}) {
   return (
     <div className="p-4 bg-blue-900 rounded flex flex-col-reverse justify-between items-center shadow-blue-900 shadow-md">
       <h3 className="text-sm font-medium text-white">{title}</h3>

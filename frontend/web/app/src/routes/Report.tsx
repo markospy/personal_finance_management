@@ -6,7 +6,6 @@ import { FutureExpenses } from "@/components/custom/future-expenses";
 import { CustomCategories } from "@/components/custom/custom-categories";
 import { AccountSettings } from "@/components/custom/account-setting";
 import { Support } from "@/components/custom/support";
-import { useState } from "react";
 import { GetMonthlyExpensesTryCatch, GetMonthlyIncomesTryCatch, GetMonthlySumaryTryCatch } from "@/services/statistic";
 import { QueryClient } from "@tanstack/react-query";
 import {  GetAccountsTryCatch } from "@/services/account";
@@ -77,16 +76,11 @@ export function ReportMain() {
   return (
     <main className="flex-1 pl-6 bg-blue-50">
       <Charts
-        data1={data.summaryExpenses}
-        data2={data.summaryIncomes}
-        title1="November Expenses"
-        title2="November Incomes"
-        label1="Expenses"
-        label2="Incomes"
-        dataKey1="totalAmount"
-        dataKey2="totalAmount"
-        nameKey1="categoryName"
-        nameKey2="categoryName"
+        data={[data.accounts, data.summary, data.summaryExpenses, data.summaryIncomes]}
+        title={["November Expenses", "November Incomes"]}
+        label={["Expenses", "Incomes"]}
+        dataKey={["totalAmount", "totalAmount"]}
+        nameKey={["categoryName", "categoryName"]}
       />
       <FinancialSummary data={data} />
       <TransactionModal data={data} />

@@ -1,39 +1,51 @@
 import { PieChartCustom } from '@/components/custom/PieChart';
+import { CardInfo } from './financial-sumary';
 
 interface ChartsInfo {
-  data1: object;
-  data2: object;
-  title1: string;
-  title2: string;
-  description1?: string;
-  description2?: string;
-  label1: string;
-  label2: string;
-  dataKey1: string;
-  dataKey2: string;
-  nameKey1: string;
-  nameKey2: string
+  data: object[];
+  title: string[];
+  label: string[];
+  dataKey: string[];
+  nameKey: string[];
 }
 
-export const Charts = ({data1, data2, title1, title2, description1, description2, label1, label2, dataKey1, dataKey2, nameKey1, nameKey2}: ChartsInfo) => (
-    <div className="mb-4">
-      <div className='flex flex-row gap-4'>
+export function Charts ({data, title, label, dataKey, nameKey}: ChartsInfo) {
+
+  let balance = 0;
+  if (data[0]) {
+    Object.values(data[0]).map(account => balance += account.balance);
+  };
+  const balanceAccount = balance ? `$${balance}` : `$0`;
+  const incomesTotal = data[1].totalIncomes ? data[1].totalIncomes : 0;
+  const expensesTotal = data[1].totalExpenses ? data[1].totalExpenses : 0;
+  const netBalance = `$${incomesTotal - expensesTotal}`
+
+  return (
+    <div className="flex flex-row gap-4 mb-4">
+        <div className='flex flex-col gap-4'>
+          <CardInfo title="Total Balance of Accounts" data={balanceAccount} />
+          <CardInfo title="Income - Expenses" data={netBalance} />
+        </div>
+        <div className='flex flex-row gap-4'>
+        { Object.keys(data[2]).length && (
           <PieChartCustom
-            title={title1}
-            label={label1}
-            description={description1}
-            dataKey={dataKey1}
-            nameKey={nameKey1}
-            chartData={data1}
+            title={title[0]}
+            label={label[0]}
+            dataKey={dataKey[0]}
+            nameKey={nameKey[0]}
+            chartData={data[2]}
           />
+        )}
+        { Object.keys(data[3]).length != 0 && (
           <PieChartCustom
-            title={title2}
-            label={label2}
-            description={description2}
-            dataKey={dataKey2}
-            nameKey={nameKey2}
-            chartData={data2}
+            title={title[1]}
+            label={label[1]}
+            dataKey={dataKey[1]}
+            nameKey={nameKey[1]}
+            chartData={data[3]}
           />
+        )}
       </div>
     </div>
   );
+}
