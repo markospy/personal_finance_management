@@ -34,26 +34,11 @@ export function AccountForm() {
       <ButtonShowForm title="Add Accounts" onClick={() => setIsOpen(true)} />
 
       {isOpen && (
-        <WrapperForms title="Add Account" url="/account/new-account">
+        <WrapperForms title="Add Account" url="/account/new-account" onClick={() => setIsOpen(false)}>
           <>
             <Input title="Account Name" name="name" type="text" placeholder="Account name" required={true} />
             <SelectCurrency title="Currency" name="currency" options={currencies} placeholder="Account currency" />
             <Input title="Balance" name="balance" type="number" placeholder="Account amount" required={true} />
-            <div className="flex justify-end">
-              <button
-                type="button"
-                className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
-                onClick={() => setIsOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Create
-              </button>
-            </div>
           </>
         </ WrapperForms>
       )}

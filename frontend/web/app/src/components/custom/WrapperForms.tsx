@@ -6,8 +6,14 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
+interface Props {
+  title: string;
+  url: string;
+  children: React.ReactNode;
+  onClick: () => void
+}
 
-export function WrapperForms({title, url, children}: {title: string, url: string, children: React.ReactNode}) {
+export function WrapperForms({title, url, children, onClick}:Props ) {
   const fetcher = useFetcher();
 
   return (
@@ -17,7 +23,24 @@ export function WrapperForms({title, url, children}: {title: string, url: string
       </CardHeader>
       <CardContent>
         <fetcher.Form method="post" action={url}>
-          {children}
+          <>
+            {children}
+          </>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+              onClick={onClick}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Create
+            </button>
+          </div>
         </fetcher.Form>
       </CardContent>
     </Card>
