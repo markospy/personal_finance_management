@@ -5,6 +5,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { createAccount } from "@/api/account";
 import { Input, SelectCurrency } from "./Inputs";
 import { WrapperForms } from "./WrapperForms";
+import { ButtonShowForm } from "./ShowForm";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const action  = (queryClient: QueryClient) =>
@@ -30,12 +31,7 @@ export function AccountForm() {
 
   return (
     <div className="h-full w-full flex items-center justify-center bg-gray-100">
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-        onClick={() => setIsOpen(true)}
-      >
-        Add Account
-      </button>
+      <ButtonShowForm title="Add Accounts" onClick={() => setIsOpen(true)} />
 
       {isOpen && (
         <WrapperForms title="Add Account" url="/account/new-account">

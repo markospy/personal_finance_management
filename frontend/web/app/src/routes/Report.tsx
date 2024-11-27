@@ -76,15 +76,7 @@ export function ReportMain() {
   }
 
   return (
-    <main className="flex-1 p-6 bg-blue-50">
-      <FinancialSummary data={data} />
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-        onClick={() => setShowModal(true)}
-      >
-        Add Transaction
-      </button>
-      {showModal && <TransactionModal onClose={() => setShowModal(false)} data={data} />}
+    <main className="flex-1 pl-6 bg-blue-50">
       <Charts
         data1={data.summaryExpenses}
         data2={data.summaryIncomes}
@@ -97,6 +89,14 @@ export function ReportMain() {
         nameKey1="categoryName"
         nameKey2="categoryName"
       />
+      <button
+        className="bg-blue-500 text-white px-4 py-2 rounded mb-4 shadow-md font-medium hover:shadow-xl hover:bg-white hover:text-blue-500 hover:font-bold hover:outline"
+        onClick={() => setShowModal(true)}
+      >
+        Add Transaction
+      </button>
+      <FinancialSummary data={data} />
+      {showModal && <TransactionModal onClose={() => setShowModal(false)} data={data} />}
       {/* <TransactionList transactions={transactions} /> */}
       <BudgetManagement />
       <FutureExpenses />
