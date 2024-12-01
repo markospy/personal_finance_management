@@ -1,7 +1,12 @@
 fastapi[standard]==0.114.0
 sqlalchemy==2.0.34
 pytest==8.3.3
-psycopg2
+psycopg2==2.9.9
+pydantic==2.9.1
+pydantic_core==2.23.3
 pydantic_extra_types==2.9.0
 pycountry==24.6.1
 coverage==7.6.4
+PyJWT==2.9.0
+python-multipart==0.0.9
+passlib==1.7.4

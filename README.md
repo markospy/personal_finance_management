@@ -45,7 +45,21 @@ personal_finance_management/
 ## **Configuración del entorno de desarrollo**
 1. Clona el repositorio
 2. Instala Docker y Docker Compose
-3. Ejecuta docker-compose -f docker-compose-dev.yml up.
+3. Crea el archivo *.env.develoment* en la ruta *.backend/app* y copia el siguiente contenido:
+```
+POSTGRES_USER = "my_user"
+POSTGRES_PASSWORD = "my_password"
+POSTGRES_DB = "my_database"
+PORT = 5432
+HOST = "db"
+
+# to get a string like this run:
+# openssl rand -hex 32
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 1440 # 24 horas
+```
+4. Ejecuta docker compose -f docker-compose-dev.yml up.
 
 Esto levantará los contenedores de:
 
