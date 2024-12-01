@@ -29,6 +29,23 @@ Este proyecto es una aplicación web y móvil para ayudar a los usuarios a gesti
 * Docker
 * Docker Compose
 
+## Versiones Utilizadas
+
+A continuación se detallan las versiones de las herramientas y tecnologías utilizadas en este proyecto:
+
+- **Builders**: 
+  - Vite: v5.4.1
+
+- **TypeScript**: v5.5.3
+
+- **Engines**:
+  - Node.js: v22.3.0
+
+- **Docker**: v27.0.3
+
+- **Docker Compose**: v2.28.1-desktop.1
+
+
 ## **Estructura del proyecto**
 
 ```
