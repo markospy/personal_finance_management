@@ -1,4 +1,4 @@
-import { axi } from "./config";
+import { axi } from "./axiosConfig";
 
 export type TokenOut = {
     access_token: string;

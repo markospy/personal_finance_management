@@ -1,5 +1,5 @@
 import { ExpTransactionIn, ExpTransactionOut, ExpTransactionUpdate } from "../schemas/expected_transaction";
-import { axi } from "./config";
+import { axi } from "./axiosConfig";
 
 
 export const createExpTransaction: (toke: string, transaction: ExpTransactionIn) => Promise<ExpTransactionOut> = (token, transaction) => {

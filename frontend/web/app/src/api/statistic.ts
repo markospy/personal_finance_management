@@ -1,4 +1,4 @@
-import { axi } from "./config";
+import { axi } from "./axiosConfig";
 import { DateIn } from "@/schemas/date";
 
 export type MonthlySumary = {

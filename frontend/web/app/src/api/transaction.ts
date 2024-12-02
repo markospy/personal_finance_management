@@ -1,5 +1,5 @@
 import { TransactionIn, TransactionOut, TransactionUpdate } from "../schemas/transaction";
-import { axi } from "./config";
+import { axi } from "./axiosConfig";
 
 
 export const createTransaction: (toke: string, transaction: TransactionIn) => Promise<TransactionOut> = (token, transaction) => {

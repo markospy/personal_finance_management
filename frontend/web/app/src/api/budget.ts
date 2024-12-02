@@ -1,4 +1,4 @@
-import { axi } from "./config";
+import { axi } from "./axiosConfig";
 import { BudgetIn, BudgetOut, BudgetStatus, BudgetUpdate } from "../schemas/budget";
 
 

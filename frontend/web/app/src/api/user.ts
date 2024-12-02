@@ -1,5 +1,5 @@
 import { UserIn, UserOut } from "../schemas/user";
-import { axi } from "./config";
+import { axi } from "./axiosConfig";
 
 export const createUser = (user: UserIn): Promise<UserOut | Error> => {
     return axi.post('/user', user)
