@@ -48,7 +48,7 @@ services:
       watch:
         - path: ./frontend/web/app/src
           action: sync
-          target: /usr/local/app/src
+          target: /usr/src/app/src
         - path: ./frontend/web/app/package.json
           action: rebuild
           ignore:

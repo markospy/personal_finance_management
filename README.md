@@ -1,4 +1,4 @@
-* [Go to markospy](https://github.com/markospy)
+[Go to markospy](https://github.com/markospy)
 
 **Status:** **en** **desarrollo**
 

@@ -1,3 +1,10 @@
+# syntax=docker/dockerfile:1.7-labs
+
+# Esta linea me permite aprovechar la flag experimental de --exclude en la linea COPY
+
+
+
+
 # First stage: base image
 FROM python:bookworm as base
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -18,5 +25,5 @@ CMD [ "fastapi", "dev", "main.py" ]
 # Third stage: deploy
 FROM base as deploy
 # Does not include the app/test directory
-COPY app/!(tests) ./
+COPY --exclude=app/test app/ ./
 CMD [ "fastapi", "run", "main.py" ]
