@@ -1,152 +1,107 @@
 import { TransactionIn, TransactionOut, TransactionUpdate } from "../schemas/transaction";
+import { ErrorResponse  } from "@/schemas/error";
+import { AxiosError } from 'axios';
 import { axi } from "./axiosConfig";
 
 
-export const createTransaction: (toke: string, transaction: TransactionIn) => Promise<TransactionOut> = (token, transaction) => {
-	return axi.post('/transactions/',
-	{
-		"category_id": transaction.category_id,
-		"account_id": transaction.account_id,
-		"amount": transaction.amount,
-		"date": transaction.date,
-		"comments": transaction.comments,
-	},
-	{headers: {'Authorization': `Bearer ${token}`}}
-	).then(
-		response => {
-			console.log(response.status)
-			return response.data;
-		}
-	)
-	.catch(error => {
-		// Manejo de errores
-		if (error.response) {
-			console.log('Error en la respuesta del servidor:', error.response.data);
-			console.log('Estado del error:', error.response.status);
-			console.log('Encabezados del error:', error.response.headers);
-		} else if (error.request) {
-			console.log('No se recibió respuesta:', error.request);
-		} else {
-			console.log('Error al configurar la solicitud:', error.message);
-		}
-		console.log('Configuración de la solicitud:', error.config);
+export const createTransaction = (token: string, transaction: TransactionIn): Promise<TransactionOut | ErrorResponse> => {
+    return axi.post('/transactions/', {
+        "category_id": transaction.category_id,
+        "account_id": transaction.account_id,
+        "amount": transaction.amount,
+        "date": transaction.date,
+        "comments": transaction.comments,
+    }, { headers: { 'Authorization': `Bearer ${token}` } })
+    .then(response => {
+        console.log(response.status);
+        return response.data; // Devuelve los datos de la respuesta
+    })
+    .catch((error: AxiosError) => {
+        const status = error.response?.status || 500; // Valor por defecto
+        const msg = error.message;
 
-		// Puedes lanzar el error de nuevo si quieres que la promesa se rechace
-		return Promise.reject(error);
-	});
-}
+        // Retornar un objeto de error
+        return {
+            status,
+            msg
+        };
+    });
+};
 
-export const getTransaction: (toke: string, id: number) => Promise<TransactionOut> = (token, id) => {
-	return axi.get('/transactions/' + id, {headers: {'Authorization': `Bearer ${token}`}})
-	.then(
-		response => {
-			console.log(response.status)
-			return response.data;
-		}
-	)
-	.catch(error => {
-		// Manejo de errores
-		if (error.response) {
-			console.log('Error en la respuesta del servidor:', error.response.data);
-			console.log('Estado del error:', error.response.status);
-			console.log('Encabezados del error:', error.response.headers);
-		} else if (error.request) {
-			console.log('No se recibió respuesta:', error.request);
-		} else {
-			console.log('Error al configurar la solicitud:', error.message);
-		}
-		console.log('Configuración de la solicitud:', error.config);
+export const getTransaction = (token: string, id: number): Promise<TransactionOut | ErrorResponse> => {
+    return axi.get('/transactions/' + id, { headers: { 'Authorization': `Bearer ${token}` } })
+    .then(response => {
+        console.log(response.status);
+        return response.data; // Devuelve los datos de la respuesta
+    })
+    .catch((error: AxiosError) => {
+        const status = error.response?.status || 500; // Valor por defecto
+        const msg = error.message;
 
-		// Puedes lanzar el error de nuevo si quieres que la promesa se rechace
-		return Promise.reject(error);
-	});
-}
+        // Retornar un objeto de error
+        return {
+            status,
+            msg
+        };
+    });
+};
 
-export const getTransactions: (toke: string) => Promise<TransactionOut[]> = (token) => {
-	return axi.get('/transactions/', {headers: {'Authorization': `Bearer ${token}`}})
-	.then(
-		response => {
-			console.log(response.status)
-			return response.data;
-		}
-	)
-	.catch(error => {
-		// Manejo de errores
-		if (error.response) {
-			console.log('Error en la respuesta del servidor:', error.response.data);
-			console.log('Estado del error:', error.response.status);
-			console.log('Encabezados del error:', error.response.headers);
-		} else if (error.request) {
-			console.log('No se recibió respuesta:', error.request);
-		} else {
-			console.log('Error al configurar la solicitud:', error.message);
-		}
-		console.log('Configuración de la solicitud:', error.config);
+export const getTransactions = (token: string): Promise<TransactionOut[] | ErrorResponse> => {
+    return axi.get('/transactions/', { headers: { 'Authorization': `Bearer ${token}` } })
+    .then(response => {
+        console.log(response.status);
+        return response.data; // Devuelve los datos de la respuesta
+    })
+    .catch((error: AxiosError) => {
+        const status = error.response?.status || 500; // Valor por defecto
+        const msg = error.message;
 
-		// Puedes lanzar el error de nuevo si quieres que la promesa se rechace
-		return Promise.reject(error);
-	});
-}
+        // Retornar un objeto de error
+        return {
+            status,
+            msg
+        };
+    });
+};
 
-export const getTransactionsByAccount: (toke: string, accountId: number) => Promise<TransactionOut[]> = (token, accountId) => {
-	return axi.get('/transactions/account/'+ accountId,
-		{headers: {'Authorization': `Bearer ${token}`}}
-	)
-	.then(
-		response => {
-			console.log(response.status)
-			return response.data;
-		}
-	)
-	.catch(error => {
-		// Manejo de errores
-		if (error.response) {
-			console.log('Error en la respuesta del servidor:', error.response.data);
-			console.log('Estado del error:', error.response.status);
-			console.log('Encabezados del error:', error.response.headers);
-		} else if (error.request) {
-			console.log('No se recibió respuesta:', error.request);
-		} else {
-			console.log('Error al configurar la solicitud:', error.message);
-		}
-		console.log('Configuración de la solicitud:', error.config);
+export const getTransactionsByAccount = (token: string, accountId: number): Promise<TransactionOut[] | ErrorResponse> => {
+    return axi.get('/transactions/account/' + accountId, { headers: { 'Authorization': `Bearer ${token}` } })
+    .then(response => {
+        console.log(response.status);
+        return response.data; // Devuelve los datos de la respuesta
+    })
+    .catch((error: AxiosError) => {
+        const status = error.response?.status || 500; // Valor por defecto
+        const msg = error.message;
 
-		// Puedes lanzar el error de nuevo si quieres que la promesa se rechace
-		return Promise.reject(error);
-	});
-}
+        // Retornar un objeto de error
+        return {
+            status,
+            msg
+        };
+    });
+};
 
-export const updateTransaction: (toke: string, id: number, transaction: TransactionUpdate) => Promise<TransactionOut> = (token, id, transaction) => {
-	return axi.put('/transactions/' + id,
-		{
+export const updateTransaction = (token: string, id: number, transaction: TransactionUpdate): Promise<TransactionOut | ErrorResponse> => {
+    return axi.put('/transactions/' + id, {
 			"category_id": transaction.category_id,
 			"account_id": transaction.account_id,
 			"amount": transaction.amount,
 			"date": transaction.date,
 			"comments": transaction.comments,
-		},
-		{headers: {'Authorization': `Bearer ${token}`}})
-	.then(
-		response => {
-			console.log(response.status)
-			return response.data;
-		}
-	)
-	.catch(error => {
-		console.log(transaction)
-		// Manejo de errores
-		if (error.response) {
-			console.log('Error en la respuesta del servidor:', error.response.data);
-			console.log('Estado del error:', error.response.status);
-			console.log('Encabezados del error:', error.response.headers);
-		} else if (error.request) {
-			console.log('No se recibió respuesta:', error.request);
-		} else {
-			console.log('Error al configurar la solicitud:', error.message);
-		}
-		console.log('Configuración de la solicitud:', error.config);
+		}, { headers: { 'Authorization': `Bearer ${token}` } })
+		.then(response => {
+			console.log(response.status);
+			return response.data; // Devuelve los datos de la respuesta
+		})
+		.catch((error: AxiosError) => {
+			const status = error.response?.status || 500; // Valor por defecto
+			const msg = error.message;
 
-		// Puedes lanzar el error de nuevo si quieres que la promesa se rechace
-		return Promise.reject(error);
-	});
-}
+			// Retornar un objeto de error
+			return {
+				status,
+				msg
+			};
+		});
+};
