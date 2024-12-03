@@ -11,7 +11,7 @@ const userBase = z.object(
 export const zodUserIn = userBase.merge(
   z.object(
     {
-      "password": z.string({required_error: 'Name is required'}).min(6, 'Must be 6 or more characters long')
+      "password": z.string({required_error: 'Password is required'}).min(6, 'Must be 6 or more characters long')
     }
   )
 )
