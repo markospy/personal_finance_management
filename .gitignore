@@ -8,6 +8,8 @@ __pycache__
 *.db
 .env
 backend/.coverage
+backend/app/my_database.db-journal
+
 
 # React
 # Logs
