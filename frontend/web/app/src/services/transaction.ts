@@ -1,16 +1,17 @@
 import { getTransaction, getTransactions } from "@/api/transaction";
+import { queryOptions } from "@tanstack/react-query";
 
 
 export function GetTransactions(token: string) {
-    return {
-        querKey: ['transactions'],
+    return queryOptions({
+        queryKey: ['transactions'],
         queryFn: () => getTransactions(token)
-    }
+    });
 }
 
 export function GetTransaction(token: string, id: number) {
-    return {
-        querKey: ['transactions', id],
+    return queryOptions({
+        queryKey: ['transactions', id],
         queryFn: () => getTransaction(token, id)
-    }
+    });
 }
