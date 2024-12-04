@@ -8,8 +8,9 @@ import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react'
 import { MonthlyExpenses, MonthlyIncomes, MonthlySumary } from "@/api/statistic"
 import { PieChartCustom } from "./PieChart"
 import { DateIn } from "@/schemas/date"
-import { Dispatch, SetStateAction } from "react"
+import { useState } from "react"
 import { isMonthlyExpenses, isMonthlyIncomes } from "@/utils/guards"
+import { useNavigate, useSearchParams } from "react-router-dom"
 
 interface Data {
   summary: MonthlySumary | false;
@@ -22,8 +23,6 @@ interface ChartsInfo {
   label: string[];
   dataKey: string[];
   nameKey: string[];
-  date: DateIn;
-  onChangeDate: Dispatch<SetStateAction<DateIn>>;
 }
 
 const months = [
@@ -34,7 +33,19 @@ const months = [
 const currentYear = new Date().getFullYear()
 const years = Array.from({length: 5}, (_, i) => currentYear - i)
 
-export default function FinancialSummary({data, label, dataKey, nameKey, date, onChangeDate}: ChartsInfo) {
+export default function FinancialSummary({data, label, dataKey, nameKey}: ChartsInfo) {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const year = Number(searchParams.get('year'));
+  const month = Number(searchParams.get('month'));
+  const [date, setDate] = useState<DateIn>(
+    {
+      year: year > 2000 ? year : new Date().getFullYear(),
+      month: month > 2000 ? month : new Date().getMonth()+1,
+    }
+  )
+  console.log(date)
   let netBalance: number = 0;
   if(isMonthlyExpenses(data.summaryExpenses) && isMonthlyIncomes(data.summaryIncomes)){
     const totalIncomes: number = (typeof data.summary !== 'boolean') ? data.summary.totalIncomes : 0
@@ -43,18 +54,25 @@ export default function FinancialSummary({data, label, dataKey, nameKey, date, o
   }
 
   const handleMonthChange = (value: string) => {
-    onChangeDate(date => ({
+    setDate(date => ({
       ...date,
-      month: months.indexOf(value)
+      month: months.indexOf(value)+1
     }));
+    console.log(value);
+    console.log(`/dashboard/?year=${date.year}&month=${months.indexOf(value)+1}`);
+    navigate(`/dashboard/?year=${date.year}&month=${months.indexOf(value)+1}`);
   };
 
   const handleYearChange = (value: string) => {
-    onChangeDate(date => ({
+    setDate(date => ({
       ...date,
       year: parseInt(value)
     }));
+    console.log(`/dashboard/?year=${value}&month=${date.month+1}`);
+    navigate(`/dashboard/?year=${value}&month=${date.month+1}`);
   };
+
+
 
   console.log(data)
   console.log(date)
@@ -65,15 +83,15 @@ export default function FinancialSummary({data, label, dataKey, nameKey, date, o
         <div className="flex justify-between items-center">
           <div className="flex space-x-4">
             <Select
-              value={months[date.month]}
+              value={months[date.month-1]}
               onValueChange={handleMonthChange}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Selecciona un mes" />
               </SelectTrigger>
               <SelectContent>
-                {months.map((month) => (
-                  <SelectItem key={month} value={month}>{month}</SelectItem>
+                {months.map((month, index) => (
+                  <SelectItem key={month} value={months[index]}>{months[index]}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
