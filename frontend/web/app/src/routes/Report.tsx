@@ -1,6 +1,6 @@
 import { GetMonthlyExpenses, GetMonthlyIncomes, GetMonthlySumary } from "@/services/statistic";
 import {  GetAccounts } from "@/services/account";
-import { redirect, useLoaderData } from "react-router-dom";
+import { redirect, useLoaderData, useSearchParams } from "react-router-dom";
 import { AccountForm } from "@/components/custom/AccountModal";
 import { CategoryOut } from "@/schemas/category";
 import { AccountOut } from "@/schemas/account";
@@ -9,9 +9,8 @@ import { GetCategories } from "@/services/category";
 import { ErrorResponse } from "@/schemas/error";
 import FinancialSummary from "@/components/custom/FinancialSummary";
 import { QueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { DateIn } from "@/schemas/date";
 import { isAccount, isMonthlyExpenses, isMonthlyIncomes, isMonthlySummary } from "@/utils/guards";
+import { useState } from "react";
 
 interface LoaderData {
   summary: MonthlySumary | ErrorResponse;
@@ -38,9 +37,8 @@ function isTokenExpired(token: string): boolean {
   return exp < Math.floor(Date.now() / 1000);
 }
 
-export const loader = (queryClient: QueryClient) => async () => {
+export const loader = (queryClient: QueryClient) => async ({ request }) => {
   const token = window.localStorage.getItem('token') as string;
-
   // Verificar si el token existe y no ha expirado
   if (token) {
     if (isTokenExpired(token)) {
@@ -48,19 +46,35 @@ export const loader = (queryClient: QueryClient) => async () => {
     }
   } else {
     return redirect('/login');
-  }
-
-  const date = {
-    year: new Date().getFullYear(),
-    month: new Date().getMonth() + 1,
+  };
+  const url = new URL(request.url);
+  const year = url.searchParams.get("year");
+  const month = url.searchParams.get("month");
+  console.log(year)
+  let date = {
+    'month': Number(month),
+    'year': Number(year)
+  };
+  if (!year||Number(year)==0) {
+    date = {
+      'month': Number(month),
+      'year': new Date().getFullYear(),
+    };
+  };
+  if (!month) {
+    date = {
+      ...date,
+      'month': new Date().getMonth()+1,
+    };
   };
 
-  const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token))
-  const categories: CategoryOut[] | ErrorResponse = await queryClient.ensureQueryData(GetCategories(token))
-  const summary: MonthlySumary | ErrorResponse = await queryClient.ensureQueryData(GetMonthlySumary(token, date))
-  const summaryExpenses: MonthlyExpenses[] | ErrorResponse = await queryClient.ensureQueryData(GetMonthlyExpenses(token, date))
-  const summaryIncomes: MonthlyIncomes[] | ErrorResponse = await queryClient.ensureQueryData(GetMonthlyIncomes(token, date))
+  console.log(date);
 
+  const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token));
+  const categories: CategoryOut[] | ErrorResponse = await queryClient.ensureQueryData(GetCategories(token));
+  const summary: MonthlySumary | ErrorResponse = await queryClient.ensureQueryData(GetMonthlySumary(token, date));
+  const summaryExpenses: MonthlyExpenses[] | ErrorResponse = await queryClient.ensureQueryData(GetMonthlyExpenses(token, date));
+  const summaryIncomes: MonthlyIncomes[] | ErrorResponse = await queryClient.ensureQueryData(GetMonthlyIncomes(token, date));
 
   return {
     'summary': summary,
@@ -74,12 +88,6 @@ export const loader = (queryClient: QueryClient) => async () => {
 export function ReportMain() {
   const data: LoaderData = useLoaderData()
   console.log(data)
-  const [date, setDate] = useState<DateIn>(
-    {
-      year: new Date().getFullYear(),
-      month: new Date().getMonth(),
-    }
-  )
 
   const sumaryData: SummaryData = {
     'summary': isMonthlySummary(data.summary) && data.summary,
@@ -100,14 +108,7 @@ export function ReportMain() {
        label={["Expenses", "Incomes"]}
        dataKey={["totalAmount", "totalAmount"]}
        nameKey={["categoryName", "categoryName"]}
-       date={date}
-       onChangeDate={setDate}
       />
     </main>
   )
 }
-
-
-
-// TODO: [QUEDA PENDIENTE LOGRAR PASAR EL VALOR DEL ESTADO DEL OBJETO DATA A]
-// TODO: [LA FUNCION LOADER PARA PARAMETRIZAR LOS FETCH DE LAS ESTADISTICAS]
