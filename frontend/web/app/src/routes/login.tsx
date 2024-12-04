@@ -52,7 +52,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md animate-slide-up-fade">
       <div className='flex justify-between'>
         <h2 className="text-2xl font-bold mb-4">Login</h2>
         {error && 

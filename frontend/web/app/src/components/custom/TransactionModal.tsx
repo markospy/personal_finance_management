@@ -3,8 +3,8 @@ import { Input, InputDate, InputTextTarea, SelectScrollable } from "./Inputs";
 import { createTransaction } from "@/api/transaction";
 import { WrapperForms } from "./WrapperForms";
 import { ActionFunctionArgs } from "react-router-dom";
-import { GetCategoriesTryCatch } from "@/services/category";
-import { GetAccountsTryCatch } from "@/services/account";
+import { GetCategories } from "@/services/category";
+import { GetAccounts } from "@/services/account";
 import { TransactionIn } from "@/schemas/transaction";
 import { useState } from "react";
 import { ButtonShowForm } from "./ShowForm";
@@ -18,14 +18,14 @@ export const action  = (queryClient: QueryClient) =>
     let accountId: number = 0;
 
 
-    const categories = await GetCategoriesTryCatch(token, queryClient);
+    const categories = await GetCategories(token);
     if(categories) {
       const category = categories.find(category => category.name === formData.get('category'));
       categoryId = category ? category.id : 0;
     }
 
 
-    const accounts = await GetAccountsTryCatch(token, queryClient);
+    const accounts = await GetAccounts(token);
     if(accounts) {
       const account = accounts.find(account => account.name === formData.get('account'))
       accountId = account ? account.id : 0;
