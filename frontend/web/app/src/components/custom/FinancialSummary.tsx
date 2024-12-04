@@ -59,10 +59,10 @@ export default function FinancialSummary({data, label, dataKey, nameKey, date, o
   console.log(data)
   console.log(date)
   return (
-    <Card className="w-full h-80 max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Dashboard Financiero</CardTitle>
-        <div className="flex justify-between items-center mt-4">
+    <Card className="w-full h-fit max-w-4xl mx-auto pb-12">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-2xl font-bold mb-2">Resumen Mensual</CardTitle>
+        <div className="flex justify-between items-center">
           <div className="flex space-x-4">
             <Select
               value={months[date.month]}
@@ -115,7 +115,7 @@ export default function FinancialSummary({data, label, dataKey, nameKey, date, o
                 label={label[0]}
                 dataKey={dataKey[0]}
                 nameKey={nameKey[0]}
-                chartData={data.summaryExpenses}
+                chartData={data.summaryExpenses as MonthlyExpenses[]}
               />
             ) : (
               <span>No hay datos de gastos disponibles</span>
@@ -137,7 +137,7 @@ export default function FinancialSummary({data, label, dataKey, nameKey, date, o
                 label={label[1]}
                 dataKey={dataKey[1]}
                 nameKey={nameKey[1]}
-                chartData={data.summaryIncomes}
+                chartData={data.summaryIncomes as MonthlyIncomes[]}
               />
             ) : (
               <span>No hay datos de ingresos disponibles</span>
