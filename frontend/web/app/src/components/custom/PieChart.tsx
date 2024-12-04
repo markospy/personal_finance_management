@@ -4,7 +4,6 @@ import * as React from "react"
 import { Label, Pie, PieChart } from "recharts"
 
 import {
-  Card,
   CardContent,
   CardHeader,
   CardTitle,
@@ -64,12 +63,16 @@ export function PieChartCustom({label, chartData, dataKey, nameKey}: InfoChart) 
 
   const chartConfig = createConfig({dataArray, nameKey, label}) satisfies ChartConfig
 
+  console.log((chartConfig))
+  console.log(dataArray)
+  console.log(total)
+
   return (
-    <Card className="flex flex-col min-w-80 min-h-80">
+    <div>
       <CardHeader className="items-center pb-0">
-        <CardTitle>{label}</CardTitle>
+        <CardTitle className="text-lg font-normal">{label}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent className="flex-1">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square max-h-[250px]"
@@ -119,6 +122,6 @@ export function PieChartCustom({label, chartData, dataKey, nameKey}: InfoChart) 
           </PieChart>
         </ChartContainer>
       </CardContent>
-    </Card>
+    </div>
   )
 }

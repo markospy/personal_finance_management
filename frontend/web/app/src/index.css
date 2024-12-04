@@ -24,15 +24,55 @@
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
     --chart-1: 210 100% 50%;  /* Azul brillante */
-    --chart-2: 210 90% 60%;   /* Azul claro */
-    --chart-3: 210 80% 40%;   /* Azul medio oscuro */
-    --chart-4: 210 70% 70%;   /* Azul suave */
-    --chart-5: 210 60% 30%;   /* Azul oscuro */
-    --chart-6: 210 95% 85%;   /* Azul muy claro */
-    --chart-7: 210 80% 50%;   /* Azul estándar */
-    --chart-8: 210 75% 55%;   /* Azul intermedio */
-    --chart-9: 210 85% 75%;   /* Azul pastel */
-    --chart-10: 210 50% 90%;  /* Azul pálido */
+    --chart-2: 0 100% 50%;    /* Rojo brillante */
+    --chart-3: 60 100% 50%;   /* Amarillo brillante */
+    --chart-4: 120 100% 50%;  /* Verde brillante */
+    --chart-5: 240 100% 50%;  /* Azul marino brillante */
+    --chart-6: 30 100% 50%;   /* Naranja brillante */
+    --chart-7: 300 100% 50%;  /* Magenta brillante */
+    --chart-8: 210 90% 60%;   /* Azul claro */
+    --chart-9: 0 80% 60%;     /* Rojo claro */
+    --chart-10: 60 80% 60%;   /* Amarillo claro */
+    --chart-11: 120 80% 60%;  /* Verde claro */
+    --chart-12: 240 80% 60%;  /* Azul marino claro */
+    --chart-13: 30 80% 60%;    /* Naranja claro */
+    --chart-14: 300 80% 60%;   /* Magenta claro */
+    --chart-15: 210 80% 40%;   /* Azul medio oscuro */
+    --chart-16: 0 70% 40%;     /* Rojo medio oscuro */
+    --chart-17: 60 70% 40%;    /* Amarillo medio oscuro */
+    --chart-18: 120 70% 40%;   /* Verde medio oscuro */
+    --chart-19: 240 70% 40%;   /* Azul marino medio oscuro */
+    --chart-20: 30 70% 40%;    /* Naranja medio oscuro */
+    --chart-21: 300 70% 40%;   /* Magenta medio oscuro */
+    --chart-22: 210 70% 70%;   /* Azul suave */
+    --chart-23: 0 60% 70%;     /* Rojo suave */
+    --chart-24: 60 60% 70%;    /* Amarillo suave */
+    --chart-25: 120 60% 70%;   /* Verde suave */
+    --chart-26: 240 60% 70%;   /* Azul marino suave */
+    --chart-27: 30 60% 70%;    /* Naranja suave */
+    --chart-28: 300 60% 70%;   /* Magenta suave */
+    --chart-29: 210 60% 30%;   /* Azul oscuro */
+    --chart-30: 0 50% 30%;     /* Rojo oscuro */
+    --chart-31: 60 50% 30%;    /* Amarillo oscuro */
+    --chart-32: 120 50% 30%;   /* Verde oscuro */
+    --chart-33: 240 50% 30%;   /* Azul marino oscuro */
+    --chart-34: 30 50% 30%;    /* Naranja oscuro */
+    --chart-35: 300 50% 30%;   /* Magenta oscuro */
+    --chart-36: 210 95% 85%;   /* Azul muy claro */
+    --chart-37: 0 95% 85%;     /* Rojo muy claro */
+    --chart-38: 60 95% 85%;    /* Amarillo muy claro */
+    --chart-39: 120 95% 85%;   /* Verde muy claro */
+    --chart-40: 240 95% 85%;   /* Azul marino muy claro */
+    --chart-41: 30 95% 85%;    /* Naranja muy claro */
+    --chart-42: 300 95% 85%;   /* Magenta muy claro */
+    --chart-43: 210 50% 90%;   /* Azul pálido */
+    --chart-44: 0 50% 90%;     /* Rojo pálido */
+    --chart-45: 60 50% 90%;    /* Amarillo pálido */
+    --chart-46: 120 50% 90%;   /* Verde pálido */
+    --chart-47: 240 50% 90%;   /* Azul marino pálido */
+    --chart-48: 30 50% 90%;    /* Naranja pálido */
+    --chart-49: 300 50% 90%;   /* Magenta pálido */
+    --chart-50 : 210 0% 90%;    /* Azul muy pálido */
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -54,16 +94,56 @@
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
-    --chart-1: 210 100% 40%;  /* Azul brillante (más oscuro) */
-    --chart-2: 210 90% 50%;   /* Azul claro (más oscuro) */
-    --chart-3: 210 80% 35%;   /* Azul medio oscuro */
-    --chart-4: 210 70% 50%;   /* Azul suave (más oscuro) */
-    --chart-5: 210 60% 25%;   /* Azul oscuro */
-    --chart-6: 210 95% 70%;   /* Azul muy claro (más suave) */
-    --chart-7: 210 80% 45%;   /* Azul estándar (más oscuro) */
-    --chart-8: 210 75% 40%;   /* Azul intermedio (más oscuro) */
-    --chart-9: 210 85% 60%;   /* Azul pastel (más oscuro) */
-    --chart-10: 210 50% 80%;  /* Azul pálido (más oscuro) */
+    --chart-1: 240 100% 20%;  /* Azul oscuro brillante */
+    --chart-2: 0 100% 20%;    /* Rojo oscuro brillante */
+    --chart-3: 60 100% 20%;   /* Amarillo oscuro brillante */
+    --chart-4: 120 100% 20%;  /* Verde oscuro brillante */
+    --chart-5: 210 100% 20%;  /* Azul marino oscuro brillante */
+    --chart-6: 30 100% 20%;   /* Naranja oscuro brillante */
+    --chart-7: 300 100% 20%;  /* Magenta oscuro brillante */
+    --chart-8: 240 90% 30%;   /* Azul oscuro claro */
+    --chart-9: 0 80% 30%;     /* Rojo claro oscuro */
+    --chart-10: 60 80% 30%;   /* Amarillo claro oscuro */
+    --chart-11: 120 80% 30%;  /* Verde claro oscuro */
+    --chart-12: 210 80% 30%;  /* Azul marino claro oscuro */
+    --chart-13: 30 80% 30%;   /* Naranja claro oscuro */
+    --chart-14: 300 80% 30%;   /* Magenta claro oscuro */
+    --chart-15: 240 80% 20%;   /* Azul medio oscuro */
+    --chart-16: 0 70% 20%;     /* Rojo medio oscuro */
+    --chart-17: 60 70% 20%;    /* Amarillo medio oscuro */
+    --chart-18: 120 70% 20%;   /* Verde medio oscuro */
+    --chart-19: 210 70% 20%;   /* Azul marino medio oscuro */
+    --chart-20: 30 70% 20%;    /* Naranja medio oscuro */
+    --chart-21: 300 70% 20%;   /* Magenta medio oscuro */
+    --chart-22: 240 70% 40%;   /* Azul suave oscuro */
+    --chart-23: 0 60% 40%;     /* Rojo suave oscuro */
+    --chart-24: 60 60% 40%;    /* Amarillo suave oscuro */
+    --chart-25: 120 60% 40%;   /* Verde suave oscuro */
+    --chart-26: 210 60% 40%;   /* Azul marino suave oscuro */
+    --chart-27: 30 60% 40%;    /* Naranja suave oscuro */
+    --chart-28: 300 60% 40%;   /* Magenta suave oscuro */
+    --chart-29: 240 50% 30%;   /* Azul oscuro muy oscuro */
+    --chart-30: 0 50% 30%;     /* Rojo oscuro */
+    --chart-31: 60 50% 30%;    /* Amarillo oscuro */
+    --chart-32: 120 50% 30%;   /* Verde oscuro */
+    --chart-33: 210 50% 30%;   /* Azul marino oscuro */
+    --chart-34: 30 50% 30%;    /* Naranja oscuro */
+    --chart-35: 300 50% 30%;   /* Magenta oscuro */
+    --chart-36: 240 95% 15%;   /* Azul muy oscuro */
+    --chart-37: 0 95% 15%;     /* Rojo muy oscuro */
+    --chart-38: 60 95% 15%;    /* Amarillo muy oscuro */
+    --chart-39: 120 95% 15%;   /* Verde muy oscuro */
+    --chart-40: 210 95% 15%;   /* Azul marino muy oscuro */
+    --chart-41: 30 95% 15%;    /* Naranja muy oscuro */
+    --chart-42: 300 95% 15%;   /* Magenta muy oscuro */
+    --chart-43: 240 50% 10%;   /* Azul pálido oscuro */
+    --chart-44: 0 50% 10%;     /* Rojo pálido oscuro */
+    --chart-45: 60 50% 10%;    /* Amarillo pálido oscuro */
+    --chart-46: 120 50% 10%;   /* Verde pálido oscuro */
+    --chart-47: 210 50% 10%;   /* Azul marino pálido oscuro */
+    --chart-48: 30 50% 10%;    /* Naranja pálido oscuro */
+    --chart-49: 300  50% 10%;   /* Magenta pálido oscuro */
+    --chart-50: 240 0% 10%;    /* Azul muy pálido oscuro */
   }
 }
 @layer base {
