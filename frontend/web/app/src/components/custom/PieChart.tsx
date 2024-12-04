@@ -6,7 +6,6 @@ import { Label, Pie, PieChart } from "recharts"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -18,8 +17,6 @@ import {
 } from "@/components/ui/chart"
 
 interface InfoChart {
-    title: string;
-    description?: string;
     label: string;
     chartData: object;
     nameKey: string;
@@ -55,7 +52,7 @@ function createConfig({dataArray, nameKey, label}: Info) {
   return chartConfig;
 };
 
-export function PieChartCustom({title, description, label, chartData, dataKey, nameKey}: InfoChart) {
+export function PieChartCustom({label, chartData, dataKey, nameKey}: InfoChart) {
   const dataArray: Record<string, string|number>[] = Object.values(chartData)
   // La siguiente linea es para agregar la propiedad fill, la cual es necesaria para darle color a cada una las variables representadas en el grafico
   dataArray.map((data: object ) => data['fill'] = `var(--color-${data['categoryName']})`)
@@ -68,10 +65,9 @@ export function PieChartCustom({title, description, label, chartData, dataKey, n
   const chartConfig = createConfig({dataArray, nameKey, label}) satisfies ChartConfig
 
   return (
-    <Card className="flex flex-col min-w-80 min-h-80 shadow-md">
+    <Card className="flex flex-col min-w-80 min-h-80">
       <CardHeader className="items-center pb-0">
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle>{label}</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
