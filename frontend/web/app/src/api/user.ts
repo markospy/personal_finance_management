@@ -6,10 +6,7 @@ import { axi } from "./axiosConfig";
 
 export const createUser = (user: UserIn): Promise<UserOut | ErrorResponse > => {
   return axi.post('/user', user)
-    .then(response => {
-      console.log(response.status);
-      return response.data; // Devuelve los datos de la respuesta
-    })
+    .then(response => response.data) // Devuelve los datos de la respuesta
     .catch((error: AxiosError) => {
       // Asegúrate de que error.response esté definido
       const status = error.response?.status || 500; // Valor por defecto
@@ -25,10 +22,7 @@ export const createUser = (user: UserIn): Promise<UserOut | ErrorResponse > => {
 
 export const getUser  = (token: string): Promise<UserOut | ErrorResponse> => {
   return axi.get('/user/me', { headers: { 'Authorization': `Bearer ${token}` } })
-    .then(response => {
-      console.log(response.status);
-      return response.data; // Devuelve los datos de la respuesta
-    })
+    .then(response => response.data) // Devuelve los datos de la respuesta
     .catch((error: AxiosError) => {
       // Manejo de errores
       const status = error.response?.status || 500; // Valor por defecto
