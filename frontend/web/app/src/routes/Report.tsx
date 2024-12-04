@@ -61,12 +61,13 @@ export const loader = (queryClient: QueryClient) => async () => {
   const summaryExpenses: MonthlyExpenses[] | ErrorResponse = await queryClient.ensureQueryData(GetMonthlyExpenses(token, date))
   const summaryIncomes: MonthlyIncomes[] | ErrorResponse = await queryClient.ensureQueryData(GetMonthlyIncomes(token, date))
 
+
   return {
-    'summary': {...summary},
-    'summaryExpenses': {...summaryExpenses},
-    'summaryIncomes': {...summaryIncomes},
-    'accounts': {...accounts},
-    'categories': {...categories},
+    'summary': summary,
+    'summaryExpenses': summaryExpenses,
+    'summaryIncomes': summaryIncomes,
+    'accounts': accounts,
+    'categories': categories,
   };
 };
 
@@ -97,7 +98,7 @@ export function ReportMain() {
       <FinancialSummary
        data={sumaryData}
        label={["Expenses", "Incomes"]}
-       dataKey={["Expenses", "Incomes"]}
+       dataKey={["totalAmount", "totalAmount"]}
        nameKey={["categoryName", "categoryName"]}
        date={date}
        onChangeDate={setDate}
