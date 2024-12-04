@@ -68,8 +68,8 @@ export default function FinancialSummary({data, label, dataKey, nameKey}: Charts
       ...date,
       year: parseInt(value)
     }));
-    console.log(`/dashboard/?year=${value}&month=${date.month+1}`);
-    navigate(`/dashboard/?year=${value}&month=${date.month+1}`);
+    console.log(`/dashboard/?year=${value}&month=${date.month}`);
+    navigate(`/dashboard/?year=${value}&month=${date.month}`);
   };
 
 
