@@ -1,18 +1,31 @@
-import { Charts } from "@/components/custom/Charts";
-import { BudgetManagement } from "@/components/custom/budget-management";
-import { FutureExpenses } from "@/components/custom/future-expenses";
-import { CustomCategories } from "@/components/custom/custom-categories";
-import { AccountSettings } from "@/components/custom/account-setting";
-import { Support } from "@/components/custom/support";
-import { GetMonthlyExpensesTryCatch, GetMonthlyIncomesTryCatch, GetMonthlySumaryTryCatch } from "@/services/statistic";
-import { QueryClient } from "@tanstack/react-query";
-import {  GetAccountsTryCatch } from "@/services/account";
+import { GetMonthlyExpenses, GetMonthlyIncomes, GetMonthlySumary } from "@/services/statistic";
+import {  GetAccounts } from "@/services/account";
 import { redirect, useLoaderData } from "react-router-dom";
 import { AccountForm } from "@/components/custom/AccountModal";
 import { CategoryOut } from "@/schemas/category";
 import { AccountOut } from "@/schemas/account";
 import { MonthlyExpenses, MonthlyIncomes, MonthlySumary } from "@/api/statistic";
-import { GetCategoriesTryCatch } from "@/services/category";
+import { GetCategories } from "@/services/category";
+import { ErrorResponse } from "@/schemas/error";
+import FinancialSummary from "@/components/custom/FinancialSummary";
+import { QueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { DateIn } from "@/schemas/date";
+import { isAccount, isMonthlyExpenses, isMonthlyIncomes, isMonthlySummary } from "@/utils/guards";
+
+interface LoaderData {
+  summary: MonthlySumary | ErrorResponse;
+  summaryExpenses: MonthlyExpenses[] | ErrorResponse;
+  summaryIncomes: MonthlyIncomes[] | ErrorResponse;
+  accounts: AccountOut[] | ErrorResponse;
+  categories: CategoryOut[] | ErrorResponse;
+}
+
+interface SummaryData {
+  summary: MonthlySumary | false;
+  summaryExpenses: MonthlyExpenses[] | false;
+  summaryIncomes: MonthlyIncomes[] | false;
+}
 
 function isTokenExpired(token: string): boolean {
   // Decodifica el token para obtener su contenido
@@ -42,11 +55,11 @@ export const loader = (queryClient: QueryClient) => async () => {
     month: new Date().getMonth() + 1,
   };
 
-  const accounts: AccountOut[] | null = await GetAccountsTryCatch(token, queryClient)
-  const categories: CategoryOut[] | null = await GetCategoriesTryCatch(token, queryClient)
-  const summary: MonthlySumary | null = await GetMonthlySumaryTryCatch(token, date, queryClient)
-  const summaryExpenses: MonthlyExpenses[] | null = await GetMonthlyExpensesTryCatch(token, date, queryClient)
-  const summaryIncomes: MonthlyIncomes[] | null = await GetMonthlyIncomesTryCatch(token, date, queryClient)
+  const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token))
+  const categories: CategoryOut[] | ErrorResponse = await queryClient.ensureQueryData(GetCategories(token))
+  const summary: MonthlySumary | ErrorResponse = await queryClient.ensureQueryData(GetMonthlySumary(token, date))
+  const summaryExpenses: MonthlyExpenses[] | ErrorResponse = await queryClient.ensureQueryData(GetMonthlyExpenses(token, date))
+  const summaryIncomes: MonthlyIncomes[] | ErrorResponse = await queryClient.ensureQueryData(GetMonthlyIncomes(token, date))
 
   return {
     'summary': {...summary},
@@ -58,14 +71,22 @@ export const loader = (queryClient: QueryClient) => async () => {
 };
 
 export function ReportMain() {
-  const data = useLoaderData()
+  const data: LoaderData = useLoaderData()
   console.log(data)
+  const [date, setDate] = useState<DateIn>(
+    {
+      year: new Date().getFullYear(),
+      month: new Date().getMonth(),
+    }
+  )
 
-  const isEmpty = (obj) => {
-    return Object.keys(obj).length === 0;
-  };
+  const sumaryData: SummaryData = {
+    'summary': isMonthlySummary(data.summary) && data.summary,
+    'summaryExpenses': isMonthlyExpenses(data.summaryExpenses) && data.summaryExpenses,
+    'summaryIncomes': isMonthlyIncomes(data.summaryIncomes) && data.summaryIncomes,
+  }
 
-  if(isEmpty(data.accounts)) {
+  if(isAccount(data.accounts)) {
     return (
       <AccountForm />
     )
@@ -73,19 +94,19 @@ export function ReportMain() {
 
   return (
     <main className="flex-1 pl-6 bg-blue-50">
-      <Charts
-        data={data}
-        title={["November Expenses", "November Incomes"]}
-        label={["Expenses", "Incomes"]}
-        dataKey={["totalAmount", "totalAmount"]}
-        nameKey={["categoryName", "categoryName"]}
+      <FinancialSummary
+       data={sumaryData}
+       label={["Expenses", "Incomes"]}
+       dataKey={["Expenses", "Incomes"]}
+       nameKey={["categoryName", "categoryName"]}
+       date={date}
+       onChangeDate={setDate}
       />
-      {/* <TransactionList transactions={transactions} /> */}
-      <BudgetManagement />
-      <FutureExpenses />
-      <CustomCategories />
-      <AccountSettings />
-      <Support />
     </main>
   )
 }
+
+
+
+// TODO: [QUEDA PENDIENTE LOGRAR PASAR EL VALOR DEL ESTADO DEL OBJETO DATA A]
+// TODO: [LA FUNCION LOADER PARA PARAMETRIZAR LOS FETCH DE LAS ESTADISTICAS]
