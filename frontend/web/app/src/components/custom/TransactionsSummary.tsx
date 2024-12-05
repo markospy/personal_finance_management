@@ -34,6 +34,19 @@ const months = [
 const currentYear = new Date().getFullYear()
 const years = Array.from({length: 5}, (_, i) => currentYear - i)
 
+const NoDataComponent = ({ message }) => {
+  return (
+    <div className="relative flex flex-col items-center">
+      <span className='absolute top-1/2 font-medium text-xs text-gray-300'>{message}</span>
+      <img 
+        src={montonDeDinero} 
+        alt="Imagen de bolsa con signo de dinero llena de monedas de oro, rodeada de otras tantas monedas de oro y un fajo de dolares americanos"
+        className='size-72 opacity-20 animate-sink'
+      />
+    </div>
+  );
+};
+
 export default function TransactionsSummary({data, label, dataKey, nameKey}: ChartsInfo) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -140,10 +153,7 @@ export default function TransactionsSummary({data, label, dataKey, nameKey}: Cha
                 chartData={data.summaryExpenses as MonthlyExpenses[]}
               />
             ) : (
-              <div className="flex flex-col items-center">
-                <span className='font-medium text-gray-200'>No hay datos de gastos disponibles</span>
-                <img src={montonDeDinero} alt="Imagen de bolsa con signo de dinero llena de monedas de oro, rodeada de otras tantas monedad de oro y un fajo de dolares americanos" className='size-72 opacity-20 animate-sink'/>
-              </div>
+              <NoDataComponent message='No hay datos de gastos disponibles' />
             )}
           </ResponsiveContainer>
         </ChartContainer>
@@ -165,10 +175,7 @@ export default function TransactionsSummary({data, label, dataKey, nameKey}: Cha
                 chartData={data.summaryIncomes as MonthlyIncomes[]}
               />
             ) : (
-              <div className="flex flex-col items-center">
-                <span className='font-medium text-gray-200'>No hay datos de ingresos disponibles</span>
-                <img src={montonDeDinero} alt="Imagen de bolsa con signo de dinero llena de monedas de oro, rodeada de otras tantas monedad de oro y un fajo de dolares americanos" className='size-72 opacity-20 animate-sink'/>
-              </div>
+              <NoDataComponent message='No hay datos de ingresos disponibles' />
             )}
           </ResponsiveContainer>
         </ChartContainer>
@@ -176,4 +183,3 @@ export default function TransactionsSummary({data, label, dataKey, nameKey}: Cha
     </Card>
   )
 }
-
