@@ -13,7 +13,7 @@ export default function AccountsSummary({ data }:{data: AccountsCategories}) {
   return(
     <Card className="w-full h-fit max-w-4xl mx-auto">
       <CardContent className="pt-6">
-      <div className="text-center">
+      <div className="text-center animate-blurred-fade-in">
         <p className="text-sm font-medium text-gray-500">Saldo actual</p>
         <h2 className="text-3xl font-bold">${balance}</h2>
       </div>

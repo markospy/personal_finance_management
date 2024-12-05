@@ -44,7 +44,7 @@ export function WrapperForms({title, url, children, onClick}:Props ) {
             </button>
             <button
                 type="submit"
-                className="bg-blue-500 text-white  rounded"
+                className="bg-blue-500 text-white py-2 px-4 rounded"
               >
                 Create
             </button>

@@ -92,7 +92,7 @@ export default function TransactionsSummary({data, label, dataKey, nameKey}: Cha
   console.log(date)
   return (
     <Card className="w-full h-fit max-w-4xl mx-auto pb-12">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-4 animate-blurred-fade-in">
         <CardTitle className="text-2xl font-bold mb-2">Resumen Mensual</CardTitle>
         <div className="flex justify-between items-center">
           <div className="flex space-x-4">
@@ -134,7 +134,7 @@ export default function TransactionsSummary({data, label, dataKey, nameKey}: Cha
           }
         </div>
       </CardHeader>
-      <CardContent className="flex justify-between">
+      <CardContent className="flex justify-between animate-blurred-fade-in">
         <ChartContainer
           config={{
             income: {
