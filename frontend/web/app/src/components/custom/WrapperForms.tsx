@@ -16,6 +16,14 @@ interface Props {
 export function WrapperForms({title, url, children, onClick}:Props ) {
   const fetcher = useFetcher();
 
+  const handleSubmitClick = () => {
+    // Llama a la función onClick
+    if (onClick) {
+      onClick();
+    }
+    // No llamamos a event.preventDefault() para permitir que el formulario se envíe
+  };
+
   return (
     <Card className="fixed z-50 inset-y-20 inset-x-1/3 bg-white rounded-lg shadow-lg p-2 max-w-md max-h-fit">
       <CardHeader>
@@ -35,10 +43,10 @@ export function WrapperForms({title, url, children, onClick}:Props ) {
               Cancel
             </button>
             <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Create
+                type="submit"
+                className="bg-blue-500 text-white  rounded"
+              >
+                Create
             </button>
           </div>
         </fetcher.Form>

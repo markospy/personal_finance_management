@@ -34,7 +34,7 @@ const months = [
 const currentYear = new Date().getFullYear()
 const years = Array.from({length: 5}, (_, i) => currentYear - i)
 
-const NoDataComponent = ({ message }) => {
+const NoDataComponent = ({ message }:{ message:string }) => {
   return (
     <div className="relative flex flex-col items-center">
       <span className='absolute top-1/2 font-medium text-xs text-gray-300'>{message}</span>

@@ -38,6 +38,26 @@ export const action  = (queryClient: QueryClient) =>
       accountId = account ? account.id : 0;
     }
 
+    const url = new URL(request.url);
+    const year = url.searchParams.get("year");
+    const month = url.searchParams.get("month");
+    let date = {
+      'month': Number(month),
+      'year': Number(year)
+    };
+    if (!year||Number(year)==0) {
+      date = {
+        'month': Number(month),
+        'year': new Date().getFullYear(),
+      };
+    };
+    if (!month) {
+      date = {
+        ...date,
+        'month': new Date().getMonth()+1,
+      };
+    };
+    console.log(date)
 
     const transaction: TransactionIn = {
       amount: parseFloat(formData.get('amount') as string),
@@ -47,15 +67,10 @@ export const action  = (queryClient: QueryClient) =>
       comments: comment ? comment : undefined,
     }
     await createTransaction(token, transaction)
-    await queryClient.resetQueries({ queryKey: ['account', 'all'] })
-    await queryClient.resetQueries({
-      queryKey: ['monthlySumary',
-        {
-          year: new Date().getFullYear(),
-          month: new Date().getMonth()+1
-        }
-      ],
-    })
+    await queryClient.refetchQueries({ queryKey: ['account', 'all'] })
+    await queryClient.refetchQueries({ queryKey: ['monthlySumary', date] })
+    await queryClient.refetchQueries({ queryKey: ['monthlyIncomes', date] })
+    await queryClient.refetchQueries({ queryKey: ['monthlyExpenses', date] })
     return null
   }
 
