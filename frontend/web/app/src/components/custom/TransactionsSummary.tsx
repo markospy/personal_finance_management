@@ -1,5 +1,6 @@
 "use client"
 
+import montonDeDinero from '../../assets/monton_de_dinero.png';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {  ResponsiveContainer } from 'recharts'
@@ -33,7 +34,7 @@ const months = [
 const currentYear = new Date().getFullYear()
 const years = Array.from({length: 5}, (_, i) => currentYear - i)
 
-export default function FinancialSummary({data, label, dataKey, nameKey}: ChartsInfo) {
+export default function TransactionsSummary({data, label, dataKey, nameKey}: ChartsInfo) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -109,12 +110,15 @@ export default function FinancialSummary({data, label, dataKey, nameKey}: Charts
               </SelectContent>
             </Select>
           </div>
-          <div className={`flex items-center ${netBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            <span className="text-2xl font-bold mr-2">
-              {netBalance >= 0 ? '+' : '-'}${Math.abs(netBalance).toLocaleString()}
-            </span>
-            {netBalance >= 0 ? <ArrowUpIcon size={24} /> : <ArrowDownIcon size={24} />}
-          </div>
+          {(data.summaryExpenses && data.summaryIncomes) ?
+            <div className={`flex items-center ${netBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              <span className="text-2xl font-bold mr-2">
+                {netBalance >= 0 ? '+' : '-'}${Math.abs(netBalance).toLocaleString()}
+              </span>
+              {netBalance >= 0 ? <ArrowUpIcon size={24} /> : <ArrowDownIcon size={24} />}
+            </div> :
+            <></>
+          }
         </div>
       </CardHeader>
       <CardContent className="flex justify-between">
@@ -128,7 +132,7 @@ export default function FinancialSummary({data, label, dataKey, nameKey}: Charts
           className="w-1/2"
         >
           <ResponsiveContainer width="100%" height={300}>
-            { Object.keys(data.summaryExpenses).length ? (
+            { data.summaryExpenses ? (
               <PieChartCustom
                 label={label[0]}
                 dataKey={dataKey[0]}
@@ -136,7 +140,10 @@ export default function FinancialSummary({data, label, dataKey, nameKey}: Charts
                 chartData={data.summaryExpenses as MonthlyExpenses[]}
               />
             ) : (
-              <span>No hay datos de gastos disponibles</span>
+              <div className="flex flex-col items-center">
+                <span className='font-medium text-gray-200'>No hay datos de gastos disponibles</span>
+                <img src={montonDeDinero} alt="Imagen de bolsa con signo de dinero llena de monedas de oro, rodeada de otras tantas monedad de oro y un fajo de dolares americanos" className='size-72 opacity-20 animate-sink'/>
+              </div>
             )}
           </ResponsiveContainer>
         </ChartContainer>
@@ -150,7 +157,7 @@ export default function FinancialSummary({data, label, dataKey, nameKey}: Charts
           className="w-1/2"
         >
           <ResponsiveContainer width="100%" height={300}>
-            { Object.keys(data.summaryIncomes).length != 0 ? (
+            { data.summaryIncomes ? (
               <PieChartCustom
                 label={label[1]}
                 dataKey={dataKey[1]}
@@ -158,7 +165,10 @@ export default function FinancialSummary({data, label, dataKey, nameKey}: Charts
                 chartData={data.summaryIncomes as MonthlyIncomes[]}
               />
             ) : (
-              <span>No hay datos de ingresos disponibles</span>
+              <div className="flex flex-col items-center">
+                <span className='font-medium text-gray-200'>No hay datos de ingresos disponibles</span>
+                <img src={montonDeDinero} alt="Imagen de bolsa con signo de dinero llena de monedas de oro, rodeada de otras tantas monedad de oro y un fajo de dolares americanos" className='size-72 opacity-20 animate-sink'/>
+              </div>
             )}
           </ResponsiveContainer>
         </ChartContainer>
