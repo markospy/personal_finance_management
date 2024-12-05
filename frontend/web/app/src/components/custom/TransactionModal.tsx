@@ -8,6 +8,13 @@ import { GetAccounts } from "@/services/account";
 import { TransactionIn } from "@/schemas/transaction";
 import { useState } from "react";
 import { ButtonShowForm } from "./ShowForm";
+import { Plus } from "lucide-react";
+import { AccountsCategories } from "@/routes/Report";
+import { CategoryOut } from "@/schemas/category";
+import { AccountOut } from "@/schemas/account";
+import { ErrorResponse } from "@/schemas/error";
+import { isAccount, isCategory } from "@/utils/guards";
+
 
 export const action  = (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -18,16 +25,16 @@ export const action  = (queryClient: QueryClient) =>
     let accountId: number = 0;
 
 
-    const categories = await GetCategories(token);
-    if(categories) {
-      const category = categories.find(category => category.name === formData.get('category'));
+    const categories: CategoryOut[] | ErrorResponse = await queryClient.ensureQueryData(GetCategories(token));
+    if(isCategory(categories)) {
+      const category = categories.find((category:CategoryOut)=> category.name === formData.get('category'));
       categoryId = category ? category.id : 0;
     }
 
 
-    const accounts = await GetAccounts(token);
-    if(accounts) {
-      const account = accounts.find(account => account.name === formData.get('account'))
+    const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token));
+    if(isAccount(accounts)) {
+      const account = accounts.find((account:AccountOut) => account.name === formData.get('account'))
       accountId = account ? account.id : 0;
     }
 
@@ -54,40 +61,57 @@ export const action  = (queryClient: QueryClient) =>
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function TransactionModal({ data }: {data: any}) {
+export function TransactionModal({ data }:{data: AccountsCategories}) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const categoriesExpenses = Object.values(data.categories)
-  .filter(category => category.type==='expense')
-  .map(category => category.name);
+  let categoriesExpenses: string[] = []
+  let categoriesIncomes: string[] = []
+  if(data.categories){
+    const categories: CategoryOut[] = data.categories;
+    categoriesExpenses = categories
+    .filter(category => category.type==='expense')
+    .map(category => category.name);
 
-  const categoriesIncomes = Object.values(data.categories)
-  .filter(category => category.type==='income')
-  .map(category => category.name);
+    categoriesIncomes = categories
+    .filter(category => category.type==='income')
+    .map(category => category.name);
+  }
+
 
   const categories = {
     'incomes': categoriesIncomes,
     'expenses': categoriesExpenses
   }
+  let accountsList: string[] = []
+  if(data.accounts){
+    const accounts: AccountOut[] = data.accounts;
+    console.log(accounts)
+    accountsList = accounts.map(account => account.name);
+  }
 
-  const accounts = Object.values(data.accounts).map(account => account.name);
-
+  console.log(accountsList)
 
   return (
-    <div className="h-full w-full flex items-center justify-center bg-gray-100">
-      <ButtonShowForm title="Add Transaction" onClick={() => setIsOpen(true)} />
+    <div className="h-full w-full flex items-center justify-center">
+      <ButtonShowForm title="Add Transaction" onClick={() => setIsOpen(true)}>
+        <Plus className="mr-2 h-4 w-4" />
+      </ButtonShowForm>
 
       {isOpen && (
         <WrapperForms title="Add Transaction" url="/transaction/new-transaction" onClick={() => setIsOpen(false)}>
           <>
             <Input title="Amount" name="amount" type="number" placeholder="Define the amount" required={true} />
             <SelectScrollable title="Category" name="category" options={categories} placeholder="Select a category" />
-            <SelectScrollable title="Account" name="account" options={{'accounts': accounts}} placeholder="Select an account" />
+            <SelectScrollable title="Account" name="account" options={{'accounts': accountsList}} placeholder="Select an account" />
             <InputDate title="Date" name="date" />
             <InputTextTarea title="Notes" name="note" />
           </>
         </ WrapperForms>
-      )};
+      )}
     </div>
   );
 };
+
+
+// TODO: queda pendiente recargar el cache con la data de los incomes y expenses despues de cada transaccion.
+// TODO: asu como cerrar el modal de agregar transaccion una vez se realice la transaccion.
