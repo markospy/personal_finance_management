@@ -1,16 +1,16 @@
 import { GetMonthlyExpenses, GetMonthlyIncomes, GetMonthlySumary } from "@/services/statistic";
 import {  GetAccounts } from "@/services/account";
-import { redirect, useLoaderData, useSearchParams } from "react-router-dom";
+import { redirect, useLoaderData } from "react-router-dom";
 import { AccountForm } from "@/components/custom/AccountModal";
 import { CategoryOut } from "@/schemas/category";
 import { AccountOut } from "@/schemas/account";
 import { MonthlyExpenses, MonthlyIncomes, MonthlySumary } from "@/api/statistic";
 import { GetCategories } from "@/services/category";
 import { ErrorResponse } from "@/schemas/error";
-import FinancialSummary from "@/components/custom/FinancialSummary";
+import TransactionsSummary from "@/components/custom/TransactionsSummary";
 import { QueryClient } from "@tanstack/react-query";
-import { isAccount, isMonthlyExpenses, isMonthlyIncomes, isMonthlySummary } from "@/utils/guards";
-import { useState } from "react";
+import { isAccount, isCategory, isMonthlyExpenses, isMonthlyIncomes, isMonthlySummary } from "@/utils/guards";
+import AccountsSummary from "@/components/custom/AccountsSummary";
 
 interface LoaderData {
   summary: MonthlySumary | ErrorResponse;
@@ -24,6 +24,11 @@ interface SummaryData {
   summary: MonthlySumary | false;
   summaryExpenses: MonthlyExpenses[] | false;
   summaryIncomes: MonthlyIncomes[] | false;
+}
+
+export interface AccountsCategories {
+  accounts: AccountOut[] | false;
+  categories: CategoryOut[] | false;
 }
 
 function isTokenExpired(token: string): boolean {
@@ -95,15 +100,24 @@ export function ReportMain() {
     'summaryIncomes': isMonthlyIncomes(data.summaryIncomes) && data.summaryIncomes,
   }
 
-  if(isAccount(data.accounts)) {
+  const accountCategories: AccountsCategories = {
+    'accounts': isAccount(data.accounts) && data.accounts,
+    'categories': isCategory(data.categories) && data.categories,
+  }
+  console.log(isAccount(data.accounts))
+  console.log(isCategory(data.categories))
+  console.log(accountCategories)
+
+  if(!isAccount(data.accounts)) {
     return (
       <AccountForm />
     )
   }
 
   return (
-    <main className="flex-1 pl-6 bg-blue-50">
-      <FinancialSummary
+    <main className="flex flex-col flex-1 gap-2 pl-4 bg-blue-50">
+      <AccountsSummary data={accountCategories}/>
+      <TransactionsSummary
        data={sumaryData}
        label={["Expenses", "Incomes"]}
        dataKey={["totalAmount", "totalAmount"]}
