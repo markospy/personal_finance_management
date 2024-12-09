@@ -95,11 +95,15 @@ def create_transaction(
 def get_transactions(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+    offset: int,
+    limit: int = 10,
 ):
     accounts = db.scalars(select(Account).where(Account.user_id == current_user.id)).all()
     transactions_list = []
     for account in accounts:
-        transactions = db.scalars(select(Transaction).where(Transaction.account_id == account.id)).all()
+        transactions = db.scalars(
+            select(Transaction).where(Transaction.account_id == account.id).offset(offset).limit(limit)
+        ).all()
         for translation in transactions:
             transactions_list.append(translation)
     if not transactions_list:
