@@ -6,14 +6,14 @@ services:
       context: ./backend/
       target: developer
     ports:
-      - 8000:8000
+      - "127.0.0.1:8000:0.0.0.0:8000"
     links:
       - db
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "https://localhost:8000"]
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:8000/docs"]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -30,7 +30,7 @@ services:
           ignore:
             - ./backend/.venv
             - ./backend/Dockerfile
-            - ./frontend/web/app/*.md
+            - ./backend/app/*.md
 
 
   web:
@@ -53,7 +53,6 @@ services:
           action: rebuild
           ignore:
             - ./frontend/web/app/public
-            - ./frontend/web/app/src
             - ./frontend/web/app/*.md
             - ./frontend/web/app/*.html
             - ./frontend/web/app/*.json
@@ -92,7 +91,7 @@ services:
   phpmyadmin:
     image: phpmyadmin:latest
     ports:
-      - 80:8080
+      - 8080:8080
     depends_on:
       db:
         condition: service_healthy
