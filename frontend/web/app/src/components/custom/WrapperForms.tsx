@@ -16,16 +16,15 @@ interface Props {
 
 export function WrapperForms({title, url, children, onClick}:Props ) {
   const fetcher = useFetcher();
-  const busy = fetcher.state !== 'idle';
-  // useEffect(() => {
-  //   if (busy) {
-  //     onClick(); // Llama a la función que cierra el modal
-  //   }
-  // }, [busy, onClick]);
 
   return (
     <Card className="fixed z-50 inset-y-20 inset-x-1/3 bg-white rounded-lg shadow-lg p-2 max-w-md max-h-fit">
       {fetcher.state!=='idle' && <div className="absolute inset-0 bg-white opacity-50"></div>}
+      {fetcher.data?.error && (
+        <p style={{ color: "red" }}>
+          {fetcher.data.error}
+        </p>
+      )}
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-blue-900">{title}</CardTitle>
       </CardHeader>
