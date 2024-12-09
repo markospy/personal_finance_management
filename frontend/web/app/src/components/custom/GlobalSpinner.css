@@ -1,0 +1,17 @@
+.globalspinner {
+    width: 80px; /* Ancho del spinner */
+    height: 80px; /* Alto del spinner */
+    border: 10px solid #0c4dff; /* Color del borde */
+    border-top: 10px solid transparent; /* Color del borde superior transparente */
+    border-radius: 50%; /* Hacerlo circular */
+    animation: spin 1s linear infinite; /* Aplicar la animación */
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg); /* Comienza en 0 grados */
+    }
+    100% {
+        transform: rotate(360deg); /* Termina en 360 grados */
+    }
+}
