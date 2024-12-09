@@ -1,0 +1,17 @@
+.spinner {
+    width: 20px; /* Ancho del spinner */
+    height: 20px; /* Alto del spinner */
+    border: 2px solid #ffffff; /* Color del borde */
+    border-top: 2px solid transparent; /* Color del borde superior transparente */
+    border-radius: 50%; /* Hacerlo circular */
+    animation: spin 1s linear infinite; /* Aplicar la animación */
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg); /* Comienza en 0 grados */
+    }
+    100% {
+        transform: rotate(360deg); /* Termina en 360 grados */
+    }
+}
