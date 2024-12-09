@@ -104,9 +104,13 @@ export function ReportMain() {
     'accounts': isAccount(data.accounts) && data.accounts,
     'categories': isCategory(data.categories) && data.categories,
   }
-  console.log(isAccount(data.accounts))
+  console.log(data.accounts)
   console.log(isCategory(data.categories))
   console.log(accountCategories)
+
+  if(data.accounts.status == 500) {
+    throw new Error('Tenemos problemas con el servidor. Intente mas tarde.')
+  }
 
   if(!isAccount(data.accounts)) {
     return (

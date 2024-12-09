@@ -38,8 +38,8 @@ const NoDataComponent = ({ message }:{ message:string }) => {
   return (
     <div className="relative flex flex-col items-center">
       <span className='absolute top-1/2 font-medium text-xs text-gray-300'>{message}</span>
-      <img 
-        src={montonDeDinero} 
+      <img
+        src={montonDeDinero}
         alt="Imagen de bolsa con signo de dinero llena de monedas de oro, rodeada de otras tantas monedas de oro y un fajo de dolares americanos"
         className='size-72 opacity-20 animate-sink'
       />
