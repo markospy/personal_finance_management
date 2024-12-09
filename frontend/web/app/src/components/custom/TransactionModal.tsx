@@ -15,6 +15,7 @@ import { AccountOut } from "@/schemas/account";
 import { ErrorResponse } from "@/schemas/error";
 import { isAccount, isCategory } from "@/utils/guards";
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const action  = (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -29,14 +30,14 @@ export const action  = (queryClient: QueryClient) =>
     if(isCategory(categories)) {
       const category = categories.find((category:CategoryOut)=> category.name === formData.get('category'));
       categoryId = category ? category.id : 0;
-    }
+    };
 
 
     const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token));
     if(isAccount(accounts)) {
       const account = accounts.find((account:AccountOut) => account.name === formData.get('account'))
       accountId = account ? account.id : 0;
-    }
+    };
 
     const url = new URL(request.url);
     const year = url.searchParams.get("year");
@@ -57,7 +58,6 @@ export const action  = (queryClient: QueryClient) =>
         'month': new Date().getMonth()+1,
       };
     };
-    console.log(date)
 
     const transaction: TransactionIn = {
       amount: parseFloat(formData.get('amount') as string),
@@ -65,13 +65,17 @@ export const action  = (queryClient: QueryClient) =>
       account_id: accountId,
       date: new Date(formData.get('date') as string),
       comments: comment ? comment : undefined,
-    }
-    await createTransaction(token, transaction)
-    await queryClient.refetchQueries({ queryKey: ['account', 'all'] })
-    await queryClient.refetchQueries({ queryKey: ['monthlySumary', date] })
-    await queryClient.refetchQueries({ queryKey: ['monthlyIncomes', date] })
-    await queryClient.refetchQueries({ queryKey: ['monthlyExpenses', date] })
-    return null
+    };
+
+    // Agregar latencia de 2 segundos (2000 ms) antes de crear la transacción
+    await delay(1000);
+
+    await createTransaction(token, transaction);
+    await queryClient.refetchQueries({ queryKey: ['account', 'all'] });
+    await queryClient.refetchQueries({ queryKey: ['monthlySumary', date] });
+    await queryClient.refetchQueries({ queryKey: ['monthlyIncomes', date] });
+    await queryClient.refetchQueries({ queryKey: ['monthlyExpenses', date] });
+    return null;
   }
 
 
