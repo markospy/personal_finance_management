@@ -91,6 +91,34 @@ def create_transaction(
     return transaction
 
 
+@router.get("/{transaction_id}", response_model=TransactionOut)
+def get_transaction(
+    transaction_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+):
+    transaction = db.scalar(
+        select(Transaction).where(Transaction.id == transaction_id, Account.user_id == current_user.id)
+    )
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    return transaction
+
+
+@router.get("/by-account/{account_id}", response_model=list[TransactionOut])
+def get_transactions_by_account(
+    account_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+):
+    account = db.scalar(select(Account).where(Account.id == account_id, Account.user_id == current_user.id))
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    transactions = db.scalars(select(Transaction).join(Account).where(Transaction.account_id == account_id)).all()
+    return transactions
+
+
 @router.get("/", response_model=list[TransactionOut])
 def get_transactions(
     db: Annotated[Session, Depends(get_db)],
@@ -109,34 +137,6 @@ def get_transactions(
     if not transactions_list:
         raise HTTPException(status_code=404, detail="Transactions not found")
     return transactions_list
-
-
-@router.get("/{transaction_id}", response_model=TransactionOut)
-def get_transaction(
-    transaction_id: int,
-    db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
-):
-    transaction = db.scalar(
-        select(Transaction).where(Transaction.id == transaction_id, Account.user_id == current_user.id)
-    )
-    if not transaction:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    return transaction
-
-
-@router.get("/account/{account_id}", response_model=list[TransactionOut])
-def get_transactions_by_account(
-    account_id: int,
-    db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
-):
-    account = db.scalar(select(Account).where(Account.id == account_id, Account.user_id == current_user.id))
-    if not account:
-        raise HTTPException(status_code=404, detail="Account not found")
-
-    transactions = db.scalars(select(Transaction).join(Account).where(Transaction.account_id == account_id)).all()
-    return transactions
 
 
 @router.put("/{transaction_id}", response_model=TransactionOut)
