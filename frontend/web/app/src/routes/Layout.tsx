@@ -1,17 +1,16 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, useNavigation } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import { QueryClient } from "@tanstack/react-query";
+import GlobalSpinner from "@/components/custom/GlobalSpinner";
 
 export function Layout({queryClient}:{queryClient: QueryClient}) {
-  const { isAuthenticated, logout, user, loading } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
 
   const logoutAction = async () => {
     queryClient.removeQueries()
     logout()
-  }
-
-  if(loading) {
-    return <h1>Loading...</h1>
   }
 
   return (
@@ -44,6 +43,7 @@ export function Layout({queryClient}:{queryClient: QueryClient}) {
         </div>
       </header>
       <main className="flex-grow content-center container mx-auto p-4">
+        {isNavigating && <GlobalSpinner />}
         <Outlet />
       </main>
     </div>
