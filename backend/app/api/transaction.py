@@ -1,4 +1,5 @@
 from datetime import datetime
+from math import ceil
 from typing import Annotated
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Security
@@ -119,24 +120,44 @@ def get_transactions_by_account(
     return transactions
 
 
-@router.get("/", response_model=list[TransactionOut])
+@router.get("")
 def get_transactions(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
-    offset: int,
-    limit: int = 10,
+    page: int = 0,
+    size_page: int = 10,
 ):
     accounts = db.scalars(select(Account).where(Account.user_id == current_user.id)).all()
     transactions_list = []
+    total_transactions = 0
     for account in accounts:
-        transactions = db.scalars(
-            select(Transaction).where(Transaction.account_id == account.id).offset(offset).limit(limit)
-        ).all()
+        total_transactions += len(db.scalars(select(Transaction).where(Transaction.account_id == account.id)).all())
+        transactions = db.scalars(select(Transaction).where(Transaction.account_id == account.id)).all()
         for translation in transactions:
             transactions_list.append(translation)
     if not transactions_list:
         raise HTTPException(status_code=404, detail="Transactions not found")
-    return transactions_list
+    # Calcular el total de páginas
+    total_pages = ceil(total_transactions / size_page)
+    # Asegurarse de que la página solicitada no exceda el total de páginas
+    if page > total_pages:
+        page = total_pages
+    if page < 1:
+        page = 1
+    # Calcular el índice de inicio y fin para la paginación
+    init = (page - 1) * size_page
+    end = init + size_page
+    # Obtener los items para la página actual
+    paginated_items = transactions_list[init:end]
+
+    pageContent = {
+        "total_transactions": total_transactions,
+        "totalPages": total_pages,
+        "pageCurrent": page,
+        "sizePage": size_page,
+        "transactions": paginated_items,
+    }
+    return pageContent
 
 
 @router.put("/{transaction_id}", response_model=TransactionOut)
