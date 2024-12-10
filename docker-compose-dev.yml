@@ -5,6 +5,10 @@ services:
     build:
       context: ./backend/
       target: developer
+    volumes:
+      - type: bind
+        source: ./backend/app
+        target: /usr/local/app
     ports:
       - "8000:8000"
     links:
@@ -37,6 +41,10 @@ services:
     build:
       context: ./frontend/web/
       target: developer
+    volumes:
+      - type: bind
+        source: ./frontend/web/app
+        target: /usr/src/app
     ports:
         - "5173:5173"
     links:
