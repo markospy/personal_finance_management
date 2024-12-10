@@ -19,11 +19,11 @@ RUN pip install -r requirements.txt
 # Second stage: dev image
 FROM base as developer
 COPY app/ .
-CMD [ "fastapi", "dev", "main.py" ]
+CMD ["fastapi", "dev", "main.py", "--host", "0.0.0.0", "--port", "8000"]
 
 
 # Third stage: deploy
 FROM base as deploy
 # Does not include the app/test directory
 COPY --exclude=app/test app/ ./
-CMD [ "fastapi", "run", "main.py" ]
+CMD [ "fastapi", "run", "main.py"]

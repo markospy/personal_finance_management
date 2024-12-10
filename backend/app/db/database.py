@@ -18,7 +18,7 @@ database_config = DatabaseConfig(
     os.getenv("POSTGRES_DB"),
 )
 
-engine = create_engine_from_user_choice("sqlite", database_config)
+engine = create_engine_from_user_choice("postgresql_prod", database_config)
 
 session_local = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

@@ -6,14 +6,14 @@ services:
       context: ./backend/
       target: developer
     ports:
-      - "127.0.0.1:8000:0.0.0.0:8000"
+      - "8000:8000"
     links:
       - db
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://0.0.0.0:8000/docs"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -38,7 +38,7 @@ services:
       context: ./frontend/web/
       target: developer
     ports:
-        - 5173:5173
+        - "5173:5173"
     links:
       - backend
     depends_on:
@@ -88,13 +88,16 @@ services:
       retries: 5
       start_period: 30s
 
-  phpmyadmin:
-    image: phpmyadmin:latest
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: marcos.seocuba@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: your_pgadmin_password
     ports:
-      - 8080:8080
+      - "8080:80"
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
 volumes:
   data_personal_finance:
