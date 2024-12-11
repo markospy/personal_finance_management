@@ -1,11 +1,12 @@
 import { getTransaction, getTransactions } from "@/api/transaction";
-import { queryOptions } from "@tanstack/react-query";
+import { queryOptions, keepPreviousData } from "@tanstack/react-query";
 
 
-export function GetTransactions(token: string) {
+export function GetTransactions(token: string, page: number, sizePage: number) {
     return queryOptions({
-        queryKey: ['transactions'],
-        queryFn: () => getTransactions(token)
+        queryKey: ['transactions', page, sizePage],
+        queryFn: () => getTransactions(token, page, sizePage),
+        placeholderData: keepPreviousData,
     });
 }
 

@@ -46,8 +46,8 @@ export const getTransaction = (token: string, id: number): Promise<TransactionOu
     });
 };
 
-export const getTransactions = (token: string): Promise<TransactionOut[] | ErrorResponse> => {
-    return axi.get('/transactions/', { headers: { 'Authorization': `Bearer ${token}` } })
+export const getTransactions = (token:string, page:number=0, sizePage:number=10): Promise<TransactionOut[] | ErrorResponse> => {
+    return axi.get(`/transactions?page=${page}&size_page=${sizePage}`, { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
         console.log(response.status);
         return response.data; // Devuelve los datos de la respuesta
@@ -65,7 +65,7 @@ export const getTransactions = (token: string): Promise<TransactionOut[] | Error
 };
 
 export const getTransactionsByAccount = (token: string, accountId: number): Promise<TransactionOut[] | ErrorResponse> => {
-    return axi.get('/transactions/account/' + accountId, { headers: { 'Authorization': `Bearer ${token}` } })
+    return axi.get(`/transactions/by-account/${accountId}`, { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
         console.log(response.status);
         return response.data; // Devuelve los datos de la respuesta
