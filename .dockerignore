@@ -1,10 +1,2 @@
-node_modules
-build
-.git
-*.md
-
-# Python
-*.pyc
-
 # Visual Studio Code
 .vscode/
