@@ -3,6 +3,15 @@ import { ErrorResponse  } from "@/schemas/error";
 import { AxiosError } from 'axios';
 import { axi } from "./axiosConfig";
 
+interface MetaTransactions {
+    "total_transactions": number,
+    "totalPages": number,
+    "pageCurrent": number,
+    "sizePage": number,
+    "transactions": TransactionOut[],
+}
+
+
 
 export const createTransaction = (token: string, transaction: TransactionIn): Promise<TransactionOut | ErrorResponse> => {
     return axi.post('/transactions/', {
@@ -46,7 +55,7 @@ export const getTransaction = (token: string, id: number): Promise<TransactionOu
     });
 };
 
-export const getTransactions = (token:string, page:number=0, sizePage:number=10): Promise<TransactionOut[] | ErrorResponse> => {
+export const getTransactions = (token:string, page:number=0, sizePage:number=10): Promise<MetaTransactions> => {
     return axi.get(`/transactions?page=${page}&size_page=${sizePage}`, { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
         console.log(response.status);
@@ -55,7 +64,7 @@ export const getTransactions = (token:string, page:number=0, sizePage:number=10)
     .catch((error: AxiosError) => {
         const status = error.response?.status || 500; // Valor por defecto
         const msg = error.message;
-
+        console.log(msg)
         // Retornar un objeto de error
         return {
             status,
