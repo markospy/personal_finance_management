@@ -11,6 +11,7 @@ import TransactionsSummary from "@/components/custom/TransactionsSummary";
 import { QueryClient } from "@tanstack/react-query";
 import { isAccount, isCategory, isMonthlyExpenses, isMonthlyIncomes, isMonthlySummary } from "@/utils/guards";
 import AccountsSummary from "@/components/custom/AccountsSummary";
+import { RecentTransactions } from "./Transactions";
 
 interface LoaderData {
   summary: MonthlySumary | ErrorResponse;
@@ -90,7 +91,7 @@ export const loader = (queryClient: QueryClient) => async ({ request }) => {
   };
 };
 
-export function ReportMain() {
+export function ReportMain({queryClient}:{queryClient:QueryClient}) {
   const data: LoaderData = useLoaderData()
   console.log(data)
 
@@ -127,6 +128,7 @@ export function ReportMain() {
        dataKey={["totalAmount", "totalAmount"]}
        nameKey={["categoryName", "categoryName"]}
       />
+      <RecentTransactions sizePage={5} />
     </main>
   )
 }
