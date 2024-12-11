@@ -43,7 +43,7 @@ const router = createBrowserRouter([
               children: [
                 {
                   path: "/dashboard",
-                  element: <ReportMain />,
+                  element: <ReportMain queryClient={queryClient}/>,
                   loader: loaderSumary(queryClient),
                   children: [
                     {
