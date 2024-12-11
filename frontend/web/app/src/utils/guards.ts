@@ -2,6 +2,7 @@ import { MonthlyExpenses, MonthlyIncomes, MonthlySumary } from "@/api/statistic"
 import { AccountOut } from "@/schemas/account";
 import { CategoryOut } from "@/schemas/category";
 import { ErrorResponse } from "@/schemas/error";
+import { TransactionOut } from "@/schemas/transaction";
 
 export const isMonthlySummary = (summary: MonthlySumary | ErrorResponse | false): summary is MonthlySumary => {
   return (
@@ -59,6 +60,21 @@ export const isCategory = (categories: CategoryOut[] | ErrorResponse): categorie
     'name' in category && (typeof category.name === 'string') &&
     'isGlobal' in category && (typeof category.isGlobal === 'boolean') &&
     'userId' in category && (typeof category.userId === 'number' || category.userId === null)
+    )
+  );
+};
+
+export const isTransaction = (transactions: TransactionOut[] | ErrorResponse): transactions is TransactionOut[] => {
+  return (
+    Array.isArray(transactions) &&
+    transactions.every(transaction =>
+    typeof transaction === 'object' &&
+    'id' in transaction && (typeof transaction.id === 'number') &&
+    'category_id' in transaction && (typeof transaction.category_id === 'number') &&
+    'account_id' in transaction && (typeof transaction.account_id === 'number') &&
+    'amount' in transaction && (typeof transaction.amount === 'number') &&
+    'date' in transaction && (typeof transaction.date === 'string') &&
+    'comments' in transaction && (typeof transaction.comments === 'string' || transaction.comments === undefined)
     )
   );
 };
