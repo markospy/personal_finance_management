@@ -91,7 +91,7 @@ export function isUserOut(user: unknown): user is UserOut {
   );
 }
 
-export function isTokenOut(token: TokenOut): token is TokenOut {
+export function isTokenOut(token: TokenOut | ErrorResponse): token is TokenOut {
   return (
       typeof token === 'object' &&
       token !== null &&
