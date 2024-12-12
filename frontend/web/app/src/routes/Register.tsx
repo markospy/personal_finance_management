@@ -31,20 +31,13 @@ export function CreateUserForm() {
     };
 
     const user = await createUser (newUser );
-    console.log(user);
-    
-    console.log(isUserOut(user))
     if(isUserOut(user)) {
       const responseToken = await getToken(user.name, newUser.password);
-      console.log(isTokenOut(responseToken))
-      console.log(responseToken)
       if(isTokenOut(responseToken)){
-        login(responseToken.access_token)
         navigate('/dashboard');
       }
     } else {
       setCorrectUser(false)
-      console.log(isUserOut(user))
     }
   };
 

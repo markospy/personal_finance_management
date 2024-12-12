@@ -9,7 +9,7 @@ interface Props {
 export function ButtonShowForm({title, children, onClick}:Props) {
     return (
       <button
-        className="w-full mt-4 py-2 flex justify-center items-center bg-blue-500 text-white rounded shadow-md font-medium hover:opacity-95"
+        className="w-full mt-4 py-2 flex justify-center items-center gap-2 bg-blue-500 text-white rounded shadow-md font-medium hover:opacity-95"
         onClick={onClick}
       >
         { children }
