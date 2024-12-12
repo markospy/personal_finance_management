@@ -4,7 +4,7 @@ import { AxiosError } from 'axios';
 import { axi } from "./axiosConfig";
 
 interface MetaTransactions {
-    "total_transactions": number,
+    "totalTransactions": number,
     "totalPages": number,
     "pageCurrent": number,
     "sizePage": number,

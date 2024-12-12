@@ -151,7 +151,7 @@ def get_transactions(
     paginated_items = transactions_list[init:end]
 
     pageContent = {
-        "total_transactions": total_transactions,
+        "totalTransactions": total_transactions,
         "totalPages": total_pages,
         "pageCurrent": page,
         "sizePage": size_page,
