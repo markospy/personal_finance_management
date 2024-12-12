@@ -44,6 +44,9 @@ def create_transaction(
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
 
+    if not transaction.comments:
+        transaction.comments = category.name
+
     transaction = Transaction(**transaction.model_dump())
     db.add(transaction)
 
