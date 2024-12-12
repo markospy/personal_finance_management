@@ -1,31 +1,15 @@
 import { useForm } from "react-hook-form";
 import { useNavigate, Navigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { zodUserIn, UserOut, UserIn } from "../schemas/user";
+import { zodUserIn, UserIn } from "../schemas/user";
 import { createUser } from "../api/user";
 import { useAuth } from "../context/AuthProvider";
-import { getToken, TokenOut } from '../api/auth';
+import { getToken } from '../api/auth';
 import { useState } from "react";
 import { AlertDestructive } from "@/components/custom/Alert";
+import { isTokenOut, isUserOut } from "@/utils/guards";
 
-function isUserOut(user: unknown): user is UserOut {
-  return (
-    typeof user === 'object' &&
-    user !== null &&
-    'id' in user && typeof (user as UserOut).id === 'number' &&
-    'name' in user && typeof (user as UserOut).name === 'string' &&
-    'email' in user && typeof (user as UserOut).email === 'string'
-  );
-}
 
-function isTokenOut(token: unknown): token is TokenOut {
-  return (
-      typeof token === 'object' &&
-      token !== null &&
-      'access_token' in token && typeof (token as TokenOut) === 'string' &&
-      'token_type' in token && typeof (token as TokenOut) === 'string'
-  );
-}
 
 export function CreateUserForm() {
   const { isAuthenticated, login } = useAuth();
@@ -48,8 +32,12 @@ export function CreateUserForm() {
 
     const user = await createUser (newUser );
     console.log(user);
+    
+    console.log(isUserOut(user))
     if(isUserOut(user)) {
       const responseToken = await getToken(user.name, newUser.password);
+      console.log(isTokenOut(responseToken))
+      console.log(responseToken)
       if(isTokenOut(responseToken)){
         login(responseToken.access_token)
         navigate('/dashboard');

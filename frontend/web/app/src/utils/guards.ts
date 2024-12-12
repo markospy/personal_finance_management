@@ -1,8 +1,10 @@
+import { TokenOut } from "@/api/auth";
 import { MonthlyExpenses, MonthlyIncomes, MonthlySumary } from "@/api/statistic";
 import { AccountOut } from "@/schemas/account";
 import { CategoryOut } from "@/schemas/category";
 import { ErrorResponse } from "@/schemas/error";
 import { TransactionOut } from "@/schemas/transaction";
+import { UserOut } from "@/schemas/user";
 
 export const isMonthlySummary = (summary: MonthlySumary | ErrorResponse | false): summary is MonthlySumary => {
   return (
@@ -78,3 +80,22 @@ export const isTransaction = (transactions: TransactionOut[] | ErrorResponse): t
     )
   );
 };
+
+export function isUserOut(user: unknown): user is UserOut {
+  return (
+    typeof user === 'object' &&
+    user !== null &&
+    'id' in user && typeof (user as UserOut).id === 'number' &&
+    'name' in user && typeof (user as UserOut).name === 'string' &&
+    'email' in user && typeof (user as UserOut).email === 'string'
+  );
+}
+
+export function isTokenOut(token: TokenOut): token is TokenOut {
+  return (
+      typeof token === 'object' &&
+      token !== null &&
+      'access_token' in token && typeof token.access_token === 'string' &&
+      'token_type' in token && typeof token.token_type === 'string'
+  );
+}
