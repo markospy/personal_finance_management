@@ -11,7 +11,7 @@ import TransactionsSummary from "@/components/custom/TransactionsSummary";
 import { QueryClient } from "@tanstack/react-query";
 import { isAccount, isCategory, isMonthlyExpenses, isMonthlyIncomes, isMonthlySummary } from "@/utils/guards";
 import AccountsSummary from "@/components/custom/AccountsSummary";
-import { RecentTransactions } from "./Transactions";
+import { RecentTransactions } from "../components/custom/Transactions";
 
 interface LoaderData {
   summary: MonthlySumary | ErrorResponse;
