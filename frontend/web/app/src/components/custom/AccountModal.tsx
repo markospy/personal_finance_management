@@ -6,6 +6,7 @@ import { createAccount } from "@/api/account";
 import { Input, SelectCurrency } from "./Inputs";
 import { WrapperForms } from "./WrapperForms";
 import { ButtonShowForm } from "./ShowForm";
+import { Wallet } from "lucide-react";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const action  = (queryClient: QueryClient) =>
@@ -31,7 +32,9 @@ export function AccountForm() {
 
   return (
     <div className="h-full w-full flex items-center justify-center bg-gray-100">
-      <ButtonShowForm title="Add Accounts" onClick={() => setIsOpen(true)} />
+      <ButtonShowForm title="Add Accounts" onClick={() => setIsOpen(true)}>
+        <Wallet />
+      </ButtonShowForm>
 
       {isOpen && (
         <WrapperForms title="Add Account" url="/account/new-account" onClick={() => setIsOpen(false)}>
