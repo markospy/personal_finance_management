@@ -89,7 +89,7 @@ Esto levantará los contenedores de:
 ## **Modelo entidad-relación**
 <img src='doc/MER.png' alt='Modelo entidad-relación de la app de Finanzas Personales' />
 
-## **Contribuir**
+## **Contributing**
 Si deseas contribuir al proyecto, por favor:
 
 1. Haz un fork del repositorio
