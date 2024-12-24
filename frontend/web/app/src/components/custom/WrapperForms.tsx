@@ -6,13 +6,17 @@ import {
 } from "@/components/ui/card"
 import './Spinner.css';
 import { QueryClient, UseMutationResult } from "@tanstack/react-query";
-import { NewTransaction, NewTransactionProps } from "./TransactionModal";
+import { NewTransactionProps } from "./TransactionModal";
 import { getToken } from "@/utils/token";
+import { TransactionIn } from "@/schemas/transaction";
+
+type Mutations = UseMutationResult<TransactionIn, Error, [string, TransactionIn], unknown>
+type Data = Promise<{token: string, transaction: TransactionIn}>;
 
 interface Props {
   title: string;
-  mutation: UseMutationResult<NewTransaction, Error, NewTransaction, unknown>;
-  dataProvider: ({queryClient, token, data}: NewTransactionProps) => Promise<NewTransaction>;
+  mutation: Mutations;
+  dataProvider: ({...props}: NewTransactionProps) => Data;
   children: React.ReactNode;
   onClick: () => void;
   queryClient: QueryClient;

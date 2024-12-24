@@ -4,7 +4,7 @@ import { createTransaction } from "@/api/transaction";
 import { WrapperForms } from "./WrapperForms";
 import { GetCategories } from "@/services/category";
 import { GetAccounts } from "@/services/account";
-import { TransactionIn } from "@/schemas/transaction";
+import { TransactionIn, TransactionOut } from "@/schemas/transaction";
 import { useState } from "react";
 import { ButtonShowForm } from "./ShowForm";
 import { Plus } from "lucide-react";
@@ -15,11 +15,6 @@ import { ErrorResponse } from "@/schemas/error";
 import { isAccount, isCategory } from "@/utils/guards";
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export interface NewTransaction {
-  token: string;
-  transaction: TransactionIn;
-}
 
 interface TransactionModalProps {
   data: AccountsCategories;
@@ -61,7 +56,7 @@ const newTransaction = async ({queryClient, token, data}: NewTransactionProps) =
     throw new Error("Failed to fetch accounts");
   }
 
-  const transaction: NewTransaction = {
+  const transaction: { token: string, transaction: TransactionIn } = {
     'token': token,
     'transaction': {
       'amount': parseFloat(data.amount as string),
@@ -77,20 +72,20 @@ const newTransaction = async ({queryClient, token, data}: NewTransactionProps) =
 };
 
 const useNewTransacion = (queryClient: QueryClient) => {
-  const mutation = useMutation({
-    mutationFn: ({token, transaction}: NewTransaction) => createTransaction(token, transaction),
-    onSuccess: async (data: TransactionIn) => {
+  const mutation = useMutation<TransactionOut, Error, [string, TransactionIn]>({
+    mutationFn: ({token, transaction}: { token: string, transaction: TransactionIn}) => createTransaction(token, transaction),
+    onSuccess: async (data: TransactionOut) => {
       const date = new Date(data.date);
       console.log(date)
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
       console.log(month);
       console.log(year);
-      const dateKey = { "month": month, "year": year};
-      await queryClient.refetchQueries({ queryKey: ['account', 'all'] });
+      const dateKey = {"month": month, "year": year};
+      await queryClient.fetchQuery({ queryKey: ['account', 'all'] });
       await queryClient.refetchQueries({ queryKey: ['monthlySumary', dateKey] });
       await queryClient.refetchQueries({ queryKey: ['monthlyIncomes', dateKey] });
-      await queryClient.refetchQueries({ queryKey: ['monthlyExpenses', dateKey] });
+      await queryClient.fetchQuery({ queryKey: ['monthlyExpenses', dateKey] });
     }
   });
 
