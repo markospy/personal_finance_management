@@ -1,6 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import { GetMonthlyExpenses, GetMonthlyIncomes, GetMonthlySumary } from "@/services/statistic";
 import {  GetAccounts } from "@/services/account";
-import { redirect, useLoaderData } from "react-router-dom";
+import { ActionFunctionArgs, redirect, useLoaderData } from "react-router-dom";
 import { AccountForm } from "@/components/custom/AccountModal";
 import { CategoryOut } from "@/schemas/category";
 import { AccountOut } from "@/schemas/account";
@@ -12,6 +13,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { isAccount, isCategory, isMonthlyExpenses, isMonthlyIncomes, isMonthlySummary } from "@/utils/guards";
 import AccountsSummary from "@/components/custom/AccountsSummary";
 import { RecentTransactions } from "../components/custom/Transactions";
+import { getToken } from "@/utils/token";
 
 interface LoaderData {
   summary: MonthlySumary | ErrorResponse;
@@ -43,8 +45,8 @@ function isTokenExpired(token: string): boolean {
   return exp < Math.floor(Date.now() / 1000);
 }
 
-export const loader = (queryClient: QueryClient) => async ({ request }) => {
-  const token = window.localStorage.getItem('token') as string;
+export const loader = (queryClient: QueryClient) => async ({ request }: ActionFunctionArgs) => {
+  const token = getToken() as string;
   // Verificar si el token existe y no ha expirado
   if (token) {
     if (isTokenExpired(token)) {
@@ -92,7 +94,7 @@ export const loader = (queryClient: QueryClient) => async ({ request }) => {
 };
 
 export function ReportMain({queryClient}:{queryClient:QueryClient}) {
-  const data: LoaderData = useLoaderData()
+  const data = useLoaderData() as LoaderData;
   console.log(data)
 
   const sumaryData: SummaryData = {
@@ -109,7 +111,7 @@ export function ReportMain({queryClient}:{queryClient:QueryClient}) {
   console.log(isCategory(data.categories))
   console.log(accountCategories)
 
-  if(data.accounts.status == 500) {
+  if(!isAccount(data.accounts) && data.accounts.status == 500) {
     throw new Error('Tenemos problemas con el servidor. Intente mas tarde.')
   }
 
@@ -121,7 +123,7 @@ export function ReportMain({queryClient}:{queryClient:QueryClient}) {
 
   return (
     <main className="flex flex-col flex-1 gap-2 pl-4 bg-blue-50">
-      <AccountsSummary data={accountCategories}/>
+      <AccountsSummary data={accountCategories} queryClient={queryClient}/>
       <TransactionsSummary
        data={sumaryData}
        label={["Expenses", "Incomes"]}
