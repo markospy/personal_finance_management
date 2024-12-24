@@ -13,7 +13,7 @@ interface MetaTransactions {
 
 
 
-export const createTransaction = (token: string, transaction: TransactionIn): Promise<TransactionOut | ErrorResponse> => {
+export const createTransaction = (token: string, transaction: TransactionIn): Promise<TransactionOut> => {
     return axi.post('/transactions/', {
         "category_id": transaction.category_id,
         "account_id": transaction.account_id,
@@ -26,14 +26,7 @@ export const createTransaction = (token: string, transaction: TransactionIn): Pr
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        const status = error.response?.status || 500; // Valor por defecto
-        const msg = error.message;
-
-        // Retornar un objeto de error
-        return {
-            status,
-            msg
-        };
+        console.log(error);
     });
 };
 
