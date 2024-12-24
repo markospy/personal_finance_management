@@ -1,8 +1,7 @@
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import { Input, InputDate, InputTextTarea, SelectScrollable } from "./Inputs";
 import { createTransaction } from "@/api/transaction";
 import { WrapperForms } from "./WrapperForms";
-import { ActionFunctionArgs } from "react-router-dom";
 import { GetCategories } from "@/services/category";
 import { GetAccounts } from "@/services/account";
 import { TransactionIn } from "@/schemas/transaction";
@@ -17,71 +16,90 @@ import { isAccount, isCategory } from "@/utils/guards";
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export const action  = (queryClient: QueryClient) =>
-  async ({ request }: ActionFunctionArgs) => {
-    const token = window.localStorage.getItem('token') as string;
-    const formData = await request.formData()
-    const comment = formData.get('note') as string;
-    let categoryId: number = 0;
-    let accountId: number = 0;
+export interface NewTransaction {
+  token: string;
+  transaction: TransactionIn;
+}
 
+interface TransactionModalProps {
+  data: AccountsCategories;
+  queryClient: QueryClient
+}
 
-    const categories: CategoryOut[] | ErrorResponse = await queryClient.ensureQueryData(GetCategories(token));
-    if(isCategory(categories)) {
-      const category = categories.find((category:CategoryOut)=> category.name === formData.get('category'));
-      categoryId = category ? category.id : 0;
-    };
+interface TransactionForm  {
+  amount: string,
+  category: string,
+  account: string,
+  date: string,
+  comment: string
+}
 
+export interface NewTransactionProps{
+  queryClient: QueryClient;
+  token: string;
+  data: TransactionForm
+}
 
-    const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token));
-    if(isAccount(accounts)) {
-      const account = accounts.find((account:AccountOut) => account.name === formData.get('account'))
-      accountId = account ? account.id : 0;
-    };
+const newTransaction = async ({queryClient, token, data}: NewTransactionProps) => {
+  console.log('Hola')
+  let categoryId: number = 0;
+  let accountId: number = 0;
 
-    const url = new URL(request.url);
-    const year = url.searchParams.get("year");
-    const month = url.searchParams.get("month");
-    let date = {
-      'month': Number(month),
-      'year': Number(year)
-    };
-    if (!year||Number(year)==0) {
-      date = {
-        'month': Number(month),
-        'year': new Date().getFullYear(),
-      };
-    };
-    if (!month) {
-      date = {
-        ...date,
-        'month': new Date().getMonth()+1,
-      };
-    };
-
-    const transaction: TransactionIn = {
-      amount: parseFloat(formData.get('amount') as string),
-      category_id: categoryId,
-      account_id: accountId,
-      date: new Date(formData.get('date') as string),
-      comments: comment ? comment : undefined,
-    };
-
-    // Agregar latencia de 2 segundos (2000 ms) antes de crear la transacción
-    await delay(1000);
-
-    await createTransaction(token, transaction);
-    await queryClient.refetchQueries({ queryKey: ['account', 'all'] });
-    await queryClient.refetchQueries({ queryKey: ['monthlySumary', date] });
-    await queryClient.refetchQueries({ queryKey: ['monthlyIncomes', date] });
-    await queryClient.refetchQueries({ queryKey: ['monthlyExpenses', date] });
-    return null;
+  const categories: CategoryOut[] | ErrorResponse = await queryClient.ensureQueryData(GetCategories(token));
+  if (isCategory(categories)) {
+    const category = categories.find((category: CategoryOut) => category.name === data.category);
+    categoryId = category ? category.id : 0;
+  } else {
+    throw new Error("Failed to fetch categories");
   }
 
+  const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token));
+  if (isAccount(accounts)) {
+    const account = accounts.find((account: AccountOut) => account.name === data.account);
+    accountId = account ? account.id : 0;
+  } else {
+    throw new Error("Failed to fetch accounts");
+  }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function TransactionModal({ data }:{data: AccountsCategories}) {
+  const transaction: NewTransaction = {
+    'token': token,
+    'transaction': {
+      'amount': parseFloat(data.amount as string),
+      'category_id': categoryId,
+      'account_id': accountId,
+      'date': new Date(data.date as string),
+      'comments': data.comment ? data.comment : undefined,
+    }
+  };
+
+  delay(3000);
+  return transaction;
+};
+
+const useNewTransacion = (queryClient: QueryClient) => {
+  const mutation = useMutation({
+    mutationFn: ({token, transaction}: NewTransaction) => createTransaction(token, transaction),
+    onSuccess: async (data: TransactionIn) => {
+      const date = new Date(data.date);
+      console.log(date)
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      console.log(month);
+      console.log(year);
+      const dateKey = { "month": month, "year": year};
+      await queryClient.refetchQueries({ queryKey: ['account', 'all'] });
+      await queryClient.refetchQueries({ queryKey: ['monthlySumary', dateKey] });
+      await queryClient.refetchQueries({ queryKey: ['monthlyIncomes', dateKey] });
+      await queryClient.refetchQueries({ queryKey: ['monthlyExpenses', dateKey] });
+    }
+  });
+
+  return mutation;
+}
+
+export function TransactionModal({ data, queryClient }: TransactionModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const mutation = useNewTransacion(queryClient);
 
   let categoriesExpenses: string[] = []
   let categoriesIncomes: string[] = []
@@ -104,11 +122,8 @@ export function TransactionModal({ data }:{data: AccountsCategories}) {
   let accountsList: string[] = []
   if(data.accounts){
     const accounts: AccountOut[] = data.accounts;
-    console.log(accounts)
     accountsList = accounts.map(account => account.name);
   }
-
-  console.log(accountsList)
 
   return (
     <div className="h-full w-full flex items-center justify-center">
@@ -117,13 +132,19 @@ export function TransactionModal({ data }:{data: AccountsCategories}) {
       </ButtonShowForm>
 
       {isOpen && (
-        <WrapperForms title="Add Transaction" url="/transaction/new-transaction" onClick={() => setIsOpen(false)}>
+        <WrapperForms
+          title="Add Transaction"
+          mutation={mutation}
+          dataProvider={newTransaction}
+          onClick={() => setIsOpen(false)}
+          queryClient={queryClient}
+        >
           <>
             <Input title="Amount" name="amount" type="number" placeholder="Define the amount" required={true} />
             <SelectScrollable title="Category" name="category" options={categories} placeholder="Select a category" />
             <SelectScrollable title="Account" name="account" options={{'accounts': accountsList}} placeholder="Select an account" />
             <InputDate title="Date" name="date" />
-            <InputTextTarea title="Notes" name="note" />
+            <InputTextTarea title="Notes" name="comment" />
           </>
         </ WrapperForms>
       )}
