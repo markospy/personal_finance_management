@@ -10,7 +10,7 @@ import { NewTransactionProps } from "./TransactionModal";
 import { getToken } from "@/utils/token";
 import { TransactionIn } from "@/schemas/transaction";
 
-type Mutations = UseMutationResult<TransactionIn, Error, [string, TransactionIn], unknown>
+type Mutations = UseMutationResult<TransactionIn, Error, {token: string, transaction: TransactionIn}, unknown>
 type Data = Promise<{token: string, transaction: TransactionIn}>;
 
 interface Props {
@@ -23,26 +23,20 @@ interface Props {
 }
 
 export function WrapperForms({title, mutation, dataProvider, children, onClick, queryClient}:Props ) {
-
   return (
     <Card className="fixed z-50 inset-y-20 inset-x-1/3 bg-white rounded-lg shadow-lg p-2 max-w-md max-h-fit">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-blue-900">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={async (e) => {
+        <form onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
             const token = getToken();
-            // Accede a los datos del formulario
-            const formData = new FormData(e.target);
-
-            // Aquí puedes convertir formData a un objeto si es necesario
-            const data = Object.fromEntries(formData.entries());
+            const data = new FormData(e.currentTarget);
             console.log(data);
-
             const mutationData = await dataProvider({queryClient, token, data});
-            console.log(mutationData)
-            mutation.mutate(mutationData)
+            console.log(mutationData);
+            mutation.mutate(mutationData);
           }} >
           <>
             {children}
