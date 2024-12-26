@@ -1,17 +1,26 @@
 import { getTransactions } from "@/api/transaction";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { isTransaction } from "@/utils/guards";
+import { CategoryOut } from "@/schemas/category";
+import { ErrorResponse } from "@/schemas/error";
+import { TransactionOut } from "@/schemas/transaction";
+import { GetCategories } from "@/services/category";
+import { isCategory, isTransaction } from "@/utils/guards";
 import { getToken } from "@/utils/token";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, CreditCard } from "lucide-react";
-import { useState } from "react";
+import { keepPreviousData, QueryClient, useQuery } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight, CreditCard, ListEnd, ListStart } from "lucide-react";
+import { useEffect, useState } from "react";
 
-interface Props {
-  sizePage: number,
+function getCategoryType(transaction: TransactionOut, categories: CategoryOut[] | ErrorResponse | null) {
+  if (categories !== null) {
+    if (isCategory(categories)){
+      const category: CategoryOut | undefined = categories.find((category) => category.id == transaction.category_id);
+      return category?.type;
+    }
+  }
+  return
 }
 
-
-export const RecentTransactions = ({sizePage}: Props) => {
+export const RecentTransactions = ({sizePage, queryClient}: {sizePage: number, queryClient: QueryClient}) => {
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(sizePage);
   const token = getToken();
@@ -21,6 +30,18 @@ export const RecentTransactions = ({sizePage}: Props) => {
     queryFn: () => getTransactions(token, page, pageSize),
     placeholderData: keepPreviousData,
   });
+
+  const [categories, setCategories] = useState<CategoryOut[] | ErrorResponse | null>(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const result = await queryClient.ensureQueryData(GetCategories(token));
+      setCategories(result);
+    };
+
+    fetchCategories();
+  }, [token, queryClient]);
+
 
   // Manejo de estados de carga y error
   if (isPending) {
@@ -57,9 +78,9 @@ export const RecentTransactions = ({sizePage}: Props) => {
               ))}
             </select>
           </div>
-          <ul className="space-y-4 my-4 overflow-y-auto max-h-screen scroll-smooth pr-2">
+          <ul className="mt-4 overflow-y-auto max-h-screen scroll-smooth rounded-lg">
             {transactions.map(transaction => (
-              <li key={transaction.id} className="flex justify-between items-center">
+              <li key={transaction.id} className={`${getCategoryType(transaction, categories) === 'income' ? "bg-green-50" : "bg-red-50"} flex justify-between items-center py-2 px-4`}>
                 <div className="flex items-center">
                   <div className="bg-gray-200 p-2 rounded-full mr-3">
                     <CreditCard className="h-4 w-4" />
@@ -69,34 +90,54 @@ export const RecentTransactions = ({sizePage}: Props) => {
                     <p className="text-sm text-gray-500">{new Date(transaction.date).toLocaleString()}</p>
                   </div>
                 </div>
-                <span className={transaction.amount > 0 ? "text-green-600" : "text-red-600"}>
-                  {transaction.amount > 0 ? "+" : "-"}${Math.abs(transaction.amount).toFixed(2)}
+                <span className={getCategoryType(transaction, categories) === 'income' ? "text-green-600" : "text-red-600"}>
+                  {getCategoryType(transaction, categories) === 'income' ? "+" : "-"}${Math.abs(transaction.amount).toFixed(2)}
                 </span>
               </li>
             ))}
           </ul>
           {pageSize!==data.totalTransactions &&
-            <div className="flex items-center justify-center gap-4 p-2 bg-gray-50 border-t border-gray-200 space-x-2">
-              <button 
-                onClick={() => setPage((old) => old - 1)}
+            <div className="flex items-center justify-around">
+              <button
+                onClick={() => setPage(1)}
                 disabled={page === 1}
-                className={`flex px-4 py-2 text-white rounded-md ${isFetching && 'text-sm text-gray-500'} ${page === 1 ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+                className={`flex px-4 py-2 ${page === 1 ? 'text-transparent' : 'text-gray-600'}`}
               >
-                <ChevronLeft /> Back
+                <ListStart className="mr-2"/> To Start
               </button>
-              <span className="text-lg font-medium text-gray-500">
-                {page}/{data.totalPages}
-              </span>
+              <div className="flex items-center justify-center gap-4 p-2 bg-gray-50 border-t border-gray-200 space-x-2">
+                <button
+                  onClick={() => setPage((old) => old - 1)}
+                  disabled={page === 1}
+                  className={`flex px-4 py-2 text-white rounded-md ${isFetching && 'text-sm text-gray-500'} ${page === 1 ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+                >
+                  <ChevronLeft /> Back
+                </button>
+                <span className="text-lg font-medium text-gray-500">
+                  {page}/{data.totalPages}
+                </span>
+                <button
+                  onClick={() => {
+                    if (!isPlaceholderData && (data.totalPages > data.pageCurrent)) {
+                      setPage((old) => old + 1);
+                    }
+                  }}
+                  disabled={isPlaceholderData || !(data.totalPages > data.pageCurrent)}
+                  className={`flex px-4 py-2 text-white rounded-md ${isPlaceholderData || !(data.totalPages > data.pageCurrent) ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+                >
+                  Next <ChevronRight />
+                </button>
+              </div>
               <button
                 onClick={() => {
                   if (!isPlaceholderData && (data.totalPages > data.pageCurrent)) {
-                    setPage((old) => old + 1);
+                    setPage(data.totalPages);
                   }
                 }}
                 disabled={isPlaceholderData || !(data.totalPages > data.pageCurrent)}
-                className={`flex px-4 py-2 text-white rounded-md ${isPlaceholderData || !(data.totalPages > data.pageCurrent) ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+                className={`flex px-4 py-2 ${isPlaceholderData || !(data.totalPages > data.pageCurrent) ? 'text-transparent' : 'text-gray-600'}`}
               >
-                Next <ChevronRight />
+                To End <ListEnd className="ml-2"/>
               </button>
             </div>
           }

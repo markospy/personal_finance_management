@@ -130,7 +130,7 @@ export function ReportMain({queryClient}:{queryClient:QueryClient}) {
        dataKey={["totalAmount", "totalAmount"]}
        nameKey={["categoryName", "categoryName"]}
       />
-      <RecentTransactions sizePage={5} />
+      <RecentTransactions sizePage={5} queryClient={queryClient} />
     </main>
   )
 }
