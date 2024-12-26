@@ -1,5 +1,3 @@
-version: 'v2.28.1-desktop.1'
-
 services:
   backend:
     build:
