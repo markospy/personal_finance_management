@@ -117,7 +117,7 @@ export function ReportMain({queryClient}:{queryClient:QueryClient}) {
 
   if(!isAccount(data.accounts)) {
     return (
-      <AccountForm />
+      <AccountForm queryClient={queryClient}/>
     )
   }
 
