@@ -26,7 +26,7 @@ export const createTransaction = (token: string, transaction: TransactionIn): Pr
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        console.log(error);
+        console.log(error.message);
     });
 };
 

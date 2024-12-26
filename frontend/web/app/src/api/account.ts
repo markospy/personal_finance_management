@@ -40,7 +40,7 @@ export const getAccount = (token: string, id: number): Promise<AccountOut | Erro
     });
 };
 
-export const createAccount = (token: string, account: AccountIn): Promise<AccountOut | ErrorResponse> => {
+export const createAccount = (token: string, account: AccountIn): Promise<AccountOut> => {
     return axi.post('/accounts', {
         "name": account.name,
         "currency": account.currency,
@@ -51,14 +51,7 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        const status = error.response?.status || 500; // Valor por defecto
-        const msg = error.message;
-
-        // Retornar un objeto de error
-        return {
-            status,
-            msg
-        };
+        console.log(error.message)
     });
 };
 
@@ -72,7 +65,6 @@ export const deleteAccount = (token: string, id: number): Promise<string | Error
         const status = error.response?.status || 500; // Valor por defecto
         const msg = error.message;
 
-        // Retornar un objeto de error
         return {
             status,
             msg
