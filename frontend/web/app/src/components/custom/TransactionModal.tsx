@@ -1,10 +1,9 @@
-import { QueryClient, useMutation } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { Input, InputDate, InputTextTarea, SelectScrollable } from "./Inputs";
-import { createTransaction } from "@/api/transaction";
 import { WrapperForms } from "./WrapperForms";
 import { GetCategories } from "@/services/category";
 import { GetAccounts } from "@/services/account";
-import { TransactionIn, TransactionOut } from "@/schemas/transaction";
+import { TransactionIn } from "@/schemas/transaction";
 import { useEffect, useState } from "react";
 import { ButtonShowForm } from "./ShowForm";
 import { Plus } from "lucide-react";
@@ -13,6 +12,8 @@ import { CategoryOut } from "@/schemas/category";
 import { AccountOut } from "@/schemas/account";
 import { ErrorResponse } from "@/schemas/error";
 import { isAccount, isCategory } from "@/utils/guards";
+import { useNewTransaction } from "@/hooks/useNewTransaction";
+import { NewDataProps } from "@/schemas/utils";
 
 
 interface TransactionModalProps {
@@ -28,14 +29,8 @@ export interface TransactionForm  {
   comment: string
 }
 
-export interface NewTransactionProps{
-  queryClient: QueryClient;
-  token: string;
-  data: FormData
-}
 
-const newTransaction = async ({queryClient, token, data}: NewTransactionProps) => {
-  console.log('Hola')
+const newTransaction = async ({queryClient, token, data}: NewDataProps) => {
   const categoryForm = data.get('category') as string;
   const accountForm = data.get('account') as string;
   const amountForm = Number(data.get('amount'));
@@ -46,22 +41,23 @@ const newTransaction = async ({queryClient, token, data}: NewTransactionProps) =
   let categoryId: number = 0;
   let accountId: number = 0;
 
-  const categories: CategoryOut[] | ErrorResponse = await queryClient.ensureQueryData(GetCategories(token));
-  if (isCategory(categories)) {
-    const category = categories.find((category: CategoryOut) => category.name === categoryForm);
-    categoryId = category ? category.id : 0;
-  } else {
-    throw new Error("Failed to fetch categories");
-  }
+  if(queryClient){
+    const categories: CategoryOut[] | ErrorResponse = await queryClient.ensureQueryData(GetCategories(token));
+    if (isCategory(categories)) {
+      const category = categories.find((category: CategoryOut) => category.name === categoryForm);
+      categoryId = category ? category.id : 0;
+    } else {
+      throw new Error("Failed to fetch categories");
+    }
 
-  const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token));
-  if (isAccount(accounts)) {
-    const account = accounts.find((account: AccountOut) => account.name === accountForm);
-    accountId = account ? account.id : 0;
-  } else {
-    throw new Error("Failed to fetch accounts");
+    const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token));
+    if (isAccount(accounts)) {
+      const account = accounts.find((account: AccountOut) => account.name === accountForm);
+      accountId = account ? account.id : 0;
+    } else {
+      throw new Error("Failed to fetch accounts");
+    }
   }
-
   const transaction: { token: string, transaction: TransactionIn } = {
     'token': token,
     'transaction': {
@@ -76,27 +72,9 @@ const newTransaction = async ({queryClient, token, data}: NewTransactionProps) =
   return transaction;
 };
 
-const useNewTransacion = (queryClient: QueryClient) => {
-  const mutation = useMutation<TransactionOut, Error, {token: string, transaction: TransactionIn}>({
-    mutationFn: ({token, transaction}: { token: string, transaction: TransactionIn}) => createTransaction(token, transaction),
-    onSuccess: async (data: TransactionOut) => {
-      const date = new Date(data.date);
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-      const dateKey = {"month": month, "year": year};
-      await queryClient.invalidateQueries({ queryKey: ['account', 'all'] });
-      await queryClient.invalidateQueries({ queryKey: ['monthlySumary', dateKey] });
-      await queryClient.invalidateQueries({ queryKey: ['monthlyIncomes', dateKey] });
-      await queryClient.invalidateQueries({ queryKey: ['monthlyExpenses', dateKey] });
-    }
-  });
-
-  return mutation;
-}
-
 export function TransactionModal({ data, queryClient }: TransactionModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const mutation = useNewTransacion(queryClient);
+  const mutation = useNewTransaction(queryClient);
 
   let categoriesExpenses: string[] = []
   let categoriesIncomes: string[] = []
