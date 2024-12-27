@@ -36,7 +36,7 @@ export default function AccountsSummary({ data, queryClient }: { data: AccountsC
         </div>
         {lookForm && <AccountForm queryClient={queryClient} viewHandler={setLookForm} />}
         <div className="text-center animate-blurred-fade-in">
-          <p className="text-lg font-medium text-gray-500 w-full text-center">Balance</p>
+          <p className="text-base font-medium text-gray-500 w-full text-center">Current Balance</p>
           <h2 className="text-3xl font-bold">${balance}</h2>
         </div>
         <TransactionModal data={data} queryClient={queryClient} />

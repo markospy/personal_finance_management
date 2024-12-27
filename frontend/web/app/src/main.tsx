@@ -14,6 +14,7 @@ import { ReportMain, loader as loaderSumary } from './routes/Report'
 
 import { ProtectedRoutes } from './utils/ProtectedRoutes'
 import { AuthProvider } from './context/AuthProvider'
+import UserAccounts from './routes/UserAccounts'
 
 const queryClient = new QueryClient()
 
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
                   path: "/dashboard",
                   element: <ReportMain queryClient={queryClient}/>,
                   loader: loaderSumary(queryClient),
+                },
+                {
+                  path: "/accounts",
+                  element: <UserAccounts />,
                 },
               ]
             },
