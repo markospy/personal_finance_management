@@ -1,14 +1,21 @@
+/* eslint-disable react-refresh/only-export-components */
 import { Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import currencies from '@/utils/currencies'
+import { AccountOut } from '@/schemas/account'
+import { useLoaderData } from 'react-router-dom'
+import { GetAccounts } from '@/services/account'
+import { getToken } from '@/utils/token'
+import { ErrorResponse } from '@/schemas/error'
+import { QueryClient } from '@tanstack/react-query'
 
-// Definimos un tipo para nuestras cuentas
-type Account = {
-  id: string
-  name: string
-  balance: number
-  currency: string
+
+export const loader = (queryClient: QueryClient) => async () => {
+  const token = getToken();
+  const accounts: AccountOut[] | ErrorResponse = await queryClient.ensureQueryData(GetAccounts(token));
+  return accounts;
 }
+
 
 // Función auxiliar para obtener el icono de la moneda
 const getCurrencyIcon = (currency: string) => {
@@ -17,12 +24,7 @@ const getCurrencyIcon = (currency: string) => {
 }
 
 export default function UserAccounts() {
-  // Simulamos algunas cuentas de usuario
-  const accounts: Account[] = [
-    { id: '1', name: 'Cuenta Corriente', balance: 5000, currency: 'USD' },
-    { id: '2', name: 'Cuenta de Ahorros', balance: 10000, currency: 'EUR' },
-    { id: '3', name: 'Inversiones', balance: 15000, currency: 'GBP' },
-  ]
+  const accounts: AccountOut[] = useLoaderData() as AccountOut[];
 
   return (
     <div className="container mx-auto p-4">
@@ -34,7 +36,6 @@ export default function UserAccounts() {
               <CardTitle className="text-sm font-medium">
                 {account.name}
               </CardTitle>
-              {console.log(getCurrencyIcon(account.currency))}
               <p>{getCurrencyIcon(account.currency) || account.currency}</p>
             </CardHeader>
             <CardContent className='w-full'>
