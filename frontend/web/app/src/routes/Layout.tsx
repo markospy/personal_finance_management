@@ -27,7 +27,7 @@ export function Layout({queryClient}:{queryClient: QueryClient}) {
                     <span className="font-semibold">{user.name}</span>
                     <form onSubmit={logoutAction}>
                       <button type="submit">
-                        <Tippy content="Logout" placement="right" className="text-white font-medium text-xs">
+                        <Tippy content="Logout" placement="bottom" className="text-white font-medium text-xs">
                           <LogOut className="focus:outline-none"/>
                         </Tippy>
                       </button>

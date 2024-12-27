@@ -1,9 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Trash2 } from 'lucide-react'
+import { ArrowBigRightDash, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import currencies from '@/utils/currencies'
 import { AccountOut } from '@/schemas/account'
-import { useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import { GetAccounts } from '@/services/account'
 import { getToken } from '@/utils/token'
 import { ErrorResponse } from '@/schemas/error'
@@ -28,7 +28,13 @@ export default function UserAccounts() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">My Accounts</h1>
+      <div className='flex items-center gap-20 mb-6'>
+        <h1 className="text-2xl font-bold">My Accounts</h1>
+        <Link to="/dashboard" className='flex items-center gap-2 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-700 font-medium'>
+          Go to Dashboard
+          <ArrowBigRightDash/>
+        </Link>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {accounts.map((account) => (
           <Card key={account.id}>
