@@ -30,45 +30,47 @@ interface Props {
 
 export function WrapperForms({title, mutation, dataProvider, children, onClick, queryClient}:Props ) {
   return (
-    <Card className="fixed z-50 inset-y-20 inset-x-1/3 bg-white rounded-lg shadow-lg p-2 max-w-md max-h-fit animate-slide-in-bottom">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-blue-900">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            const token = getToken();
-            const data = new FormData(e.currentTarget);
-            console.log(data);
-            const mutationData = await dataProvider({queryClient, token, data});
-            console.log(mutationData);
+    <div className="fixed top-0 left-0 z-50 w-full min-h-screen bg-blue-50 flex justify-center items-center animate-fade-in">
+      <Card className="bg-white rounded-lg shadow-lg p-2 min-w-[360px] max-h-fit animate-slide-in-bottom">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-blue-900">{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+              e.preventDefault();
+              const token = getToken();
+              const data = new FormData(e.currentTarget);
+              console.log(data);
+              const mutationData = await dataProvider({queryClient, token, data});
+              console.log(mutationData);
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            mutation.mutate(mutationData as any);
-          }} >
-          <>
-            {children}
-          </>
-          <div className="flex justify-end">
-            <button
-              type="button"
-              className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
-              onClick={onClick}
-              disabled={mutation.isPending}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex gap-2 items-center bg-blue-500 text-white py-2 px-4 rounded"
-              disabled={mutation.isPending}
-            >
-              {mutation.isPending && <div className="spinner"/>}
-              Create
-            </button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              mutation.mutate(mutationData as any);
+            }} >
+            <>
+              {children}
+            </>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+                onClick={onClick}
+                disabled={mutation.isPending}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex gap-2 items-center bg-blue-500 text-white py-2 px-4 rounded"
+                disabled={mutation.isPending}
+              >
+                {mutation.isPending && <div className="spinner"/>}
+                Create
+              </button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
