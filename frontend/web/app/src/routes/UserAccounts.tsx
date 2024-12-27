@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { ArrowBigRightDash, Trash2 } from 'lucide-react'
+import { ArrowBigRightDash, PencilLine, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import currencies from '@/utils/currencies'
 import { AccountOut } from '@/schemas/account'
@@ -39,8 +39,9 @@ export default function UserAccounts() {
         {accounts.map((account) => (
           <Card key={account.id}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium flex items-center gap-8">
                 {account.name}
+                <PencilLine className='size-5 cursor-pointer hover:text-blue-500'/>
               </CardTitle>
               <p>{getCurrencyIcon(account.currency) || account.currency}</p>
             </CardHeader>
