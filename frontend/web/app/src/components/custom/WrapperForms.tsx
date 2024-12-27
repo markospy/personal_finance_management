@@ -30,10 +30,10 @@ interface Props {
 
 export function WrapperForms({title, mutation, dataProvider, children, onClick, queryClient}:Props ) {
   return (
-    <div className="fixed top-0 left-0 z-50 w-full min-h-screen bg-blue-50 flex justify-center items-center animate-fade-in">
-      <Card className="bg-white rounded-lg shadow-lg p-2 min-w-[360px] max-h-fit animate-slide-in-bottom">
+    <div className="top-0 left-0 z-50 fixed flex justify-center items-center bg-blue-50 w-full min-h-screen animate-fade-in">
+      <Card className="bg-white shadow-lg p-2 rounded-lg min-w-[360px] max-h-fit animate-slide-in-bottom">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-blue-900">{title}</CardTitle>
+          <CardTitle className="font-bold text-2xl text-blue-900">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
@@ -53,7 +53,7 @@ export function WrapperForms({title, mutation, dataProvider, children, onClick, 
             <div className="flex justify-end">
               <button
                 type="button"
-                className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+                className="bg-gray-500 mr-2 px-4 py-2 rounded text-white"
                 onClick={onClick}
                 disabled={mutation.isPending}
               >
@@ -61,7 +61,7 @@ export function WrapperForms({title, mutation, dataProvider, children, onClick, 
               </button>
               <button
                 type="submit"
-                className="flex gap-2 items-center bg-blue-500 text-white py-2 px-4 rounded"
+                className="flex items-center gap-2 bg-blue-500 px-4 py-2 rounded text-white"
                 disabled={mutation.isPending}
               >
                 {mutation.isPending && <div className="spinner"/>}

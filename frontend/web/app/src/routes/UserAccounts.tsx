@@ -3,13 +3,13 @@ import { ArrowBigRightDash, PencilLine, Plus, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import currencies from '@/utils/currencies'
 import { AccountOut } from '@/schemas/account'
-import { Link, useLoaderData, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import { GetAccounts } from '@/services/account'
 import { getToken } from '@/utils/token'
 import { ErrorResponse } from '@/schemas/error'
 import { QueryClient } from '@tanstack/react-query'
 import { deleteAccount } from '@/api/account'
-
+import { useToast } from "@/hooks/use-toast"
 
 export const loader = (queryClient: QueryClient) => async () => {
   const token = getToken();
@@ -26,11 +26,17 @@ const getCurrencyIcon = (currency: string) => {
 
 export default function UserAccounts() {
   const accounts: AccountOut[] = useLoaderData() as AccountOut[];
+  const { toast } = useToast()
   const token = getToken();
 
-  function delAccount(token: string, id: number) {
-    const response = deleteAccount(token, id)
-    return true;
+  async function delAccount(token: string, id: number) {
+    const response = await deleteAccount(token, id);
+    if(typeof response !== 'string' && response.status) {
+      return toast({title: "Error deleting account"})
+    }
+    if(response) {
+      return toast({title: "Account deleted successfully"})
+    }
   }
 
   return (
@@ -64,7 +70,7 @@ export default function UserAccounts() {
                   <p className="text-muted-foreground text-xs">
                     Current balance
                   </p>
-                  <Trash2 onClick={() => delAccount(token, account.id)} className='text-red-600 hover:cursor-pointer size-4'/>
+                  <Trash2 onClick={async() => await delAccount(token, account.id)} className='text-red-600 hover:cursor-pointer size-4'/>
                 </div>
               </div>
             </CardContent>
