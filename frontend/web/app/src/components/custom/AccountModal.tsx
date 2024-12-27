@@ -20,20 +20,38 @@ const newAccount = async ({token, data}: NewDataProps) => {
   }
   return account;
 }
-
-
-export function AccountForm({ queryClient }: { queryClient: QueryClient }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const mutation = useNewAccount(queryClient)
-
+export function AccountForm({ queryClient, viewHandler }: { queryClient: QueryClient, viewHandler: (isLook: boolean) => void }) {
   const currencies = codes();
+
+  const mutation = useNewAccount(queryClient)
 
   // Efecto para cerrar el modal cuando la mutación es exitosa
   useEffect(() => {
     if (mutation.isSuccess) {
-      setIsOpen(false);
+      viewHandler(false);
     }
-  }, [mutation.isSuccess]);
+  }, [mutation.isSuccess, viewHandler]);
+
+  return (
+      <WrapperForms
+      title="Add Account"
+      mutation={mutation}
+      dataProvider={newAccount}
+      onClick={() => viewHandler(false)}
+      queryClient={queryClient}
+    >
+      <>
+        <Input title="Account Name" name="name" type="text" placeholder="Account name" required={true} />
+        <SelectCurrency title="Currency" name="currency" options={currencies} placeholder="Account currency" />
+        <Input title="Balance" name="balance" type="number" placeholder="Account amount" required={true} />
+      </>
+    </ WrapperForms>
+  )
+}
+
+export function AccountAdd({ queryClient }: { queryClient: QueryClient }) {
+  const [isOpen, setIsOpen] = useState(false);
+
 
   return (
     <div className="h-full w-full flex items-center justify-center bg-gray-100">
@@ -41,21 +59,7 @@ export function AccountForm({ queryClient }: { queryClient: QueryClient }) {
         <Wallet />
       </ButtonShowForm>
 
-      {isOpen && (
-        <WrapperForms
-          title="Add Account"
-          mutation={mutation}
-          dataProvider={newAccount}
-          onClick={() => setIsOpen(false)}
-          queryClient={queryClient}
-        >
-          <>
-            <Input title="Account Name" name="name" type="text" placeholder="Account name" required={true} />
-            <SelectCurrency title="Currency" name="currency" options={currencies} placeholder="Account currency" />
-            <Input title="Balance" name="balance" type="number" placeholder="Account amount" required={true} />
-          </>
-        </ WrapperForms>
-      )}
+      {isOpen && <AccountForm queryClient={queryClient} viewHandler={setIsOpen}/>}
     </div>
   );
 }

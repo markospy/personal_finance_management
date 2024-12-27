@@ -2,23 +2,36 @@ import { AccountsCategories } from "@/routes/Report";
 import { Card, CardContent } from "../ui/card";
 import { TransactionModal } from "./TransactionModal";
 import { QueryClient } from "@tanstack/react-query";
+import { AccountForm } from "./AccountModal";
+import { CirclePlus } from "lucide-react";
+import { useState } from "react";
+import Tippy from '@tippyjs/react'; // Asegúrate de que Tippy.js esté instalado
 
-
-
-export default function AccountsSummary({ data, queryClient }:{data: AccountsCategories, queryClient: QueryClient}) {
+export default function AccountsSummary({ data, queryClient }: { data: AccountsCategories, queryClient: QueryClient }) {
+  const [lookForm, setLookForm] = useState(false);
   let balance: number = 0;
-  if(data.accounts) {
-    data.accounts.forEach((account) => balance+=account.balance)
+
+  if (data.accounts) {
+    data.accounts.forEach((account) => balance += account.balance);
   }
 
-  return(
+  return (
     <Card className="w-full h-fit max-w-4xl mx-auto">
       <CardContent className="pt-6">
-      <div className="text-center animate-blurred-fade-in">
-        <p className="text-sm font-medium text-gray-500">Saldo actual</p>
-        <h2 className="text-3xl font-bold">${balance}</h2>
-      </div>
-      <TransactionModal data={data} queryClient={queryClient} />
+        <div className="w-full flex justify-end">
+          <Tippy content="Add account" placement="bottom-end" className="text-blue-500 font-thin text-xs">
+            <CirclePlus
+              className="focus:outline-none text-blue-500 cursor-pointer hover:text-blue-700"
+              onClick={() => setLookForm(true)}
+            />
+          </Tippy>
+        </div>
+        {lookForm && <AccountForm queryClient={queryClient} viewHandler={setLookForm} />}
+        <div className="text-center animate-blurred-fade-in">
+          <p className="text-sm font-medium text-gray-500">Saldo actual</p>
+          <h2 className="text-3xl font-bold">${balance}</h2>
+        </div>
+        <TransactionModal data={data} queryClient={queryClient} />
       </CardContent>
     </Card>
   );

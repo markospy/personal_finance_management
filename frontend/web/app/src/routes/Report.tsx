@@ -2,7 +2,7 @@
 import { GetMonthlyExpenses, GetMonthlyIncomes, GetMonthlySumary } from "@/services/statistic";
 import {  GetAccounts } from "@/services/account";
 import { ActionFunctionArgs, redirect, useLoaderData } from "react-router-dom";
-import { AccountForm } from "@/components/custom/AccountModal";
+import { AccountAdd } from "@/components/custom/AccountModal";
 import { CategoryOut } from "@/schemas/category";
 import { AccountOut } from "@/schemas/account";
 import { MonthlyExpenses, MonthlyIncomes, MonthlySumary } from "@/api/statistic";
@@ -117,7 +117,7 @@ export function ReportMain({queryClient}:{queryClient:QueryClient}) {
 
   if(!isAccount(data.accounts)) {
     return (
-      <AccountForm queryClient={queryClient}/>
+      <AccountAdd queryClient={queryClient} />
     )
   }
 
