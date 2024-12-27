@@ -11,17 +11,9 @@ type Account = {
 }
 
 // Función auxiliar para obtener el icono de la moneda
-const getCurrencyIcon = (currency: string) => { currencies.currencies
-  switch (currency.toUpperCase()) {
-    case 'USD':
-      return <DollarSign className="h-4 w-4" />
-    case 'EUR':
-      return <Euro className="h-4 w-4" />
-    case 'GBP':
-      return <PoundSterling className="h-4 w-4" />
-    default:
-      return <DollarSign className="h-4 w-4" />
-  }
+const getCurrencyIcon = (currency: string) => {
+  const coin = currencies.currencies.find(coin => coin.codigo === currency);
+  return coin ? coin?.simbolo : undefined;
 }
 
 export default function UserAccounts() {
@@ -42,7 +34,8 @@ export default function UserAccounts() {
               <CardTitle className="text-sm font-medium">
                 {account.name}
               </CardTitle>
-              {getCurrencyIcon(account.currency)}
+              {console.log(getCurrencyIcon(account.currency))}
+              <p>{getCurrencyIcon(account.currency) || account.currency}</p>
             </CardHeader>
             <CardContent className='w-full'>
               <div>
