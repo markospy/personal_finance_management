@@ -47,7 +47,7 @@ const router = createBrowserRouter([
                 },
                 {
                   path: "/accounts",
-                  element: <UserAccounts />,
+                  element: <UserAccounts queryClient={queryClient}/>,
                   loader: loaderAccounts(queryClient),
                 },
               ]

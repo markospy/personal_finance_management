@@ -11,6 +11,7 @@ import { QueryClient } from '@tanstack/react-query'
 import { deleteAccount } from '@/api/account'
 import { useToast } from "@/hooks/use-toast"
 import { useState } from 'react'
+import { AccountForm } from '@/components/custom/AccountModal'
 
 export const loader = (queryClient: QueryClient) => async () => {
   const token = getToken();
@@ -25,9 +26,10 @@ const getCurrencyIcon = (currency: string) => {
   return coin ? coin?.simbolo : undefined;
 }
 
-export default function UserAccounts() {
+export default function UserAccounts({queryClient}:{queryClient:QueryClient}) {
   const [ showConfirm, setShowConfirm ] = useState(false);
   const [ accountToDelete, setAccountToDelete ] = useState({id:-1, name:''});
+  const [lookFormAdd, setLookFormAdd] = useState(false);
   const accounts: AccountOut[] = useLoaderData() as AccountOut[];
   const { toast } = useToast()
   const token = getToken();
@@ -86,7 +88,7 @@ export default function UserAccounts() {
             </CardContent>
           </Card>
         ))}
-          <Card>
+          <Card className='cursor-pointer' onClick={()=>setLookFormAdd(true)}>
             <CardContent className='flex justify-center items-center hover:shadow-lg p-6 w-full h-full'>
               <Plus className='text-gray-300 size-16'/>
             </CardContent>
@@ -105,6 +107,7 @@ export default function UserAccounts() {
               </div>
             </div>
           )}
+          {lookFormAdd && <AccountForm queryClient={queryClient} viewHandler={setLookFormAdd} />}
       </div>
     </div>
   )
