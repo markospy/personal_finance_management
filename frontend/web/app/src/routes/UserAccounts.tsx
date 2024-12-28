@@ -37,11 +37,12 @@ export default function UserAccounts({queryClient}:{queryClient:QueryClient}) {
 
   async function delAccount(token: string, id: number) {
     const response = await deleteAccount(token, id);
-    if(typeof response !== 'string' && response.status) {
-      return toast({title: "Error deleting account"})
-    }
-    if(response) {
-      return toast({title: "Account deleted successfully"})
+
+    if (typeof response !== 'string' && response.status) {
+      toast({ title: "Error deleting account" });
+    } else {
+      toast({ title: "Account deleted successfully" });
+      await queryClient.invalidateQueries({ queryKey: ["account", "all"] });
     }
   }
 
