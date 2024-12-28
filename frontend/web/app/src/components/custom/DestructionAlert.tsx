@@ -1,11 +1,11 @@
 import { TriangleAlert } from "lucide-react";
 
 interface Props {
-  id: number;
-  info: string;
+  id?: number;
+  info?: string;
   description: string;
   token: string;
-  onAction: (token:string, id:number) => unknown;
+  onAction: (token:string, id?:number) => unknown;
   setShow: (value: boolean) => void;
 }
 
@@ -24,7 +24,11 @@ export default function DestructionAlert({id, info, description, token, onAction
           <button
             className="bg-red-400 hover:bg-red-600 p-2 rounded-md text-base text-white" 
             onClick={async() => {
-              await onAction(token, id);
+              if(id) {
+                await onAction(token, id);
+              } else {
+                await onAction(token);
+              }
               setShow(false);
             }}
           >
