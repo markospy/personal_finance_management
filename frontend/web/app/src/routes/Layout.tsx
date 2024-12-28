@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigation } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import { QueryClient } from "@tanstack/react-query";
 import GlobalSpinner from "@/components/custom/GlobalSpinner";
-import { LogIn, LogOut, UserRoundPlus } from "lucide-react";
+import { LogIn, LogOut, UserRoundMinus, UserRoundPlus } from "lucide-react";
 import Tippy from "@tippyjs/react";
 import { Toaster } from "@/components/ui/toaster"
 
@@ -24,11 +24,13 @@ export function Layout({queryClient}:{queryClient: QueryClient}) {
           <nav>
             <ul className="flex space-x-16">
               { isAuthenticated ? (
-                  <div className="flex gap-6">
-                    <span className="font-semibold">{user.name}</span>
+                  <div className="flex gap-14">
+                    <Tippy content={`Delete ${user.name}' profile`} placement="left" className="font-medium text-white text-xs">
+                      <UserRoundMinus className="focus:outline-none" />
+                    </Tippy>
                     <form onSubmit={logoutAction}>
                       <button type="submit">
-                        <Tippy content="Logout" placement="bottom" className="font-medium text-white text-xs">
+                        <Tippy content="Logout" placement="left" className="font-medium text-white text-xs">
                           <LogOut className="focus:outline-none"/>
                         </Tippy>
                       </button>
