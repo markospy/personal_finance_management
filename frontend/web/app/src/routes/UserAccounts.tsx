@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { ArrowBigRightDash, PencilLine, Plus, Trash2, TriangleAlert } from 'lucide-react'
+import { ArrowBigLeftDash, PencilLine, Plus, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import currencies from '@/utils/currencies'
 import { AccountOut } from '@/schemas/account'
@@ -12,6 +12,7 @@ import { deleteAccount } from '@/api/account'
 import { useToast } from "@/hooks/use-toast"
 import { useState } from 'react'
 import { AccountForm } from '@/components/custom/AccountModal'
+import DestructionAlert from '@/components/custom/DestructionAlert'
 
 export const loader = (queryClient: QueryClient) => async () => {
   const token = getToken();
@@ -48,12 +49,8 @@ export default function UserAccounts({queryClient}:{queryClient:QueryClient}) {
     <div className="mx-auto p-4 container">
       <div className='flex items-center gap-20 mb-6'>
         <h1 className="font-bold text-2xl">My Accounts</h1>
-        <Link to="/dashboard" className='flex items-center gap-2 bg-blue-500 hover:bg-blue-700 p-2 rounded-md font-medium text-white'>
-          Go to Dashboard
-          <ArrowBigRightDash/>
-        </Link>
       </div>
-      <div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6">
         {accounts.map((account) => (
           <Card key={account.id}>
             <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
@@ -94,21 +91,21 @@ export default function UserAccounts({queryClient}:{queryClient:QueryClient}) {
             </CardContent>
           </Card>
           {showConfirm && (
-            <div className='top-0 left-0 fixed flex justify-center items-center w-full min-h-screen' >
-              <div className='space-y-6 bg-red-100 p-6 rounded-md animate-slide-in-bottom align-middle'>
-                <div className='flex gap-2'>
-                  <TriangleAlert className='flex-none text-red-500'/>
-                  <p className='font-medium text-red-500'>Do you confirm that you want to delete the account {accountToDelete.name}?</p>
-                </div>
-                <div className='flex justify-center gap-4'>
-                  <button className='bg-gray-400 hover:bg-gray-600 p-2 rounded-md text-base text-white' onClick={() => setShowConfirm(false)}>Cancel</button>
-                  <button className="bg-red-400 hover:bg-red-600 p-2 rounded-md text-base text-white" onClick={async() => await delAccount(token, accountToDelete.id)}>Delete</button>
-                </div>
-              </div>
-            </div>
+            <DestructionAlert
+              id={accountToDelete.id}
+              info={accountToDelete.name}
+              description="Do you confirm that you want to delete the account"
+              token={token}
+              onAction={delAccount}
+              setShow={setShowConfirm}
+            />
           )}
           {lookFormAdd && <AccountForm queryClient={queryClient} viewHandler={setLookFormAdd} />}
       </div>
+      <Link to="/dashboard" className='flex items-center gap-2 bg-blue-500 hover:bg-blue-700 p-2 rounded-md max-w-44 font-medium text-white'>
+        <ArrowBigLeftDash/>
+        Go to Dashboard
+      </Link>
     </div>
   )
 }
