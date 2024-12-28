@@ -37,7 +37,7 @@ export const getUser  = (token: string): Promise<UserOut | ErrorResponse> => {
 };
 
 export const deleteUser  = (token: string): Promise<string | ErrorResponse> => {
-  return axi.delete('/user/me', { headers: { 'Authorization': `Bearer ${token}` } })
+  return axi.delete('/user', { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
       console.log(response.status);
       return response.statusText; // Devuelve el texto del estado de la respuesta

@@ -31,7 +31,7 @@ def get_me(current_user: Annotated[UserOut, Security(get_current_user, scopes=[S
     return UserOut(**current_user.model_dump())
 
 
-@router.delete("/me", status_code=204)
+@router.delete("/", status_code=204)
 def delete_me(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
