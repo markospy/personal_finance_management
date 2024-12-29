@@ -2,12 +2,21 @@ import { useEffect, useState } from "react";
 import { codes } from 'currency-codes-ts';
 import { QueryClient } from "@tanstack/react-query";
 import { Input, SelectCurrency } from "./Inputs";
-import { WrapperForms } from "./WrapperForms";
+import { MutationForm, WrapperForms } from "./WrapperForms";
 import { ButtonShowForm } from "./ShowForm";
 import { Wallet } from "lucide-react";
-import { useNewAccount } from "@/hooks/useNewAccount";
 import { NewDataProps } from "@/schemas/utils";
 import { AccountIn } from "@/schemas/account";
+import { useNewAccount } from "@/hooks/useNewAccount";
+
+
+type action = 'Update' | 'Add';
+interface Props {
+  queryClient: QueryClient;
+  viewHandler: (isLook: boolean) => void;
+  action: action;
+  mutation: MutationForm;
+};
 
 
 const newAccount = async ({token, data}: NewDataProps) => {
@@ -21,22 +30,21 @@ const newAccount = async ({token, data}: NewDataProps) => {
   }
   return account;
 }
-export function AccountForm({ queryClient, viewHandler }: { queryClient: QueryClient, viewHandler: (isLook: boolean) => void }) {
+
+
+export function AccountForm({ queryClient, viewHandler, action, mutation }: Props) {
   const currencies = codes();
 
-  const addAccountMutation = useNewAccount(queryClient)
-
-  // Efecto para cerrar el modal cuando la mutación es exitosa
   useEffect(() => {
-    if (addAccountMutation.isSuccess) {
+    if (mutation.isSuccess) {
       viewHandler(false);
     }
-  }, [addAccountMutation.isSuccess, viewHandler]);
+  }, [mutation.isSuccess, viewHandler]);
 
   return (
       <WrapperForms
-      title="Add Account"
-      mutation={addAccountMutation}
+      title={`${action} Account`}
+      mutation={mutation}
       dataProvider={newAccount}
       onClick={() => viewHandler(false)}
       queryClient={queryClient}
@@ -52,7 +60,7 @@ export function AccountForm({ queryClient, viewHandler }: { queryClient: QueryCl
 
 export function AccountAdd({ queryClient }: { queryClient: QueryClient }) {
   const [isOpen, setIsOpen] = useState(false);
-
+  const addAccountMutation = useNewAccount(queryClient);
 
   return (
     <div className="flex justify-center items-center bg-gray-100 w-full h-full">
@@ -60,7 +68,7 @@ export function AccountAdd({ queryClient }: { queryClient: QueryClient }) {
         <Wallet />
       </ButtonShowForm>
 
-      {isOpen && <AccountForm queryClient={queryClient} viewHandler={setIsOpen}/>}
+      {isOpen && <AccountForm queryClient={queryClient} viewHandler={setIsOpen} action="Add" mutation={addAccountMutation}/>}
     </div>
   );
 }

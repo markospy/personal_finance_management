@@ -12,6 +12,7 @@ import { useState } from 'react'
 import { AccountForm } from '@/components/custom/AccountModal'
 import DestructionAlert from '@/components/custom/DestructionAlert'
 import { useDeleteAccount } from '@/hooks/useDeleteAccount'
+import { useNewAccount } from '@/hooks/useNewAccount'
 
 export const loader = (queryClient: QueryClient) => async () => {
   const token = getToken();
@@ -34,6 +35,8 @@ export default function UserAccounts({queryClient}:{queryClient:QueryClient}) {
   const token = getToken();
 
   const deleteAccountMutation = useDeleteAccount(queryClient);
+  const addAccountMutation = useNewAccount(queryClient);
+  
 
   return (
     <div className="mx-auto p-4 container">
@@ -90,7 +93,13 @@ export default function UserAccounts({queryClient}:{queryClient:QueryClient}) {
               setShow={setShowConfirm}
             />
           )}
-          {lookFormAdd && <AccountForm queryClient={queryClient} viewHandler={setLookFormAdd} />}
+          {lookFormAdd && (
+            <AccountForm
+              queryClient={queryClient}
+              viewHandler={setLookFormAdd}
+              action='Add'
+              mutation={addAccountMutation}
+            />)}
       </div>
       <Link to="/dashboard" className='flex items-center gap-2 bg-blue-500 hover:bg-blue-700 p-2 rounded-md max-w-44 font-medium text-white'>
         <ArrowBigLeftDash/>

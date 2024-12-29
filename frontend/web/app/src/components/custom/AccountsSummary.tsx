@@ -7,9 +7,11 @@ import { CirclePlus, CreditCard } from "lucide-react";
 import { useState } from "react";
 import Tippy from '@tippyjs/react'; // Asegúrate de que Tippy.js esté instalado
 import { Link } from "react-router-dom";
+import { useNewAccount } from "@/hooks/useNewAccount";
 
 export default function AccountsSummary({ data, queryClient }: { data: AccountsCategories, queryClient: QueryClient }) {
   const [lookForm, setLookForm] = useState(false);
+  const addAccountMutation = useNewAccount(queryClient);
   let balance: number = 0;
 
   if (data.accounts) {
@@ -34,7 +36,7 @@ export default function AccountsSummary({ data, queryClient }: { data: AccountsC
             />
           </Tippy>
         </div>
-        {lookForm && <AccountForm queryClient={queryClient} viewHandler={setLookForm} />}
+        {lookForm && <AccountForm queryClient={queryClient} viewHandler={setLookForm} action="Add" mutation={addAccountMutation}/>}
         <div className="text-center animate-blurred-fade-in">
           <p className="w-full font-medium text-base text-center text-gray-500">Current Balance</p>
           <h2 className="font-bold text-3xl">${balance}</h2>

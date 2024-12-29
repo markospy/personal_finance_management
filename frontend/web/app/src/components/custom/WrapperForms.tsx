@@ -14,6 +14,8 @@ import { NewDataProps } from "@/schemas/utils";
 type Transaction = UseMutationResult<TransactionIn, Error, {token: string, transaction: TransactionIn}, unknown>
 type Account = UseMutationResult<AccountIn, Error, {token: string, account: AccountIn}, unknown>
 
+export type MutationForm = Transaction | Account;
+
 type MutationData =
   | { token: string; transaction: TransactionIn }
   | { token: string; account: AccountIn };
@@ -21,7 +23,7 @@ type MutationData =
 type DataProvider = ({...props}: NewDataProps) => Promise<MutationData>;
 interface Props {
   title: string;
-  mutation: Transaction | Account;
+  mutation: MutationForm;
   dataProvider: DataProvider
   children: React.ReactNode;
   onClick: () => void;
