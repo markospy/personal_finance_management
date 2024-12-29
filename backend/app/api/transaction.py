@@ -173,7 +173,7 @@ def update_transaction(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
-    """Updates a transaction."""
+    """Updates a transaction. It is only updated if it is the last transaction carried out."""
     transaction_existing = db.scalar(select(Transaction).where(Transaction.id == transaction_id))
     if not transaction_existing:
         raise HTTPException(status_code=404, detail="Transaction not found")
@@ -256,7 +256,7 @@ def delete_transaction(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
-    """Delete a transaction."""
+    """Delete a transaction. It is only deleted if it is the last transaction made."""
     transaction = db.scalar(select(Transaction).where(Transaction.id == transaction_id))
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
