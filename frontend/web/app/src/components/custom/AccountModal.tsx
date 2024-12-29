@@ -24,19 +24,19 @@ const newAccount = async ({token, data}: NewDataProps) => {
 export function AccountForm({ queryClient, viewHandler }: { queryClient: QueryClient, viewHandler: (isLook: boolean) => void }) {
   const currencies = codes();
 
-  const mutation = useNewAccount(queryClient)
+  const addAccountMutation = useNewAccount(queryClient)
 
   // Efecto para cerrar el modal cuando la mutación es exitosa
   useEffect(() => {
-    if (mutation.isSuccess) {
+    if (addAccountMutation.isSuccess) {
       viewHandler(false);
     }
-  }, [mutation.isSuccess, viewHandler]);
+  }, [addAccountMutation.isSuccess, viewHandler]);
 
   return (
       <WrapperForms
       title="Add Account"
-      mutation={mutation}
+      mutation={addAccountMutation}
       dataProvider={newAccount}
       onClick={() => viewHandler(false)}
       queryClient={queryClient}
