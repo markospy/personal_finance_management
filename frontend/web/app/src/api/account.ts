@@ -51,7 +51,22 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        throw new Error(`${error.response?.status}`)
+        throw new Error(`${error.code}`)
+    });
+};
+
+export const updateAccount = (token: string, id?: number, account?: AccountIn): Promise<AccountOut> => {
+    return axi.put(`/accounts/${id}`, {
+        "name": account?.name,
+        "currency": account?.currency,
+        "balance": account?.balance,
+    }, { headers: { 'Authorization': `Bearer ${token}` } })
+    .then(response => {
+        console.log(response.status);
+        return response.data; // Devuelve los datos de la respuesta
+    })
+    .catch((error: AxiosError) => {
+        throw new Error(`${error.code}`)
     });
 };
 
@@ -62,6 +77,6 @@ export const deleteAccount = (token: string, id?: number): Promise<string> => {
         return response.statusText; // Devuelve el texto del estado de la respuesta
     })
     .catch((error: AxiosError) => {
-        throw new Error(error.message + error.code)
+        throw new Error(`${error.code}`)
     });
 };
