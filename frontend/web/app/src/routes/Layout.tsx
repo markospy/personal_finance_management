@@ -9,6 +9,7 @@ import DestructionAlert from "@/components/custom/DestructionAlert";
 import { getToken } from "@/utils/token";
 import { useToast } from "@/hooks/use-toast";
 import { deleteUser } from "@/api/user";
+import { Toaster } from "@/components/ui/toaster";
 
 export function Layout({queryClient}:{queryClient: QueryClient}) {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -88,6 +89,7 @@ export function Layout({queryClient}:{queryClient: QueryClient}) {
             setShow={setShowConfirm}
           />
         )}
+        <Toaster />
       </main>
     </div>
   );

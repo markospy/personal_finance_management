@@ -35,13 +35,16 @@ export default function UserAccounts({queryClient}:{queryClient:QueryClient}) {
   const { toast } = useToast()
   const token = getToken();
 
-  async function delAccount(token: string, id: number) {
-    const response = await deleteAccount(token, id);
+  async function delAccount(token: string, id?: number) {
+    let response: string | ErrorResponse = '';
+    if(id) {
+      response = await deleteAccount(token, id);
+    }
 
     if (typeof response !== 'string' && response.status) {
-      toast({ title: "Error deleting account" });
+      toast({ title: "Error", description: "Error deleting account", className:"bg-red-200" });
     } else {
-      toast({ title: "Account deleted successfully" });
+      toast({ title: "Success", description: "Account deleted successfully", className:"bg-green-200" });
       await queryClient.invalidateQueries({ queryKey: ["account", "all"] });
     }
   }
