@@ -37,11 +37,11 @@ const years = Array.from({length: 5}, (_, i) => currentYear - i)
 const NoDataComponent = ({ message }:{ message:string }) => {
   return (
     <div className="relative flex flex-col items-center">
-      <span className='absolute top-1/2 font-medium text-xs text-gray-300'>{message}</span>
+      <span className='top-1/2 absolute font-medium text-gray-300 text-xs'>{message}</span>
       <img
         src={montonDeDinero}
         alt="Imagen de bolsa con signo de dinero llena de monedas de oro, rodeada de otras tantas monedas de oro y un fajo de dolares americanos"
-        className='size-72 opacity-20 animate-sink'
+        className='opacity-20 animate-sink size-72'
       />
     </div>
   );
@@ -91,9 +91,9 @@ export default function TransactionsSummary({data, label, dataKey, nameKey}: Cha
   console.log(data)
   console.log(date)
   return (
-    <Card className="w-full h-fit max-w-4xl mx-auto pb-12">
+    <Card className="mx-auto pb-12 w-full max-w-4xl h-fit">
       <CardHeader className="pb-4 animate-blurred-fade-in">
-        <CardTitle className="text-2xl font-bold mb-2">Resumen Mensual</CardTitle>
+        <CardTitle className="mb-2 font-bold text-2xl">Resumen Mensual</CardTitle>
         <div className="flex justify-between items-center">
           <div className="flex space-x-4">
             <Select
@@ -125,7 +125,7 @@ export default function TransactionsSummary({data, label, dataKey, nameKey}: Cha
           </div>
           {(data.summaryExpenses && data.summaryIncomes) ?
             <div className={`flex items-center ${netBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              <span className="text-2xl font-bold mr-2">
+              <span className="mr-2 font-bold text-2xl">
                 {netBalance >= 0 ? '+' : '-'}${Math.abs(netBalance).toLocaleString()}
               </span>
               {netBalance >= 0 ? <ArrowUpIcon size={24} /> : <ArrowDownIcon size={24} />}
