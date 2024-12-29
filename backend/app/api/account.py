@@ -65,6 +65,31 @@ def get_account(
     return account
 
 
+@router.put("/{account_id}", response_model=AccountOut)
+def update_account(
+    update_data_account: AccountIn,
+    account_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+):
+    """
+    Update the data of a specific account.
+    """
+    account = db.scalar(
+        select(AccountModel).where(AccountModel.id == account_id, AccountModel.user_id == current_user.id)
+    )
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    if update_data_account.name is not None:
+        account.name = update_data_account.name
+    if update_data_account.currency is not None:
+        account.currency = update_data_account.currency
+    if update_data_account.balance is not None:
+        account.balance = update_data_account.balance
+    db.commit()
+    return account
+
+
 @router.delete("/{account_id}", status_code=204)
 def delete_account(
     account_id: int,
