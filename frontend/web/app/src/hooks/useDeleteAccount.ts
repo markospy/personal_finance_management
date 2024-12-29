@@ -5,7 +5,7 @@ import { useToast } from "./use-toast"; // Asegúrate de tener un hook para most
 export const useDeleteAccount = (queryClient: QueryClient) => {
   const { toast } = useToast();
 
-  const mutation = useMutation<string, Error, { token: string; id: number }>({
+  const mutation = useMutation<string, Error, { token: string; id?: number }>({
     mutationFn: ({ token, id }) => deleteAccount(token, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['account', 'all'] });

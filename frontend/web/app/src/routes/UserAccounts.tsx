@@ -8,11 +8,10 @@ import { GetAccounts } from '@/services/account'
 import { getToken } from '@/utils/token'
 import { ErrorResponse } from '@/schemas/error'
 import { QueryClient } from '@tanstack/react-query'
-import { deleteAccount } from '@/api/account'
-import { useToast } from "@/hooks/use-toast"
 import { useState } from 'react'
 import { AccountForm } from '@/components/custom/AccountModal'
 import DestructionAlert from '@/components/custom/DestructionAlert'
+import { useDeleteAccount } from '@/hooks/useDeleteAccount'
 
 export const loader = (queryClient: QueryClient) => async () => {
   const token = getToken();
@@ -32,22 +31,9 @@ export default function UserAccounts({queryClient}:{queryClient:QueryClient}) {
   const [ accountToDelete, setAccountToDelete ] = useState({id:-1, name:''});
   const [lookFormAdd, setLookFormAdd] = useState(false);
   const accounts: AccountOut[] = useLoaderData() as AccountOut[];
-  const { toast } = useToast()
   const token = getToken();
 
-  async function delAccount(token: string, id?: number) {
-    let response: string | ErrorResponse = '';
-    if(id) {
-      response = await deleteAccount(token, id);
-    }
-
-    if (typeof response !== 'string' && response.status) {
-      toast({ title: "Error", description: "Error deleting account", className:"bg-red-200" });
-    } else {
-      toast({ title: "Success", description: "Account deleted successfully", className:"bg-green-200" });
-      await queryClient.invalidateQueries({ queryKey: ["account", "all"] });
-    }
-  }
+  const deleteAccountMutation = useDeleteAccount(queryClient);
 
   return (
     <div className="mx-auto p-4 container">
@@ -100,7 +86,7 @@ export default function UserAccounts({queryClient}:{queryClient:QueryClient}) {
               info={accountToDelete.name}
               description="Do you confirm that you want to delete the account"
               token={token}
-              onAction={delAccount}
+              onAction={deleteAccountMutation.mutate}
               setShow={setShowConfirm}
             />
           )}

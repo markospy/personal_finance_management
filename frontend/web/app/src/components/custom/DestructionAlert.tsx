@@ -5,7 +5,7 @@ interface Props {
   info?: string;
   description: string;
   token: string;
-  onAction: (token:string, id?:number) => unknown;
+  onAction: ({token, id}: {token:string, id?:number}) => unknown;
   setShow: (value: boolean) => void;
 }
 
@@ -25,9 +25,9 @@ export default function DestructionAlert({id, info, description, token, onAction
             className="bg-red-400 hover:bg-red-600 p-2 rounded-md text-base text-white" 
             onClick={async() => {
               if(id) {
-                await onAction(token, id);
+                await onAction({token, id});
               } else {
-                await onAction(token);
+                await onAction({token});
               }
               setShow(false);
             }}
