@@ -51,7 +51,7 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        console.log(error.message)
+        throw new Error(error.message + error.code)
     });
 };
 
@@ -62,12 +62,6 @@ export const deleteAccount = (token: string, id: number): Promise<string | Error
         return response.statusText; // Devuelve el texto del estado de la respuesta
     })
     .catch((error: AxiosError) => {
-        const status = error.response?.status || 500; // Valor por defecto
-        const msg = error.message;
-
-        return {
-            status,
-            msg
-        };
+        throw new Error(error.message + error.code)
     });
 };
