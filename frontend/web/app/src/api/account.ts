@@ -51,7 +51,7 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        throw new Error(`${error.code}`)
+        throw new Error(`${error.response?.status}`)
     });
 };
 
@@ -66,7 +66,7 @@ export const updateAccount = (token: string, id?: number, account?: AccountIn): 
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        throw new Error(`${error.code}`)
+        throw new Error(`${error.response?.status}`)
     });
 };
 
@@ -77,6 +77,6 @@ export const deleteAccount = (token: string, id?: number): Promise<string> => {
         return response.statusText; // Devuelve el texto del estado de la respuesta
     })
     .catch((error: AxiosError) => {
-        throw new Error(`${error.code}`)
+        throw new Error(`${error.response?.status}`)
     });
 };
