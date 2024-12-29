@@ -9,6 +9,7 @@ import { useNewAccount } from "@/hooks/useNewAccount";
 import { NewDataProps } from "@/schemas/utils";
 import { AccountIn } from "@/schemas/account";
 
+
 const newAccount = async ({token, data}: NewDataProps) => {
   const account: {token: string, account: AccountIn} = {
     token: token,
@@ -54,7 +55,7 @@ export function AccountAdd({ queryClient }: { queryClient: QueryClient }) {
 
 
   return (
-    <div className="h-full w-full flex items-center justify-center bg-gray-100">
+    <div className="flex justify-center items-center bg-gray-100 w-full h-full">
       <ButtonShowForm title="Add Accounts" onClick={() => setIsOpen(true)}>
         <Wallet />
       </ButtonShowForm>
