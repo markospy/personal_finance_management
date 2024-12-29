@@ -7,13 +7,11 @@ import Tippy from "@tippyjs/react";
 import { useState } from "react";
 import DestructionAlert from "@/components/custom/DestructionAlert";
 import { getToken } from "@/utils/token";
-import { useToast } from "@/hooks/use-toast";
-import { deleteUser } from "@/api/user";
 import { Toaster } from "@/components/ui/toaster";
+import { useDeleteUser } from "@/hooks/useDeleteUser";
 
 export function Layout({queryClient}:{queryClient: QueryClient}) {
   const [showConfirm, setShowConfirm] = useState(false);
-  const { toast } = useToast()
   const { isAuthenticated, logout, user } = useAuth();
   const navigation = useNavigation();
   const isNavigating = Boolean(navigation.location);
@@ -24,16 +22,7 @@ export function Layout({queryClient}:{queryClient: QueryClient}) {
     logout()
   }
 
-  async function delUser(token: string) {
-    const response = await deleteUser(token);
-
-    if (typeof response !== 'string' && response.status) {
-      toast({ title: "Error deleting profile" });
-    } else {
-      queryClient.removeQueries()
-      logout()
-    }
-  }
+  const deleteUserMutation = useDeleteUser(queryClient);
 
   return (
     <div className="flex flex-col bg-blue-50 w-full min-h-screen">
@@ -85,7 +74,7 @@ export function Layout({queryClient}:{queryClient: QueryClient}) {
           <DestructionAlert
             description="Do you confirm that you want to delete you profile"
             token={token}
-            onAction={delUser}
+            onAction={deleteUserMutation.mutate}
             setShow={setShowConfirm}
           />
         )}

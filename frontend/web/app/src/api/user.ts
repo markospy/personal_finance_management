@@ -36,21 +36,13 @@ export const getUser  = (token: string): Promise<UserOut | ErrorResponse> => {
     });
 };
 
-export const deleteUser  = (token: string): Promise<string | ErrorResponse> => {
+export const deleteUser  = (token: string): Promise<string> => {
   return axi.delete('/user', { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
       console.log(response.status);
       return response.statusText; // Devuelve el texto del estado de la respuesta
     })
     .catch((error: AxiosError) => {
-      // Manejo de errores
-      const status = error.response?.status || 500; // Valor por defecto
-      const msg = error.message;
-
-      // Retornar un objeto de error
-      return {
-        status,
-        msg
-      };
+      throw new Error(error.message + error.code);
     });
 };
