@@ -55,7 +55,7 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
     });
 };
 
-export const deleteAccount = (token: string, id: number): Promise<string | ErrorResponse> => {
+export const deleteAccount = (token: string, id: number): Promise<string> => {
     return axi.delete(`/accounts/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
         console.log(response.status);
