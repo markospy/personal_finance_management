@@ -14,8 +14,12 @@ export const useNewAccount = (queryClient: QueryClient) => {
       queryClient.invalidateQueries({ queryKey: ['account', 'all'] });
       toast({ title: "Success", description: "Account added successfully", className:"bg-green-200" });
     },
-    onError: () => {
-      toast({ title: "Error", description: "Error adding account", className:"bg-red-200" });
+    onError: (error) => {
+      if(error.message === '409'){
+        toast({ title: "Error", description: "An account with this name already exists", className:"bg-red-200" });
+      } else {
+        toast({ title: "Error", description: "An error occurred while creating the account", className:"bg-red-200" });
+      }
     }
   })
   return mutation;

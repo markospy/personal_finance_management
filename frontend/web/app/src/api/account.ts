@@ -51,7 +51,7 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        throw new Error(error.message + error.code)
+        throw new Error(`${error.response?.status}`)
     });
 };
 
