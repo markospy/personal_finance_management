@@ -15,6 +15,9 @@ router = APIRouter(prefix="/user", tags=["user"])
 
 @router.post("/", status_code=201, response_model=UserOut)
 def create_user(user: UserIn, db: Session = Depends(get_db)):
+    """
+    Creates a new user.
+    """
     db_user = db.scalar(select(User).where(User.name == user.name))
     if db_user:
         raise HTTPException(status_code=409, detail="The user's name is already being used by another user")
@@ -28,6 +31,9 @@ def create_user(user: UserIn, db: Session = Depends(get_db)):
 
 @router.get("/me")
 def get_me(current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])]):
+    """
+    Gets the data of an existing user.
+    """
     return UserOut(**current_user.model_dump())
 
 
@@ -36,6 +42,9 @@ def delete_me(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
+    """
+    Deletes an existing user.
+    """
     db_user = db.scalar(select(User).where(User.id == current_user.id))
     db.delete(db_user)
     db.commit()

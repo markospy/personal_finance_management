@@ -13,7 +13,7 @@ from ..schemas.schemas import Scopes, TransactionType, UserOut
 router = APIRouter(prefix="/statistics", tags=["statistics"])
 
 
-@router.get("/monthly-summary")
+@router.get("/monthly-summary/")
 async def get_monthly_summary(
     year: int,
     month: int,
@@ -21,7 +21,7 @@ async def get_monthly_summary(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
     """
-    Obtiene el resumen mensual de gastos e ingresos
+    Get the monthly summary of expenses and income.
     """
     # Verificar que el mes y año sean válidos
     try:
@@ -57,7 +57,7 @@ async def get_monthly_summary(
     return {"totalExpenses": float(totalExpenses), "totalIncomes": float(totalIncomes)}
 
 
-@router.get("/monthly-expenses")
+@router.get("/monthly-expenses/")
 async def get_expenses_by_category(
     year: int,
     month: int,
@@ -65,7 +65,7 @@ async def get_expenses_by_category(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
     """
-    Obtiene las categorías ordenadas por total de gastos
+    Get the categories sorted by total expenses.
     """
     # Verificar que el mes y año sean válidos
     try:
@@ -113,7 +113,7 @@ async def get_expenses_by_category(
         ]
 
 
-@router.get("/monthly-incomes")
+@router.get("/monthly-incomes/")
 async def get_incomes_by_category(
     year: int,
     month: int,
@@ -121,7 +121,7 @@ async def get_incomes_by_category(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
     """
-    Obtiene las categorías ordenadas por total de gastos
+    Get the categories sorted by total expenses.
     """
     # Verificar que el mes y año sean válidos
     try:

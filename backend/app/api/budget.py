@@ -63,7 +63,7 @@ def get_one_budget(
     return budget
 
 
-@router.get("/{budget_id}/status", response_model=dict)
+@router.get("/{budget_id}/status/", response_model=dict)
 def get_one_budget_status(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
     budget_id: int,

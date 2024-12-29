@@ -17,6 +17,9 @@ def get_categories(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
     db: Session = Depends(get_db),
 ):
+    """
+    Gets all categories.
+    """
     categories = db.scalars(select(Category).where(or_(Category.is_global, Category.user_id == current_user.id))).all()
     if not categories:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -29,7 +32,9 @@ def get_one_category(
     category_id: int,
     db: Session = Depends(get_db),
 ):
-
+    """
+    Gets a specific category.
+    """
     category = db.scalar(
         select(Category).where(
             and_(Category.id == category_id, or_(Category.is_global, Category.user_id == current_user.id))
@@ -50,6 +55,9 @@ def create_category_global(
     category: CategoryIn,
     db: Session = Depends(get_db),
 ):
+    """
+    Creates a global category (needs admin scope).
+    """
     db_category = db.scalar(
         select(Category).where(Category.is_global, Category.name == category.name, Category.type == category.type)
     )
@@ -71,6 +79,9 @@ def create_category_user(
     category: CategoryIn,
     db: Session = Depends(get_db),
 ):
+    """
+    Creates a user category
+    """
     db_category = db.scalar(select(Category).where(Category.name == category.name, Category.type == category.type))
     if db_category:
         raise HTTPException(status_code=409, detail="The category is already exists")
@@ -93,6 +104,7 @@ def delete_category(
     category_id: int,
     db: Session = Depends(get_db),
 ):
+    """Deletes a user category. Deleting categories will delete the associated transactions but will not restore the balance in the accounts."""
     db_category = db.scalar(
         select(Category).where(and_(Category.user_id == current_user.id, Category.id == category_id))
     )
@@ -108,6 +120,7 @@ def delete_global_category(
     category_id: int,
     db: Session = Depends(get_db),
 ):
+    """Deletes a global category (needs admin scope). Deleting categories will delete the associated transactions but will not restore the balance in the accounts."""
     db_category = db.scalar(select(Category).where(and_(Category.is_global, Category.id == category_id)))
     if not db_category:
         raise HTTPException(status_code=404, detail="Category not found")

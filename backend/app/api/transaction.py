@@ -29,7 +29,7 @@ def create_transaction(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
     strict: Annotated[bool, Cookie()] = False,
 ):
-
+    """Create a transaction."""
     category = db.scalar(
         select(Category).where(
             and_(Category.id == transaction.category_id, or_(Category.is_global, Category.user_id == current_user.id))
@@ -101,6 +101,7 @@ def get_transaction(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
+    """Get a specific transaction."""
     transaction = db.scalar(
         select(Transaction).where(Transaction.id == transaction_id, Account.user_id == current_user.id)
     )
@@ -115,6 +116,7 @@ def get_transactions_by_account(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
+    """Gets all transactions from a money account."""
     account = db.scalar(select(Account).where(Account.id == account_id, Account.user_id == current_user.id))
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
@@ -123,13 +125,14 @@ def get_transactions_by_account(
     return transactions
 
 
-@router.get("")
+@router.get("/")
 def get_transactions(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
     page: int = 0,
     size_page: int = 10,
 ):
+    """Get all transactions."""
     accounts = db.scalars(select(Account).where(Account.user_id == current_user.id)).all()
     transactions_list = []
     total_transactions = 0
@@ -170,6 +173,7 @@ def update_transaction(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
+    """Updates a transaction."""
     transaction_existing = db.scalar(select(Transaction).where(Transaction.id == transaction_id))
     if not transaction_existing:
         raise HTTPException(status_code=404, detail="Transaction not found")
@@ -252,6 +256,7 @@ def delete_transaction(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
 ):
+    """Delete a transaction."""
     transaction = db.scalar(select(Transaction).where(Transaction.id == transaction_id))
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
