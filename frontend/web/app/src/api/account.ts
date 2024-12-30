@@ -55,7 +55,8 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
     });
 };
 
-export const updateAccount = (token: string, id?: number, account?: AccountIn): Promise<AccountOut> => {
+export const updateAccount = (token: string, id: number, account: AccountIn): Promise<AccountOut> => {
+    console.log(id)
     return axi.put(`/accounts/${id}`, {
         "name": account?.name,
         "currency": account?.currency,
