@@ -153,6 +153,8 @@ def get_transactions(
     # Calcular el índice de inicio y fin para la paginación
     init = (page - 1) * size_page
     end = init + size_page
+    # Invertir la lista de transacciones para empezar a mostrarlas desde la mas reciente
+    transactions_list.reverse()
     # Obtener los items para la página actual
     paginated_items = transactions_list[init:end]
 
