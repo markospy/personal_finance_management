@@ -7,7 +7,7 @@ import { GetCategories } from "@/services/category";
 import { isCategory, isTransaction } from "@/utils/guards";
 import { getToken } from "@/utils/token";
 import { keepPreviousData, QueryClient, useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, CreditCard, ListEnd, ListStart } from "lucide-react";
+import { ChevronLeft, ChevronRight, CreditCard, ListEnd, ListStart, PencilLine, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 function getCategoryType(transaction: TransactionOut, categories: CategoryOut[] | ErrorResponse | null) {
@@ -54,6 +54,7 @@ export const RecentTransactions = ({sizePage, queryClient}: {sizePage: number, q
 
   if(isTransaction(data.transactions)){
     const transactions = data.transactions;
+    const idMax = transactions[0].id;
     const pageSizes = [5, 10, 15, 20, 30, 50, 'Todas'];
     return (
       <Card className="mx-auto w-full max-w-4xl h-fit">
@@ -81,14 +82,22 @@ export const RecentTransactions = ({sizePage, queryClient}: {sizePage: number, q
           <ul className="mt-4 rounded-lg max-h-screen overflow-y-auto scroll-smooth">
             {transactions.map(transaction => (
               <li key={transaction.id} className={`${getCategoryType(transaction, categories) === 'income' ? "bg-green-50" : "bg-red-50"} flex justify-between items-center py-2 px-4`}>
-                <div className="flex items-center">
-                  <div className="bg-gray-200 mr-3 p-2 rounded-full">
-                    <CreditCard className="w-4 h-4" />
+                <div className="flex items-center gap-10">
+                  <div className="flex items-center">
+                    <div className="bg-gray-200 mr-3 p-2 rounded-full">
+                      <CreditCard className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{transaction.comments}</p>
+                      <p className="text-gray-500 text-sm">{new Date(transaction.date).toLocaleString()}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">{transaction.comments}</p>
-                    <p className="text-gray-500 text-sm">{new Date(transaction.date).toLocaleString()}</p>
-                  </div>
+                  {(page===1 && transaction.id === idMax) && (
+                    <div className="flex gap-4">
+                      <PencilLine className="hover:text-blue-500 cursor-pointer size-5"/>
+                      <Trash2 className="text-red-500 cursor-pointer size-5"/>
+                    </div>
+                  )}
                 </div>
                 <span className={getCategoryType(transaction, categories) === 'income' ? "text-green-600" : "text-red-600"}>
                   {getCategoryType(transaction, categories) === 'income' ? "+" : "-"}${Math.abs(transaction.amount).toFixed(2)}

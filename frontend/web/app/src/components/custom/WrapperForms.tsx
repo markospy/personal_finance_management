@@ -48,7 +48,7 @@ export function WrapperForms({title, mutation, action, dataProvider, children, o
               const token = getToken();
               const data = new FormData(e.currentTarget);
               console.log(data);
-              const mutationData = await dataProvider({token, data, accountId: id});
+              const mutationData = await dataProvider({token, data, id});
               console.log(mutationData);
 
               // eslint-disable-next-line @typescript-eslint/no-explicit-any

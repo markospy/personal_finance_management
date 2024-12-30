@@ -108,9 +108,9 @@ export function TransactionModal({ data, queryClient }: TransactionModalProps) {
   }, [mutation.isSuccess]);
 
   return (
-    <div className="h-full w-full flex items-center justify-center">
+    <div className="flex justify-center items-center w-full h-full">
       <ButtonShowForm title="Add Transaction" onClick={() => setIsOpen(true)}>
-        <Plus className="mr-2 h-4 w-4" />
+        <Plus className="mr-2 w-4 h-4" />
       </ButtonShowForm>
 
       {isOpen && (
@@ -118,6 +118,7 @@ export function TransactionModal({ data, queryClient }: TransactionModalProps) {
           title="Add Transaction"
           mutation={mutation}
           dataProvider={newTransaction}
+          action='Add'
           onClick={() => setIsOpen(false)}
           queryClient={queryClient}
         >
