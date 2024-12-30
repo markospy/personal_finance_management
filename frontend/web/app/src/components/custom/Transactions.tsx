@@ -56,12 +56,12 @@ export const RecentTransactions = ({sizePage, queryClient}: {sizePage: number, q
     const transactions = data.transactions;
     const pageSizes = [5, 10, 15, 20, 30, 50, 'Todas'];
     return (
-      <Card className="w-full h-fit max-w-4xl mx-auto">
+      <Card className="mx-auto w-full max-w-4xl h-fit">
         <CardHeader className="pb-4 animate-blurred-fade-in">
-          <CardTitle className="text-2xl font-bold mb-2">Transacciones Recientes</CardTitle>
+          <CardTitle className="mb-2 font-bold text-2xl">Transacciones Recientes</CardTitle>
         </CardHeader>
         <CardContent className="animate-blurred-fade-in">
-          <div className="flex flex-col gap-4 bg-gray-50 border-b border-gray-200">
+          <div className="flex flex-col gap-4 border-gray-200 bg-gray-50 border-b">
             <select
               value={pageSize === data.totalTransactions ? 'Todas' : pageSize}
               onChange={(e) => {
@@ -69,7 +69,7 @@ export const RecentTransactions = ({sizePage, queryClient}: {sizePage: number, q
                 setPageSize(newSize);
                 setPage(1);
               }}
-              className="w-full p-2 pl-4 text-sm text-gray-700 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border-gray-200 p-2 pl-4 border rounded-lg focus:ring-2 focus:ring-blue-500 w-full text-gray-700 text-sm focus:outline-none"
             >
               {pageSizes.map((size) => (
                 <option key={size} value={size}>
@@ -78,16 +78,16 @@ export const RecentTransactions = ({sizePage, queryClient}: {sizePage: number, q
               ))}
             </select>
           </div>
-          <ul className="mt-4 overflow-y-auto max-h-screen scroll-smooth rounded-lg">
+          <ul className="mt-4 rounded-lg max-h-screen overflow-y-auto scroll-smooth">
             {transactions.map(transaction => (
               <li key={transaction.id} className={`${getCategoryType(transaction, categories) === 'income' ? "bg-green-50" : "bg-red-50"} flex justify-between items-center py-2 px-4`}>
                 <div className="flex items-center">
-                  <div className="bg-gray-200 p-2 rounded-full mr-3">
-                    <CreditCard className="h-4 w-4" />
+                  <div className="bg-gray-200 mr-3 p-2 rounded-full">
+                    <CreditCard className="w-4 h-4" />
                   </div>
                   <div>
                     <p className="font-medium">{transaction.comments}</p>
-                    <p className="text-sm text-gray-500">{new Date(transaction.date).toLocaleString()}</p>
+                    <p className="text-gray-500 text-sm">{new Date(transaction.date).toLocaleString()}</p>
                   </div>
                 </div>
                 <span className={getCategoryType(transaction, categories) === 'income' ? "text-green-600" : "text-red-600"}>
@@ -97,7 +97,7 @@ export const RecentTransactions = ({sizePage, queryClient}: {sizePage: number, q
             ))}
           </ul>
           {pageSize!==data.totalTransactions &&
-            <div className="flex items-center justify-around">
+            <div className="flex justify-around items-center">
               <button
                 onClick={() => setPage(1)}
                 disabled={page === 1}
@@ -105,7 +105,7 @@ export const RecentTransactions = ({sizePage, queryClient}: {sizePage: number, q
               >
                 <ListStart className="mr-2"/> To Start
               </button>
-              <div className="flex items-center justify-center gap-4 p-2 bg-gray-50 border-t border-gray-200 space-x-2">
+              <div className="flex justify-center items-center gap-4 space-x-2 border-gray-200 bg-gray-50 p-2 border-t">
                 <button
                   onClick={() => setPage((old) => old - 1)}
                   disabled={page === 1}
@@ -113,7 +113,7 @@ export const RecentTransactions = ({sizePage, queryClient}: {sizePage: number, q
                 >
                   <ChevronLeft /> Back
                 </button>
-                <span className="text-lg font-medium text-gray-500">
+                <span className="font-medium text-gray-500 text-lg">
                   {page}/{data.totalPages}
                 </span>
                 <button
