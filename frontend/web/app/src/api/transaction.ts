@@ -26,7 +26,8 @@ export const createTransaction = (token: string, transaction: TransactionIn): Pr
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        console.log(error.message);
+        const detail: {detail: string} = error.response?.data as {detail: string};
+        throw new Error(`${detail.detail}`)
     });
 };
 
@@ -96,14 +97,8 @@ export const updateTransaction = (token: string, id: number, transaction: Transa
 			console.log(response.status);
 			return response.data; // Devuelve los datos de la respuesta
 		})
-		.catch((error: AxiosError) => {
-			const status = error.response?.status || 500; // Valor por defecto
-			const msg = error.message;
-
-			// Retornar un objeto de error
-			return {
-				status,
-				msg
-			};
-		});
+        .catch((error: AxiosError) => {
+            const detail: {detail: string} = error.response?.data as {detail: string};
+            throw new Error(`${detail.detail}`)
+        });
 };

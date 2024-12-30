@@ -51,7 +51,8 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        throw new Error(`${error.response?.status}`)
+        const detail: {detail: string} = error.response?.data as {detail: string};
+        throw new Error(`${detail.detail}`)
     });
 };
 
@@ -67,7 +68,8 @@ export const updateAccount = (token: string, id: number, account: AccountIn): Pr
         return response.data; // Devuelve los datos de la respuesta
     })
     .catch((error: AxiosError) => {
-        throw new Error(`${error.response?.status}`)
+        const detail: {detail: string} = error.response?.data as {detail: string};
+        throw new Error(`${detail.detail}`)
     });
 };
 
@@ -78,6 +80,7 @@ export const deleteAccount = (token: string, id?: number): Promise<string> => {
         return response.statusText; // Devuelve el texto del estado de la respuesta
     })
     .catch((error: AxiosError) => {
-        throw new Error(`${error.response?.status}`)
+        const detail: {detail: string} = error.response?.data as {detail: string};
+        throw new Error(`${detail.detail}`)
     });
 };

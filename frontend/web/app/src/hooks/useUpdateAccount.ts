@@ -10,11 +10,11 @@ export const useUpdateAccount = (queryClient: QueryClient) => {
     mutationFn: ({ token, id, account }) => updateAccount(token, id, account),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['account', 'all'] }); // Invalida las consultas relacionadas con las cuentas
-      toast({ title: "Success", description: "Account updated successfully", className: "bg-green-200" });
+      toast({ title: "Success", description: "Account updated successfully", className: "bg-green-200 border-t-4 border-t-green-600" });
       return data; // Devuelve los datos de la cuenta actualizada
     },
-    onError: () => {
-      toast({ title: "Error", description: "Error updating account", className: "bg-red-200" });
+    onError: (error) => {
+      toast({ title: "Error", description: error.message, className:"bg-red-200 border-t-4 border-t-red-900" });
     }
   });
 

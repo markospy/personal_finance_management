@@ -9,10 +9,10 @@ export const useDeleteAccount = (queryClient: QueryClient) => {
     mutationFn: ({ token, id }) => deleteAccount(token, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['account', 'all'] });
-      toast({ title: "Success", description: "Account deleted successfully", className: "bg-green-200" });
+      toast({ title: "Success", description: "Account deleted successfully", className: "bg-green-200 border-t-4 border-t-green-600" });
     },
-    onError: () => {
-      toast({ title: "Error", description: "Error deleting account", className: "bg-red-200" });
+    onError: (error) => {
+      toast({ title: "Error", description: error.message, className:"bg-red-200 border-t-4 border-t-red-900" });
     }
   });
 
