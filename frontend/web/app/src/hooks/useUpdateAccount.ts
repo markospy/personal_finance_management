@@ -6,7 +6,7 @@ import { AccountIn, AccountOut } from "@/schemas/account"; // Asegúrate de impo
 export const useUpdateAccount = (queryClient: QueryClient) => {
   const { toast } = useToast();
 
-  const mutation = useMutation<AccountOut, Error, { token: string; id?: number; account?: AccountIn }>({
+  const mutation = useMutation<AccountOut, Error, { token: string; id: number; account: AccountIn }>({
     mutationFn: ({ token, id, account }) => updateAccount(token, id, account),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['account', 'all'] }); // Invalida las consultas relacionadas con las cuentas
