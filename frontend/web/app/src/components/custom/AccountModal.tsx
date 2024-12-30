@@ -1,25 +1,28 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useEffect, useState } from "react";
 import { codes } from 'currency-codes-ts';
 import { QueryClient } from "@tanstack/react-query";
 import { Input, SelectCurrency } from "./Inputs";
-import { MutationForm, WrapperForms } from "./WrapperForms";
+import { DataProvider, MutationForm, WrapperForms } from "./WrapperForms";
 import { ButtonShowForm } from "./ShowForm";
 import { Wallet } from "lucide-react";
 import { NewDataProps } from "@/schemas/utils";
-import { AccountIn } from "@/schemas/account";
+import { AccountIn, AccountOut } from "@/schemas/account";
 import { useNewAccount } from "@/hooks/useNewAccount";
 
 
-type action = 'Update' | 'Add';
+export type action = 'Update' | 'Add';
 interface Props {
   queryClient: QueryClient;
   viewHandler: (isLook: boolean) => void;
   action: action;
   mutation: MutationForm;
+  defaulValue?: AccountOut | null;
+  dataProvider: DataProvider
 };
 
 
-const newAccount = async ({token, data}: NewDataProps) => {
+export const newAccount = async ({token, data}: NewDataProps) => {
   const account: {token: string, account: AccountIn} = {
     token: token,
     account : {
@@ -31,28 +34,65 @@ const newAccount = async ({token, data}: NewDataProps) => {
   return account;
 }
 
+export const updateAccount = async ({token, data, accountId}: NewDataProps) => {
+  const account: {token: string, id?: number, account: AccountIn} = {
+    token: token,
+    id: accountId,
+    account : {
+      currency: data.get('currency') as string,
+      balance: parseFloat(data.get('balance') as string),
+      name: data.get('name') as string
+    }
+  }
+  return account;
+}
 
-export function AccountForm({ queryClient, viewHandler, action, mutation }: Props) {
+
+export function AccountForm({ queryClient, viewHandler, action, mutation, defaulValue, dataProvider }: Props) {
   const currencies = codes();
+  const resetFn = mutation.reset;
 
   useEffect(() => {
     if (mutation.isSuccess) {
       viewHandler(false);
+      resetFn()
     }
-  }, [mutation.isSuccess, viewHandler]);
+
+  }, [mutation.isSuccess, viewHandler, resetFn]);
 
   return (
       <WrapperForms
       title={`${action} Account`}
       mutation={mutation}
-      dataProvider={newAccount}
+      action={action}
+      dataProvider={dataProvider}
       onClick={() => viewHandler(false)}
       queryClient={queryClient}
+      id={defaulValue?.id}
     >
       <>
-        <Input title="Account Name" name="name" type="text" placeholder="Account name" required={true} />
-        <SelectCurrency title="Currency" name="currency" options={currencies} placeholder="Account currency" />
-        <Input title="Balance" name="balance" type="number" placeholder="Account amount" required={true} />
+        <Input
+          title="Account Name"
+          name="name"
+          type="text"
+          placeholder={action==='Add' ? "Account name" : `${defaulValue?.name}`}
+          defaultValue={defaulValue?.name && `${defaulValue?.name}`}
+          required={true}
+        />
+        <SelectCurrency
+          title="Currency"
+          name="currency"
+          options={currencies}
+          placeholder={defaulValue?.currency ? defaulValue?.currency : "Currency"}
+        />
+        <Input
+          title="Balance"
+          name="balance"
+          type="number"
+          placeholder={action==='Add' ? "Account amount": `${defaulValue?.balance}`}
+          defaultValue={defaulValue?.balance && `${defaulValue?.balance}`}
+          required={true}
+        />
       </>
     </ WrapperForms>
   )
@@ -68,7 +108,12 @@ export function AccountAdd({ queryClient }: { queryClient: QueryClient }) {
         <Wallet />
       </ButtonShowForm>
 
-      {isOpen && <AccountForm queryClient={queryClient} viewHandler={setIsOpen} action="Add" mutation={addAccountMutation}/>}
+      {isOpen && <AccountForm
+        queryClient={queryClient}
+        viewHandler={setIsOpen}
+        action="Add" mutation={addAccountMutation}
+        dataProvider={newAccount}
+      />}
     </div>
   );
 }
