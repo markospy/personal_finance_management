@@ -40,9 +40,11 @@ const newTransaction = async ({queryClient, token, data}: NewDataProps) => {
 
   let categoryId: number = 0;
   let accountId: number = 0;
-
+  console.log('HOla')
   if(queryClient){
     const categories: CategoryOut[] | ErrorResponse = await queryClient.ensureQueryData(GetCategories(token));
+    console.log(categories)
+    console.log(isCategory(categories))
     if (isCategory(categories)) {
       const category = categories.find((category: CategoryOut) => category.name === categoryForm);
       categoryId = category ? category.id : 0;

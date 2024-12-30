@@ -34,10 +34,10 @@ export const newAccount = async ({token, data}: NewDataProps) => {
   return account;
 }
 
-export const updateAccount = async ({token, data, accountId}: NewDataProps) => {
+export const updateAccount = async ({token, data, id}: NewDataProps) => {
   const account: {token: string, id?: number, account: AccountIn} = {
     token: token,
-    id: accountId,
+    id: id,
     account : {
       currency: data.get('currency') as string,
       balance: parseFloat(data.get('balance') as string),

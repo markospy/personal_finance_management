@@ -35,7 +35,7 @@ interface Props {
   id?: number;
 }
 
-export function WrapperForms({title, mutation, action, dataProvider, children, onClick, id}:Props ) {
+export function WrapperForms({title, mutation, action, dataProvider, children, onClick, queryClient, id}:Props ) {
   return (
     <div className="top-0 left-0 z-50 fixed flex justify-center items-center bg-blue-50 w-full min-h-screen animate-fade-in">
       <Card className="bg-white shadow-lg p-2 rounded-lg min-w-[360px] max-h-fit animate-slide-in-bottom">
@@ -48,7 +48,7 @@ export function WrapperForms({title, mutation, action, dataProvider, children, o
               const token = getToken();
               const data = new FormData(e.currentTarget);
               console.log(data);
-              const mutationData = await dataProvider({token, data, id});
+              const mutationData = await dataProvider({queryClient, token, data, id});
               console.log(mutationData);
 
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
