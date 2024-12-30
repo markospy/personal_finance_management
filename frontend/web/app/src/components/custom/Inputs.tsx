@@ -13,20 +13,22 @@ interface InputProps {
   name: string;
   type: string;
   required: boolean;
-  placeholder: string
+  placeholder?: string;
+  defaultValue?: string | number;
 }
 
-export function Input({title, name, type, required, placeholder}: InputProps) {
+export function Input({title, name, type, required, placeholder, defaultValue}: InputProps) {
   return (
     <div className="mb-2">
       <label className="block text-gray-700">{title}</label>
       <input
         name={name}
         type={type}
-        className="w-full px-3 py-2 border rounded"
+        className="px-3 py-2 border rounded w-full"
         required={required}
         min={0}
         placeholder={placeholder}
+        defaultValue={defaultValue}
       />
     </div>
   )
@@ -46,7 +48,7 @@ export function SelectScrollable({title, name, options, placeholder}: SelectScro
   return (
     <Select name={name}>
       <label className="block text-gray-700">{title}</label>
-      <SelectTrigger className="w-full mb-2 h-10">
+      <SelectTrigger className="mb-2 w-full h-10">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
@@ -72,22 +74,31 @@ interface SelectCurrencyProps {
   title: string;
   name: string;
   options: CurrencyCode[]; // Cambiar a un array de CurrencyCode
-  placeholder: string;
+  placeholder?: string;
 }
 
 export function SelectCurrency({ title, name, options, placeholder }: SelectCurrencyProps) {
   return (
-    <Select name={name}>
+    <Select
+      name={name}
+      defaultValue={placeholder !== 'Currency' && typeof placeholder !== 'undefined' && !Object.is(placeholder, null) ? placeholder : undefined}
+    >
       <label className="block text-gray-700">{title}</label>
-      <SelectTrigger className="w-full mb-2 h-10">
-        <SelectValue placeholder={placeholder} />
+      <SelectTrigger className="mb-2 w-full h-10">
+        <SelectValue
+        placeholder={placeholder === 'Currency' && placeholder}
+
+      />
       </SelectTrigger>
       <SelectContent>
         {options && options.length > 0 && (
           <SelectGroup>
             <SelectLabel>{title.toUpperCase()}</SelectLabel>
             {options.map((currency) => (
-              <SelectItem key={currency} value={currency}>
+              <SelectItem
+                key={currency}
+                value={currency}
+              >
                 {currency} {/* Mostrar el código de la moneda */}
               </SelectItem>
             ))}
@@ -105,7 +116,7 @@ export function InputTextTarea({title, name}:{title:string, name: string}) {
       <textarea
         name={name}
         placeholder="Add a comment"
-        className="w-full p-2 border rounded"
+        className="p-2 border rounded w-full"
       ></textarea>
     </div>
   );
@@ -125,7 +136,7 @@ export function InputDate({title, name}:{title:string, name: string}) {
       <input
         type="datetime-local"
         name={name}
-        className="w-full p-2 border rounded"
+        className="p-2 border rounded w-full"
         defaultValue={`${yyyy}-${mm}-${dd} ${HH}:${MM}`}
       />
     </div>
