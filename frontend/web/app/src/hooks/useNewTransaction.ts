@@ -13,7 +13,7 @@ export const useNewTransaction = (queryClient: QueryClient) => {
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
       const dateKey = {"month": month, "year": year};
-      queryClient.invalidateQueries({ queryKey: ['account', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ["transaction"] });
       queryClient.invalidateQueries({ queryKey: ['monthlySumary', dateKey] });
       queryClient.invalidateQueries({ queryKey: ['monthlyIncomes', dateKey] });
       queryClient.invalidateQueries({ queryKey: ['monthlyExpenses', dateKey] });
