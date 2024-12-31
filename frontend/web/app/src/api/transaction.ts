@@ -85,7 +85,7 @@ export const getTransactionsByAccount = (token: string, accountId: number): Prom
   });
 };
 
-export const updateTransaction = (token: string, id: number, transaction: TransactionUpdate): Promise<TransactionOut | ErrorResponse> => {
+export const updateTransaction = (token: string, id: number, transaction: TransactionUpdate): Promise<TransactionOut> => {
   return axi.put('/transactions/' + id, {
     "category_id": transaction.category_id,
     "account_id": transaction.account_id,
@@ -103,7 +103,7 @@ export const updateTransaction = (token: string, id: number, transaction: Transa
   });
 };
 
-export const deleteTransaction = (token: string, id: number): Promise<TransactionOut | ErrorResponse> => {
+export const deleteTransaction = (token: string, id: number): Promise<TransactionOut> => {
   return axi.delete('/transactions/' + id,
     { headers: { 'Authorization': `Bearer ${token}` } })
   .then(response => {
