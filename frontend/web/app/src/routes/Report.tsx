@@ -13,7 +13,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { isAccount, isCategory, isMonthlyExpenses, isMonthlyIncomes, isMonthlySummary } from "@/utils/guards";
 import AccountsSummary from "@/components/custom/AccountsSummary";
 import { RecentTransactions } from "../components/custom/Transactions";
-import { getToken } from "@/utils/token";
+import { deleteToken, getToken } from "@/utils/token";
 
 interface LoaderData {
   summary: MonthlySumary | ErrorResponse;
@@ -50,6 +50,7 @@ export const loader = (queryClient: QueryClient) => async ({ request }: ActionFu
   // Verificar si el token existe y no ha expirado
   if (token) {
     if (isTokenExpired(token)) {
+      deleteToken();
       return redirect('/login');
     }
   } else {
@@ -122,7 +123,7 @@ export function ReportMain({queryClient}:{queryClient:QueryClient}) {
   }
 
   return (
-    <main className="flex flex-col flex-1 gap-2 pl-4 bg-blue-50">
+    <main className="flex flex-col flex-1 gap-2 bg-blue-50 pl-4">
       <AccountsSummary data={accountCategories} queryClient={queryClient}/>
       <TransactionsSummary
        data={sumaryData}
