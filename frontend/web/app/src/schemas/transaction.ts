@@ -14,13 +14,7 @@ const TransactionOut = TransactionIn.extend({
     date: z.date(),
 });
 
-const TransactionUpdate = z.object({
-    category_id: z.number().int().optional(),
-    account_id: z.number().int().optional(),
-    amount: z.number().positive('It must be a number greater than zero').optional(),
-    date: z.date().default(() => new Date()).optional(),
-    comments: z.string().max(250).optional(),
-});
+const TransactionUpdate = TransactionIn.partial();
 
 export type TransactionIn = z.infer<typeof TransactionIn>
 export type TransactionOut = z.infer<typeof TransactionOut>
