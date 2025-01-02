@@ -3,7 +3,7 @@ import { ErrorResponse  } from "@/schemas/error";
 import { AxiosError } from 'axios';
 import { axi } from "./axiosConfig";
 
-
+// Create an user.
 export const createUser = (user: UserIn): Promise<UserOut | ErrorResponse > => {
   return axi.post('/user', user)
     .then(response => response.data) // Devuelve los datos de la respuesta
@@ -19,7 +19,7 @@ export const createUser = (user: UserIn): Promise<UserOut | ErrorResponse > => {
     });
 };
 
-
+// Get an user.
 export const getUser  = (token: string): Promise<UserOut | ErrorResponse> => {
   return axi.get('/user/me', { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => response.data) // Devuelve los datos de la respuesta
@@ -36,6 +36,7 @@ export const getUser  = (token: string): Promise<UserOut | ErrorResponse> => {
     });
 };
 
+// Eliminate an user.
 export const deleteUser  = (token: string): Promise<string> => {
   return axi.delete('/user', { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
