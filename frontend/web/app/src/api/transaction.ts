@@ -3,7 +3,7 @@ import { ErrorResponse  } from "@/schemas/error";
 import { AxiosError } from 'axios';
 import { axi } from "./axiosConfig";
 
-interface MetaTransactions {
+interface PaginedTransactions {
   "totalTransactions": number,
   "totalPages": number,
   "pageCurrent": number,
@@ -11,8 +11,7 @@ interface MetaTransactions {
   "transactions": TransactionOut[],
 }
 
-
-
+// Create a new transaction.
 export const createTransaction = (token: string, transaction: TransactionIn): Promise<TransactionOut> => {
   return axi.post('/transactions/', {
     "category_id": transaction.category_id,
@@ -23,7 +22,7 @@ export const createTransaction = (token: string, transaction: TransactionIn): Pr
   }, { headers: { 'Authorization': `Bearer ${token}` } })
   .then(response => {
     console.log(response.status);
-    return response.data; // Devuelve los datos de la respuesta
+    return response.data;
   })
   .catch((error: AxiosError) => {
     const detail: {detail: string} = error.response?.data as {detail: string};
@@ -31,17 +30,19 @@ export const createTransaction = (token: string, transaction: TransactionIn): Pr
   });
 };
 
+
+// Get a transaction.
 export const getTransaction = (token: string, id: number): Promise<TransactionOut | ErrorResponse> => {
-  return axi.get('/transactions/' + id, { headers: { 'Authorization': `Bearer ${token}` } })
+  return axi.get(`/transactions/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
   .then(response => {
     console.log(response.status);
-    return response.data; // Devuelve los datos de la respuesta
+    return response.data;
   })
   .catch((error: AxiosError) => {
-    const status = error.response?.status || 500; // Valor por defecto
+    const status = error.response?.status || 500;
     const msg = error.message;
 
-    // Retornar un objeto de error
+
     return {
       status,
       msg
@@ -49,17 +50,18 @@ export const getTransaction = (token: string, id: number): Promise<TransactionOu
   });
 };
 
-export const getTransactions = (token:string, page:number=0, sizePage:number=10): Promise<MetaTransactions> => {
+// Get all transactions.
+export const getTransactions = (token:string, page:number=0, sizePage:number=10): Promise<PaginedTransactions> => {
   return axi.get(`/transactions?page=${page}&size_page=${sizePage}`, { headers: { 'Authorization': `Bearer ${token}` } })
   .then(response => {
     console.log(response.status);
-    return response.data; // Devuelve los datos de la respuesta
+    return response.data;
   })
   .catch((error: AxiosError) => {
-    const status = error.response?.status || 500; // Valor por defecto
+    const status = error.response?.status || 500;
     const msg = error.message;
     console.log(msg)
-    // Retornar un objeto de error
+
     return {
       status,
       msg
@@ -67,17 +69,17 @@ export const getTransactions = (token:string, page:number=0, sizePage:number=10)
   });
 };
 
+// Obtains the transactions corresponding to a given account.
 export const getTransactionsByAccount = (token: string, accountId: number): Promise<TransactionOut[] | ErrorResponse> => {
   return axi.get(`/transactions/by-account/${accountId}`, { headers: { 'Authorization': `Bearer ${token}` } })
   .then(response => {
     console.log(response.status);
-    return response.data; // Devuelve los datos de la respuesta
+    return response.data;
   })
   .catch((error: AxiosError) => {
-    const status = error.response?.status || 500; // Valor por defecto
+    const status = error.response?.status || 500;
     const msg = error.message;
 
-    // Retornar un objeto de error
     return {
       status,
       msg
@@ -85,6 +87,7 @@ export const getTransactionsByAccount = (token: string, accountId: number): Prom
   });
 };
 
+// Update a transaction.
 export const updateTransaction = (token: string, id: number, transaction: TransactionUpdate): Promise<TransactionOut> => {
   return axi.put('/transactions/' + id, {
     "category_id": transaction.category_id,
@@ -95,7 +98,7 @@ export const updateTransaction = (token: string, id: number, transaction: Transa
   }, { headers: { 'Authorization': `Bearer ${token}` } })
   .then(response => {
     console.log(response.status);
-    return response.data; // Devuelve los datos de la respuesta
+    return response.data;
   })
   .catch((error: AxiosError) => {
     const detail: {detail: string} = error.response?.data as {detail: string};
@@ -103,12 +106,13 @@ export const updateTransaction = (token: string, id: number, transaction: Transa
   });
 };
 
+// Eliminates a transaction.
 export const deleteTransaction = (token: string, id: number): Promise<TransactionOut> => {
   return axi.delete('/transactions/' + id,
     { headers: { 'Authorization': `Bearer ${token}` } })
   .then(response => {
     console.log(response.status);
-    return response.data; // Devuelve los datos de la respuesta
+    return response.data;
   })
   .catch((error: AxiosError) => {
     const detail: {detail: string} = error.response?.data as {detail: string};

@@ -22,7 +22,7 @@ export function Layout({queryClient}:{queryClient: QueryClient}) {
     logout()
   }
 
-  const deleteUserMutation = useDeleteUser(queryClient);
+  const deleteUserMutation = useDeleteUser();
 
   return (
     <div className="flex flex-col bg-blue-50 w-full min-h-screen">
