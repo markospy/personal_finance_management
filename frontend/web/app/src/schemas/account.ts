@@ -1,9 +1,14 @@
 import { z } from "zod";
 import { codes } from "currency-codes-ts";
 
-const validCurrencyCodes = codes().map(currency => currency);
+const validCurrencyCodes = codes().map(currency => String(currency));
 
-const CurrencyCodeSchema = z.enum(validCurrencyCodes);
+if (validCurrencyCodes.length === 0) {
+    throw new Error("No se encontraron códigos de moneda válidos.");
+}
+
+// Convertir a un arreglo mutable y asegurar que tiene al menos un elemento
+const CurrencyCodeSchema = z.enum([validCurrencyCodes[0], ...validCurrencyCodes.slice(1)]);
 
 const AccountIn = z.object(
   {
@@ -13,7 +18,6 @@ const AccountIn = z.object(
   }
 )
 
-
 const AccountOut = AccountIn.merge(
   z.object({
     id: z.number().int(),
@@ -21,5 +25,10 @@ const AccountOut = AccountIn.merge(
   })
 )
 
+// Esquema para la actualización de una cuenta (todas las propiedades son opcionales)
+const AccountUpdate = AccountIn.partial();
+
 export type AccountIn = z.infer<typeof AccountIn>
 export type AccountOut = z.infer<typeof AccountOut>
+export type AccountUpdate = z.infer<typeof AccountUpdate>
+

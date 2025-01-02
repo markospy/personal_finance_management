@@ -3,18 +3,17 @@ import { ErrorResponse  } from "@/schemas/error";
 import { AxiosError } from 'axios';
 import { axi } from "./axiosConfig";
 
-
+// Get all accounts.
 export const getAccounts = (token: string): Promise<AccountOut[] | ErrorResponse> => {
     return axi.get("/accounts", { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
         console.log(response.status);
-        return response.data; // Devuelve los datos de la respuesta
+        return response.data;
     })
     .catch((error: AxiosError) => {
-        const status = error.response?.status || 500; // Valor por defecto
+        const status = error.response?.status || 500;
         const msg = error.message;
 
-        // Retornar un objeto de error
         return {
             status,
             msg
@@ -22,17 +21,17 @@ export const getAccounts = (token: string): Promise<AccountOut[] | ErrorResponse
     });
 };
 
+// Get a account
 export const getAccount = (token: string, id: number): Promise<AccountOut | ErrorResponse> => {
-    return axi.get('/accounts/' + id, { headers: { 'Authorization': `Bearer ${token}` } })
+    return axi.get(`/accounts/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
         console.log(response.status);
-        return response.data; // Devuelve los datos de la respuesta
+        return response.data;
     })
     .catch((error: AxiosError) => {
-        const status = error.response?.status || 500; // Valor por defecto
+        const status = error.response?.status || 500;
         const msg = error.message;
 
-        // Retornar un objeto de error
         return {
             status,
             msg
@@ -40,6 +39,7 @@ export const getAccount = (token: string, id: number): Promise<AccountOut | Erro
     });
 };
 
+// Create an account
 export const createAccount = (token: string, account: AccountIn): Promise<AccountOut> => {
     return axi.post('/accounts', {
         "name": account.name,
@@ -48,7 +48,7 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
     }, { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
         console.log(response.status);
-        return response.data; // Devuelve los datos de la respuesta
+        return response.data;
     })
     .catch((error: AxiosError) => {
         const detail: {detail: string} = error.response?.data as {detail: string};
@@ -56,6 +56,7 @@ export const createAccount = (token: string, account: AccountIn): Promise<Accoun
     });
 };
 
+// Update an account
 export const updateAccount = (token: string, id: number, account: AccountIn): Promise<AccountOut> => {
     console.log(id)
     return axi.put(`/accounts/${id}`, {
@@ -65,7 +66,7 @@ export const updateAccount = (token: string, id: number, account: AccountIn): Pr
     }, { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
         console.log(response.status);
-        return response.data; // Devuelve los datos de la respuesta
+        return response.data;
     })
     .catch((error: AxiosError) => {
         const detail: {detail: string} = error.response?.data as {detail: string};
@@ -73,11 +74,12 @@ export const updateAccount = (token: string, id: number, account: AccountIn): Pr
     });
 };
 
+// Eliminate an account
 export const deleteAccount = (token: string, id?: number): Promise<string> => {
     return axi.delete(`/accounts/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
     .then(response => {
         console.log(response.status);
-        return response.statusText; // Devuelve el texto del estado de la respuesta
+        return response.statusText;
     })
     .catch((error: AxiosError) => {
         const detail: {detail: string} = error.response?.data as {detail: string};
