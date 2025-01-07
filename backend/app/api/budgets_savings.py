@@ -37,7 +37,9 @@ def create_budget_saving(
 
     db_budget = db.scalar(
         select(BudgetsSavings).where(
-            BudgetsSavings.category_id == bs.category_id, BudgetsSavings.user_id == current_user.id
+            BudgetsSavings.category_id == bs.category_id,
+            BudgetsSavings.type == bs.type,
+            BudgetsSavings.user_id == current_user.id,
         )
     )
     if db_budget:
