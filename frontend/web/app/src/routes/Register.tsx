@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zodUserIn, UserIn } from "../schemas/user";
 import { createUser } from "../api/user";
@@ -48,13 +48,13 @@ export function CreateUserForm() {
 
   return (
     <div>
-      <div className="max-w-md mx-auto bg-white p-6 mb-2 rounded-lg shadow-md animate-slide-up-fade">
-        <h2 className="text-2xl font-bold mb-4">Create User</h2>
+      <div className="bg-white shadow-md mx-auto mb-2 p-6 rounded-lg max-w-md animate-slide-up-fade">
+        <h2 className="mb-4 font-bold text-2xl">Create User</h2>
         <form onSubmit={handleSubmit(registerAction)}>
           <div className="mb-4">
             <label className="block text-gray-700">Name</label>
             <input {...register("name")}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="border-gray-300 mt-1 p-2 border rounded w-full"
               placeholder="Enter your name"
               onChange={handleChange}/>
             {errors.name && typeof errors.name.message === 'string' && <p className="text-red-400 text-xs">{errors.name.message}</p>}
@@ -62,7 +62,7 @@ export function CreateUserForm() {
           <div className="mb-4">
             <label className="block text-gray-700">Email</label>
             <input {...register("email")}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="border-gray-300 mt-1 p-2 border rounded w-full"
               placeholder="Enter your email"
               onChange={handleChange}/>
             {errors.email && typeof errors.email.message === 'string' && <p className="text-red-400 text-xs">{errors.email.message}</p>}
@@ -71,16 +71,19 @@ export function CreateUserForm() {
             <label className="block text-gray-700">Password</label>
             <input {...register("password")}
               type="password"
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="border-gray-300 mt-1 p-2 border rounded w-full"
               placeholder="Enter your password"
               onChange={handleChange}/>
             {errors.password && typeof errors.password.message === 'string' && <p className="text-red-400 text-xs">{errors.password.message}</p>}
           </div>
           <input type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded mt-4 border-b-2 border-blue-950  hover:border-blue-700" />
+            className="bg-blue-600 hover:bg-blue-700 my-4 p-2 border-b-2 border-blue-950 hover:border-blue-700 rounded w-full text-white" />
         </form>
+        <div className='w-full text-center'>
+          <Link to="/" className='text-blue-500 underline'>Cancel</Link>
+        </div>
       </div>
-      {correctUser===false && <AlertDestructive msg="User already exists" className="max-w-md mx-auto bg-red-50"/>}
+      {correctUser===false && <AlertDestructive msg="User already exists" className="bg-red-50 mx-auto max-w-md"/>}
     </div>
   );
 }

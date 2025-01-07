@@ -1,5 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { getToken } from '../api/auth';
 import { useAuth } from "../context/AuthProvider";
 import { useState } from 'react';
@@ -52,11 +51,11 @@ export function LoginForm() {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md animate-slide-up-fade">
+    <div className="bg-white shadow-md mx-auto p-6 rounded-lg max-w-md animate-slide-up-fade">
       <div className='flex justify-between'>
-        <h2 className="text-2xl font-bold mb-4">Login</h2>
+        <h2 className="mb-4 font-bold text-2xl">Login</h2>
         {error && 
-        <div className='text-red-500 font-normal'>
+        <div className='font-normal text-red-500'>
           <span>Nombre de usuario </span>
           <br />
           <span>o contraseña incorrecta.</span>
@@ -71,9 +70,12 @@ export function LoginForm() {
           <Label>Password</Label>
           <Input onChange={handleChange} name='password' type='password' placeholder='Enter your password' />
         </div>
-        <Button variant="default" type="submit" className="w-full mt-4">
+        <Button variant="default" type="submit" className="my-4 w-full">
           <LockKeyholeOpen /> LOGIN
         </Button>
+        <div className='w-full text-center'>
+          <Link to="/" className='text-blue-500 underline'>Cancel</Link>
+        </div>
       </form>
     </div>
   );
