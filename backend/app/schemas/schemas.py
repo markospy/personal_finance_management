@@ -154,10 +154,13 @@ class Period(BaseModel):
         return self
 
 
-class BudgetIn(BaseModel):
-    category_id: int
+class BudgetBase(BaseModel):
     amount: float = Field(ge=0)
     period: Period
+
+
+class BudgetIn(BudgetBase):
+    category_id: int
 
 
 class BudgetOut(BudgetIn):
@@ -171,10 +174,8 @@ class BudgetOut(BudgetIn):
     )
 
 
-class BudgetUpdate(BaseModel):
-    category_id: int | None = None
-    amount: float = Field(ge=0, default=None)
-    period: Period | None = None
+class BudgetUpdate(BudgetBase):
+    pass
 
 
 class TransactionIn(BaseModel):

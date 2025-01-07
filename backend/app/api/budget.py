@@ -18,15 +18,17 @@ def create_budget(
     budget: BudgetIn,
     db: Session = Depends(get_db),
 ):
-    category = db.scalar(select(Category).where(Category.id == budget.category_id))
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+    if budget.category_id != 0:
+        category = db.scalar(select(Category).where(Category.id == budget.category_id))
+        if not category:
+            raise HTTPException(status_code=404, detail="Category not found")
 
     db_budget = db.scalar(
         select(Budget).where(Budget.category_id == budget.category_id, Budget.user_id == current_user.id)
     )
     if db_budget:
         raise HTTPException(status_code=409, detail="The budget is already exists")
+
     budget_data = budget.model_dump()
     budget_data["period"]["start_date"] = budget_data["period"]["start_date"].strftime("%Y-%m-%d %H:%M:%S")
     budget_data["period"]["end_date"] = budget_data["period"]["end_date"].strftime("%Y-%m-%d %H:%M:%S")
@@ -90,7 +92,6 @@ def get_one_budget_status(
     # Preparar el estado del presupuesto
     status = {
         "categoryId": budget.category_id,
-        "categoryName": budget.category.name,
         "budgetAmount": budget.amount,
         "spentAmount": total_expenses,
         "isExceeded": total_expenses > budget.amount,
