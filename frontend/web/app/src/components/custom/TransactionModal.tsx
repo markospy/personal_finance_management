@@ -16,7 +16,7 @@ import { useNewTransaction } from "@/hooks/useNewTransaction";
 import { NewDataProps } from "@/schemas/utils";
 
 
-interface TransactionModalProps {
+interface Props {
   data: AccountsCategories;
   queryClient: QueryClient
 }
@@ -74,7 +74,7 @@ const newTransaction = async ({queryClient, token, data}: NewDataProps) => {
   return transaction;
 };
 
-export function TransactionModal({ data, queryClient }: TransactionModalProps) {
+export function TransactionModal({ data, queryClient }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const mutation = useNewTransaction(queryClient);
 

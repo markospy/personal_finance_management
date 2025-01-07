@@ -25,6 +25,7 @@ export default function AccountsSummary({ data, queryClient }:Props ) {
 
   const currencies: Currency[] = [];
 
+  // Se rellena el array currencies con objetos tipo Currency(moneda y total en las cuentas del usuario)
   if (data.accounts) {
     data.accounts.forEach((account) => {
       const currency = currencies.find(item => account.currency === item.currency);

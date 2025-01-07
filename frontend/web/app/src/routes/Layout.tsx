@@ -28,7 +28,7 @@ export function Layout({queryClient}:{queryClient: QueryClient}) {
     <div className="flex flex-col bg-blue-50 w-full min-h-screen">
       <header className="bg-blue-600 shadow-md p-4 w-full text-white">
         <div className="flex justify-between items-center mx-auto container">
-          <h1 className="font-bold text-xl md:text-2xl">Personal Finance Management</h1>
+          <h1 className="font-bold text-xl md:text-2xl">FinanzApp</h1>
           <nav>
             <ul className="flex space-x-16">
               { isAuthenticated ? (

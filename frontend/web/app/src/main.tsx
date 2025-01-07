@@ -15,6 +15,7 @@ import { ReportMain, loader as loaderSumary } from './routes/Report'
 import { ProtectedRoutes } from './utils/ProtectedRoutes'
 import { AuthProvider } from './context/AuthProvider'
 import UserAccounts, {loader as loaderAccounts} from './routes/UserAccounts'
+import LandingPage from './routes/LandingPage'
 
 const queryClient = new QueryClient()
 
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
     children:[{
       errorElement: <ErrorPage />,
       children: [
+        {
+          index:true,
+          element: <LandingPage />,
+        },
         {
           path: "/login",
           element: <LoginForm />,
