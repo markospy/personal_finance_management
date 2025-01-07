@@ -8,7 +8,7 @@ from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.orm import Session
 
 from ..db.dependencie import get_db
-from ..models.models import Account, Budget, Category, Transaction
+from ..models.models import Account, BudgetsSavings, Category, Transaction
 from ..schemas.schemas import (
     Scopes,
     TransactionIn,
@@ -61,45 +61,49 @@ def create_transaction(
         account.balance = balance
 
         # Obtener el presupuesto con id de categoría 0 si existe
-        budget_global = db.scalar(select(Budget).where(Budget.user_id == current_user.id, Budget.category_id == 0))
+        bs_global = db.scalar(
+            select(BudgetsSavings).where(BudgetsSavings.user_id == current_user.id, BudgetsSavings.category_id == 0)
+        )
 
         # Obtener el presupuesto con id de categoría definida si es diferente de 0
-        budget_category = None
+        bs_category = None
         if transaction.category_id != 0:
-            budget_category = db.scalar(
-                select(Budget).where(Budget.user_id == current_user.id, Budget.category_id == transaction.category_id)
+            bs_category = db.scalar(
+                select(BudgetsSavings).where(
+                    BudgetsSavings.user_id == current_user.id, BudgetsSavings.category_id == transaction.category_id
+                )
             )
 
         # Verificar si la transacción está dentro del período del presupuesto global
-        if budget_global:
-            start_date_global = datetime.strptime(budget_global.period["start_date"], "%Y-%m-%d %H:%M:%S.%f%z")
-            end_date_global = datetime.strptime(budget_global.period["end_date"], "%Y-%m-%d %H:%M:%S.%f%z")
+        if bs_global:
+            start_date_global = datetime.strptime(bs_global.period["start_date"], "%Y-%m-%d %H:%M:%S.%f%z")
+            end_date_global = datetime.strptime(bs_global.period["end_date"], "%Y-%m-%d %H:%M:%S.%f%z")
             if start_date_global <= transaction.date <= end_date_global:
                 total_expenses_global = (
                     db.scalar(
                         select(func.sum(Transaction.amount))
                         .join(Account)
                         .where(
-                            Transaction.date >= budget_global.period["start_date"],
-                            Transaction.date <= budget_global.period["end_date"],
+                            Transaction.date >= bs_global.period["start_date"],
+                            Transaction.date <= bs_global.period["end_date"],
                             Account.user_id == current_user.id,
                         )
                     )
                     or 0
                 )
                 new_total_expenses_global = total_expenses_global + transaction.amount
-                if new_total_expenses_global > budget_global.amount and strict:
+                if new_total_expenses_global > bs_global.amount and strict:
                     return JSONResponse(
                         content={
-                            "warning": f"Transacción cancelada. El gasto total global supera el presupuesto proyectado de {budget_global.amount}.",
+                            "warning": f"Transacción cancelada. El gasto total global supera el presupuesto proyectado de {bs_global.amount}.",
                         },
                         status_code=409,
                     )
 
         # Verificar si la transacción está dentro del período del presupuesto de la categoría
-        if budget_category:
-            start_date_category = datetime.strptime(budget_category.period["start_date"], "%Y-%m-%d %H:%M:%S.%f%z")
-            end_date_category = datetime.strptime(budget_category.period["end_date"], "%Y-%m-%d %H:%M:%S.%f%z")
+        if bs_category:
+            start_date_category = datetime.strptime(bs_category.period["start_date"], "%Y-%m-%d %H:%M:%S.%f%z")
+            end_date_category = datetime.strptime(bs_category.period["end_date"], "%Y-%m-%d %H:%M:%S.%f%z")
             if start_date_category <= transaction.date <= end_date_category:
                 total_expenses_category = (
                     db.scalar(
@@ -107,18 +111,18 @@ def create_transaction(
                         .join(Account)
                         .where(
                             Transaction.category_id == transaction.category_id,
-                            Transaction.date >= budget_category.period["start_date"],
-                            Transaction.date <= budget_category.period["end_date"],
+                            Transaction.date >= bs_category.period["start_date"],
+                            Transaction.date <= bs_category.period["end_date"],
                             Account.user_id == current_user.id,
                         )
                     )
                     or 0
                 )
                 new_total_expenses_category = total_expenses_category + transaction.amount
-                if new_total_expenses_category > budget_category.amount and strict:
+                if new_total_expenses_category > bs_category.amount and strict:
                     return JSONResponse(
                         content={
-                            "warning": f"Transacción cancelada. El gasto total para la categoría '{category.name}' supera el presupuesto proyectado de {budget_category.amount}.",
+                            "warning": f"Transacción cancelada. El gasto total para la categoría '{category.name}' supera el presupuesto proyectado de {bs_category.amount}.",
                         },
                         status_code=409,
                     )

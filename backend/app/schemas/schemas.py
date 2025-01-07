@@ -19,9 +19,9 @@ class TransactionType(str, Enum):
     INCOME = "income"
 
 
-class BudgetsSavings:
-    BUDGET = "budgets"
-    SAVINGS = "savings"
+class BudgetsSavingsType(str, Enum):
+    BUDGET = "budget"
+    SAVINGS = "saving"
 
 
 class Frecuency(str, Enum):
@@ -160,7 +160,7 @@ class Period(BaseModel):
 
 
 class BudgetsSavingsBase(BaseModel):
-    type: BudgetsSavings
+    type: BudgetsSavingsType
     amount: float = Field(ge=0)
     period: Period
 
@@ -180,7 +180,7 @@ class BudgetsSavingsOut(BudgetsSavingsIn):
     )
 
 
-class BudgetUpdate(BudgetsSavingsBase):
+class BudgetsSavingsUpdate(BudgetsSavingsBase):
     pass
 
 

@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import JSON, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from ..schemas.schemas import BudgetsSavings, Frecuency, TransactionType
+from ..schemas.schemas import BudgetsSavingsType, Frecuency, TransactionType
 
 
 class Base(DeclarativeBase):
@@ -78,7 +78,7 @@ class BudgetsSavings(Base):
     __tablename__ = "budgets-savings"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    type: Mapped[BudgetsSavings]
+    type: Mapped[BudgetsSavingsType]
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     amount: Mapped[float]
     period: Mapped[dict] = mapped_column(JSON)
