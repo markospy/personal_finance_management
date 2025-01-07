@@ -6,10 +6,17 @@ from sqlalchemy.orm import Session
 
 from ..db.dependencie import get_db
 from ..models.models import Account, Budget, Category, Transaction
-from ..schemas.schemas import BudgetIn, BudgetOut, BudgetUpdate, Scopes, UserOut
+from ..schemas.schemas import (
+    BudgetIn,
+    BudgetOut,
+    BudgetUpdate,
+    Scopes,
+    TransactionType,
+    UserOut,
+)
 from .oauth import get_current_user
 
-router = APIRouter(prefix="/budgets", tags=["budgets"])
+router = APIRouter(prefix="/budgets-savings", tags=["budgets-savings"])
 
 
 @router.post("/", response_model=BudgetOut, status_code=201)
@@ -22,6 +29,8 @@ def create_budget(
         category = db.scalar(select(Category).where(Category.id == budget.category_id))
         if not category:
             raise HTTPException(status_code=404, detail="Category not found")
+        if category.type == TransactionType.INCOME:
+            raise HTTPException(status_code=404, detail="Category could not be an income")
 
     db_budget = db.scalar(
         select(Budget).where(Budget.category_id == budget.category_id, Budget.user_id == current_user.id)
@@ -75,19 +84,34 @@ def get_one_budget_status(
     if not budget:
         raise HTTPException(status_code=404, detail="Budget is not found")
 
-    total_expenses = (
-        db.scalar(
-            select(func.sum(Transaction.amount))
-            .join(Account)
-            .where(
-                Transaction.category_id == budget.category_id,
-                Transaction.date >= budget.period["start_date"],
-                Transaction.date <= budget.period["end_date"],
-                Account.user_id == current_user.id,
+    total_expenses = 0
+    if budget.category_id == 0:
+        total_expenses = (
+            db.scalar(
+                select(func.sum(Transaction.amount))
+                .join(Account)
+                .where(
+                    Transaction.date >= budget.period["start_date"],
+                    Transaction.date <= budget.period["end_date"],
+                    Account.user_id == current_user.id,
+                )
             )
+            or 0
         )
-        or 0
-    )
+    else:
+        total_expenses = (
+            db.scalar(
+                select(func.sum(Transaction.amount))
+                .join(Account)
+                .where(
+                    Transaction.category_id == budget.category_id,
+                    Transaction.date >= budget.period["start_date"],
+                    Transaction.date <= budget.period["end_date"],
+                    Account.user_id == current_user.id,
+                )
+            )
+            or 0
+        )
 
     # Preparar el estado del presupuesto
     status = {

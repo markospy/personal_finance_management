@@ -74,8 +74,8 @@ class Category(Base):
     transaction: Mapped[list["Transaction"]] = relationship(back_populates="category", cascade="all, delete-orphan")
 
 
-class Budget(Base):
-    __tablename__ = "budget"
+class BudgetsSavings(Base):
+    __tablename__ = "budgets-savings"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
