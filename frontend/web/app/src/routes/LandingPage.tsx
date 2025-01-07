@@ -1,15 +1,17 @@
 import { ArrowRight, BarChart2, Lock, PiggyBank, Smartphone } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useNavigate } from 'react-router-dom';
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   return (
     <div className="bg-gradient-to-b from-blue-100 to-white min-h-screen">
       <div className="mx-auto px-4 py-16 container">
         <header className="mb-16 text-center">
           <h1 className="mb-4 font-bold text-4xl text-blue-600">FinanzApp</h1>
           <p className="mb-8 text-gray-600 text-xl">Tu compañero personal para una gestión financiera inteligente</p>
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+          <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => navigate("/register")}>
             Comenzar gratis <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </header>
@@ -66,7 +68,7 @@ export default function LandingPage() {
 
           <section className="text-center">
             <h2 className="mb-8 font-semibold text-3xl">¿Listo para tomar el control de tus finanzas?</h2>
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => navigate("/register")}>
               Crear cuenta gratis <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </section>
