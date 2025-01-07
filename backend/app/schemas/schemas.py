@@ -19,6 +19,11 @@ class TransactionType(str, Enum):
     INCOME = "income"
 
 
+class BudgetsSavings:
+    BUDGET = "budgets"
+    SAVINGS = "savings"
+
+
 class Frecuency(str, Enum):
     WEEKLY = "weekly"
     BIWEEKLY = "biweekly"
@@ -154,16 +159,17 @@ class Period(BaseModel):
         return self
 
 
-class BudgetBase(BaseModel):
+class BudgetsSavingsBase(BaseModel):
+    type: BudgetsSavings
     amount: float = Field(ge=0)
     period: Period
 
 
-class BudgetIn(BudgetBase):
+class BudgetsSavingsIn(BudgetsSavingsBase):
     category_id: int
 
 
-class BudgetOut(BudgetIn):
+class BudgetsSavingsOut(BudgetsSavingsIn):
     id: int
     user_id: int
 
@@ -174,7 +180,7 @@ class BudgetOut(BudgetIn):
     )
 
 
-class BudgetUpdate(BudgetBase):
+class BudgetUpdate(BudgetsSavingsBase):
     pass
 
 

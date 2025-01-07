@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import JSON, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from ..schemas.schemas import Frecuency, TransactionType
+from ..schemas.schemas import BudgetsSavings, Frecuency, TransactionType
 
 
 class Base(DeclarativeBase):
@@ -23,7 +23,7 @@ class User(Base):
     expected_transaction: Mapped[list["ExpectedTransaction"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-    budget: Mapped[list["Budget"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    budget: Mapped[list["BudgetsSavings"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, name={self.name!r}, email={self.email!r})"
@@ -70,7 +70,7 @@ class Category(Base):
     expected_transaction: Mapped[list["ExpectedTransaction"]] = relationship(
         back_populates="category", cascade="all, delete-orphan"
     )
-    budget: Mapped[list["Budget"]] = relationship(back_populates="category", cascade="all, delete-orphan")
+    budget: Mapped[list["BudgetsSavings"]] = relationship(back_populates="category", cascade="all, delete-orphan")
     transaction: Mapped[list["Transaction"]] = relationship(back_populates="category", cascade="all, delete-orphan")
 
 
@@ -78,10 +78,10 @@ class BudgetsSavings(Base):
     __tablename__ = "budgets-savings"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    type: Mapped[BudgetsSavings]
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     amount: Mapped[float]
     period: Mapped[dict] = mapped_column(JSON)
-
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
     user: Mapped["User"] = relationship(back_populates="budget")
     category: Mapped["Category"] = relationship(back_populates="budget")
