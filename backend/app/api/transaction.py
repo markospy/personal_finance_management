@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from math import ceil
 from typing import Annotated
 
@@ -47,10 +47,6 @@ def create_transaction(
     if not transaction.comments:
         transaction.comments = category.name
 
-    # Asegurarse de que transaction.date tenga información de zona horaria
-    if transaction.date.tzinfo is None:
-        transaction.date = transaction.date.replace(tzinfo=timezone.utc)
-
     transaction = Transaction(**transaction.model_dump())
     db.add(transaction)
 
@@ -76,8 +72,8 @@ def create_transaction(
 
         # Verificar si la transacción está dentro del período del presupuesto global
         if bs_global:
-            start_date_global = datetime.strptime(bs_global.period["start_date"], "%Y-%m-%d %H:%M:%S.%f%z")
-            end_date_global = datetime.strptime(bs_global.period["end_date"], "%Y-%m-%d %H:%M:%S.%f%z")
+            start_date_global = datetime.strptime(bs_global.period["start_date"], "%Y-%m-%d %H:%M:%S")
+            end_date_global = datetime.strptime(bs_global.period["end_date"], "%Y-%m-%d %H:%M:%S")
             if start_date_global <= transaction.date <= end_date_global:
                 total_expenses_global = (
                     db.scalar(
@@ -102,8 +98,8 @@ def create_transaction(
 
         # Verificar si la transacción está dentro del período del presupuesto de la categoría
         if bs_category:
-            start_date_category = datetime.strptime(bs_category.period["start_date"], "%Y-%m-%d %H:%M:%S.%f%z")
-            end_date_category = datetime.strptime(bs_category.period["end_date"], "%Y-%m-%d %H:%M:%S.%f%z")
+            start_date_category = datetime.strptime(bs_category.period["start_date"], "%Y-%m-%d %H:%M:%S")
+            end_date_category = datetime.strptime(bs_category.period["end_date"], "%Y-%m-%d %H:%M:%S")
             if start_date_category <= transaction.date <= end_date_category:
                 total_expenses_category = (
                     db.scalar(

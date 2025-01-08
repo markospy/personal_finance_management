@@ -81,44 +81,43 @@ def get_one_budget_saving(
     return bs
 
 
-@router.get("/{budget_id}/status/", response_model=dict)
-def get_one_budget_saving_status(
+@router.get("/{budget_id}/budget_status/", response_model=dict)
+def get_one_budget_status(
     current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
     bs_id: int,
     db: Session = Depends(get_db),
 ):
-    bs = db.scalar(select(BudgetsSavings).where(BudgetsSavings.id == bs_id, BudgetsSavings.user_id == current_user.id))
+    bs = db.scalar(
+        select(BudgetsSavings).where(
+            BudgetsSavings.id == bs_id, BudgetsSavings.type == "budget", BudgetsSavings.user_id == current_user.id
+        )
+    )
     if not bs:
-        raise HTTPException(status_code=404, detail="Budget or Saving is not found")
+        raise HTTPException(status_code=404, detail="Budget is not found")
 
     total_expenses = 0
     if bs.category_id == 0:
-        total_expenses = (
-            db.scalar(
-                select(func.sum(Transaction.amount))
-                .join(Account)
-                .where(
-                    Transaction.date >= bs.period["start_date"],
-                    Transaction.date <= bs.period["end_date"],
-                    Account.user_id == current_user.id,
-                )
-            )
-            or 0
+        query = (
+            select(func.coalesce(func.sum(Transaction.amount), 0))
+            .select_from(Transaction)
+            .join(Category, Transaction.category_id == Category.id)
+            .join(Account, Transaction.account_id == Account.id)
+            .where(Category.type == "EXPENSE", Account.user_id == current_user.id)
         )
+        total_expenses = db.scalar(query)
     else:
-        total_expenses = (
-            db.scalar(
-                select(func.sum(Transaction.amount))
-                .join(Account)
-                .where(
-                    Transaction.category_id == bs.category_id,
-                    Transaction.date >= bs.period["start_date"],
-                    Transaction.date <= bs.period["end_date"],
-                    Account.user_id == current_user.id,
-                )
+        query = (
+            select(func.coalesce(func.sum(Transaction.amount), 0))
+            .select_from(Transaction)
+            .join(Category, Transaction.category_id == Category.id)
+            .join(Account, Transaction.account_id == Account.id)
+            .where(
+                Category.type == "EXPENSE",
+                Account.user_id == current_user.id,
+                Transaction.category_id == bs.category_id,
             )
-            or 0
         )
+        total_expenses = db.scalar(query)
 
     # Preparar el estado del presupuesto
     status = {
@@ -127,6 +126,56 @@ def get_one_budget_saving_status(
         "spentAmount": total_expenses,
         "isExceeded": total_expenses > bs.amount,
         "remainingAmount": bs.amount - total_expenses,
+    }
+
+    return status
+
+
+@router.get("/{saving_id}/saving_status/", response_model=dict)
+def get_one_saving_status(
+    current_user: Annotated[UserOut, Security(get_current_user, scopes=[Scopes.USER.value])],
+    bs_id: int,
+    db: Session = Depends(get_db),
+):
+    bs = db.scalar(
+        select(BudgetsSavings).where(
+            BudgetsSavings.id == bs_id, BudgetsSavings.type == "saving", BudgetsSavings.user_id == current_user.id
+        )
+    )
+    if not bs:
+        raise HTTPException(status_code=404, detail="Saving is not found")
+
+    total_incomes = 0
+    if bs.category_id == 0:
+        query = (
+            select(func.coalesce(func.sum(Transaction.amount), 0))
+            .select_from(Transaction)
+            .join(Category, Transaction.category_id == Category.id)
+            .join(Account, Transaction.account_id == Account.id)
+            .where(Category.type == "INCOME", Account.user_id == current_user.id)
+        )
+        total_incomes = db.scalar(query)
+    else:
+        query = (
+            select(func.coalesce(func.sum(Transaction.amount), 0))
+            .select_from(Transaction)
+            .join(Category, Transaction.category_id == Category.id)
+            .join(Account, Transaction.account_id == Account.id)
+            .where(
+                Category.type == "INCOME",
+                Account.user_id == current_user.id,
+                Transaction.category_id == bs.category_id,
+            )
+        )
+        total_incomes = db.scalar(query)
+
+    # Preparar el estado del presupuesto
+    status = {
+        "categoryId": bs.category_id,
+        "savingAmount": bs.amount,
+        "accumulatedAmount": total_incomes,
+        "isAchieved": total_incomes > bs.amount,
+        "amountMissing": bs.amount - total_incomes,
     }
 
     return status
